@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     infold (0.1.0)
+      hashie (>= 5.0.0)
       rails (>= 7.0.4)
 
 GEM
@@ -83,6 +84,7 @@ GEM
       railties (>= 5.0.0)
     globalid (1.0.0)
       activesupport (>= 5.0)
+    hashie (5.0.0)
     i18n (1.12.0)
       concurrent-ruby (~> 1.0)
     loofah (2.19.0)
