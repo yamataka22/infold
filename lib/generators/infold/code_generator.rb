@@ -10,7 +10,7 @@ module Infold
       target = options['resource']
       @resources = Dir.glob(Rails.root.join('infold/*.yml')).map do |file|
         resource = file.split('/').last.gsub('.yml', '')
-        if target.blank? || target == resource
+        if target.blank? || target.underscore == resource
           invoke 'infold:model',     [ resource ]
           invoke 'infold:decorator', [ resource ]
         end
