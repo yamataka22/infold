@@ -1,3 +1,9 @@
+PATH
+  remote: .
+  specs:
+    infold (0.1.0)
+      rails (>= 7.0.4)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -125,6 +131,7 @@ GEM
       thor (~> 1.0)
       zeitwerk (~> 2.5)
     rake (13.0.6)
+    sqlite3 (1.5.3-x86_64-linux)
     thor (1.2.1)
     timeout (0.3.0)
     tzinfo (2.0.5)
@@ -138,7 +145,8 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  rails
+  infold!
+  sqlite3
 
 BUNDLED WITH
    2.3.24

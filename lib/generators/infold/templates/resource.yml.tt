@@ -1,0 +1,30 @@
+<%# encoding: utf-8 -%>
+resource:
+  <%= @name %>:
+    model:
+      validates:
+      decorates:
+      associations:
+      enum:
+      active_storage:
+    app:
+      title: <%= @name.camelize %>
+      index:
+        conditions:
+          - id: eq
+          - title: like
+        list:
+          fields:
+          default_order:
+        csv:
+      show:
+        fields:
+      form:
+        fields:
+      reference_search:
+        conditions:
+          - id: eq
+          - title: like
+        list:
+          fields:
+          default_order:
