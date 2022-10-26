@@ -12,7 +12,6 @@ resource:
       index:
         conditions:
           - id: eq
-          - title: like
         list:
           fields:
           default_order:
@@ -24,7 +23,6 @@ resource:
       reference_search:
         conditions:
           - id: eq
-          - title: like
         list:
           fields:
           default_order:
