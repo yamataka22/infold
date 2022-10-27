@@ -1,27 +1,26 @@
 <%# encoding: utf-8 -%>
-<%= @name %>:
-  model:
-    validates:
-    decorates:
-    associations:
-    enum:
-    active_storage:
-  app:
-    title: <%= @name.camelize %>
-    index:
-      conditions:
-        - id: eq
-      list:
-        fields:
-        default_order:
-      csv:
-    show:
+model:
+  validates:
+  decorates:
+  associations:
+  enum:
+  active_storage:
+app:
+  title: <%= @name.camelize %>
+  index:
+    conditions:
+      - id: eq
+    list:
       fields:
-    form:
+      default_order:
+    csv:
+  show:
+    fields:
+  form:
+    fields:
+  reference_search:
+    conditions:
+      - id: eq
+    list:
       fields:
-    reference_search:
-      conditions:
-        - id: eq
-      list:
-        fields:
-        default_order:
+      default_order:
