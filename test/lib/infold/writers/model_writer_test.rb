@@ -8,7 +8,8 @@ module Infold
   class ModelWriterTest < ::ActiveSupport::TestCase
 
     setup do
-      @db_schema = DbSchema.new
+      db_schema_content = File.read(Rails.root.join('db/schema.rb'))
+      @db_schema = DbSchema.new(db_schema_content)
     end
 
     test "In association_code, if setting.associations is not defined, it will be nil" do
@@ -32,8 +33,7 @@ module Infold
       setting = Hashie::Mash.new
       setting.model = { associations: { has_many: ['children'], has_one: ['child'], belongs_to: ['parent'] } }
       resource_config = ResourceConfig.new('product', setting)
-      db_schema = DbSchema.new
-      writer = ModelWriter.new(resource_config, db_schema)
+      writer = ModelWriter.new(resource_config, @db_schema)
       code = writer.association_code
       assert_includes(code, "has_many :children")
       assert_includes(code, "has_one :child")
@@ -51,8 +51,7 @@ module Infold
         }
       }
       resource_config = ResourceConfig.new('product', setting)
-      db_schema = DbSchema.new
-      writer = ModelWriter.new(resource_config, db_schema)
+      writer = ModelWriter.new(resource_config, @db_schema)
       code = writer.association_code
       assert_includes(code, "has_many :one_details, class_name: 'OneDetail', dependent: 'destroy'")
       assert_includes(code, "has_many :two_details, class_name: 'TwoDetail', dependent: 'destroy'")
@@ -63,12 +62,31 @@ module Infold
       setting.model = { associations: { has_many: %w(one_details two_details) } }
       setting.app = { form: { fields: [ { one_details: %w(id name) } ] } }
       resource_config = ResourceConfig.new('product', setting)
-      db_schema = DbSchema.new
-      writer = ModelWriter.new(resource_config, db_schema)
+      writer = ModelWriter.new(resource_config, @db_schema)
       code = writer.association_code
       assert_includes(code, "has_many :one_details")
       assert_includes(code, "accepts_nested_attributes_for :one_details")
       refute_includes(code, "accepts_nested_attributes_for :two_details")
     end
+    
+    test "datetime_field_code should generate except timestamp filed" do
+      db_schema_content =  <<-"SCHEMA"
+        create_table "products" do |t|
+          t.string "name"
+          t.datetime "delivery_at", null: false
+          t.datetime "created_at", null: false
+          t.datetime "updated_at", null: false
+        end
+      SCHEMA
+      db_schema = DbSchema.new(db_schema_content)
+      setting = Hashie::Mash.new
+      resource_config = ResourceConfig.new('product', setting)
+      writer = ModelWriter.new(resource_config, db_schema)
+      code = writer.datetime_field_code
+      assert_includes(code, "datetime_field :delivery_at")
+      refute_includes(code, "datetime_field :created_at")
+      refute_includes(code, "datetime_field :updated_at")
+    end
+       
   end
 end

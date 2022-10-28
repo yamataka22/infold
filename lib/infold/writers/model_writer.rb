@@ -33,16 +33,16 @@ module Infold
       inset_indent(code, 2).presence
     end
 
-    def validation_code
-
-    end
-
     def datetime_field_code
       code = ''
       self_table.datetime_columns.each do |column|
         code += "datetime_field :#{column}\n"
       end
       inset_indent(code, 2).presence
+    end
+
+    def validation_code
+
     end
 
     def active_storage_attachment_code

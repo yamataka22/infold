@@ -2,11 +2,9 @@ module Infold
   class DbSchema
     attr_reader :tables
 
-    def initialize
+    def initialize(content)
       @tables = []
-      contents = nil
-      File.open(Rails.root.join('db/schema.rb'), "r") { |file| contents = file.read.to_s }
-      contents&.split("\n").each.each do |row|
+      content.split("\n").each.each do |row|
         row = row.strip
         if row.start_with?('create_table')
           table_name = row.split('"').second.strip
