@@ -13,15 +13,11 @@ module Infold
 
     def association_code
       code = ''
-      @resource_config.setting.model&.associations&.each do |association_kind, associations|
-        associations&.each do |name, options|
-          code += "#{association_kind} :#{name}"
-          if options.present?
-            options = options.map { |key, value| "#{key}: '#{value}'" }.join(', ')
-            code += ", #{options}"
-          end
-          code += "\n"
-        end
+      @resource_config.model_associations&.each do |model_association|
+        code += "#{model_association[:kind]} :#{model_association[:name]}"
+        options = model_association[:options]&.map { |key, value| "#{key}: '#{value}'" }
+        code += ", #{options.join(', ')}" if options.present?
+        code += "\n"
       end
       if @resource_config.form_associations.present?
         code += "\n"
@@ -41,11 +37,14 @@ module Infold
       inset_indent(code, 2).presence
     end
 
-    def validation_code
-
+    def active_storage_attachment_code
+      code = ''
+      @resource_config.setting.model&.active_storage&.each do |field, options|
+        code += "has_one_attached :#{field}"
+      end
     end
 
-    def active_storage_attachment_code
+    def validation_code
 
     end
 
