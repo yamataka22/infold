@@ -1,7 +1,15 @@
-require 'infold/writer/base_writer'
+require 'infold/writers/base_writer'
 
 module Infold
   class ModelWriter < BaseWriter
+
+    def self_table
+      db_schema.table(@resource_config.resource_name)
+    end
+
+    def model_name
+      self_table.model_name
+    end
 
     def association_code
       code = ''
@@ -18,7 +26,6 @@ module Infold
       if @resource_config.form_associations.present?
         code += "\n"
         @resource_config.form_associations.each do |form_association|
-          puts form_association
           code += "accepts_nested_attributes_for :#{form_association}, reject_if: :all_blank, allow_destroy: true\n"
         end
       end
@@ -31,7 +38,11 @@ module Infold
     end
 
     def datetime_field_code
-
+      code = ''
+      self_table.datetime_columns.each do |column|
+        code += "datetime_field :#{column}\n"
+      end
+      inset_indent(code, 2).presence
     end
 
     def active_storage_attachment_code

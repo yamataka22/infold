@@ -1,9 +1,10 @@
 <%# encoding: utf-8 -%>
 module Admin
-  class <%= @writer.table.model_name %> < ::<%= @writer.table.model_name %>
-  <%- if @writer.table.has_datetime_column? -%>
+  class <%= @writer.model_name %> < ::<%= @writer.model_name %>
+  <%- if @writer.self_table.datetime_columns.present? -%>
     include DatetimeFieldConcern
 
+    <%= @writer.datetime_field_code %>
   <%- end -%>
     <%= @writer.association_code %>
     <%= @writer.validation_code %>

@@ -1,15 +1,15 @@
-require 'infold/resource_config'
-require 'infold/db_schema'
-require 'infold/table'
+# require 'infold/resource_config'
+# require 'infold/db_schema'
 
 module Infold
   class BaseWriter
 
-    attr_reader :table
+    attr_reader :resource_config,
+                :db_schema
 
-    def initialize(resource_name)
-      @resource_config = ResourceConfig.new(resource_name)
-      @table = DbSchema.read_schema(resource_name)
+    def initialize(resource_config, db_schema)
+      @resource_config = resource_config
+      @db_schema = db_schema
     end
 
     def inset_indent(code, size, first_row: false)
