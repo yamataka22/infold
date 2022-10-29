@@ -146,5 +146,16 @@ module Infold
       code = writer.validation_code
       assert_includes(code.gsub(/^\s+/, ''), "validates :price, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }")
     end
+
+    test "enum_code should generate enum" do
+      setting = Hashie::Mash.new
+      setting.model = { enum: { status: { ordered: 1, charged: 2 },
+                                category: { kitchen: { value: 1, color: 'red' }, living: { value: 2, color: 'blue' } } } }
+      resource_config = ResourceConfig.new('product', setting)
+      writer = ModelWriter.new(resource_config, @db_schema)
+      code = writer.enum_code
+      assert_includes(code.gsub(/^\s+/, ''), "enum status: { ordered: 1, charged: 2 }, _prefix: true")
+      assert_includes(code.gsub(/^\s+/, ''), "enum category: { kitchen: 1, living: 2 }, _prefix: true")
+    end
   end
 end

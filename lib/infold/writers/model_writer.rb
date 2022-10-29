@@ -75,8 +75,24 @@ module Infold
       inset_indent(code, 2).presence
     end
 
-    def enum_code
+    def datetime_validation_code
+      code = []
+      self_table.datetime_columns&.each do |column|
+        code << "validates :#{column}_date, presence: true, if: -> { #{column}_time.present? }"
+        code << "validates :#{column}_time, presence: true, if: -> { #{column}_date.present? }"
+      end
+      code << "\n" if code.present?
+      inset_indent(code.join("\n"), 2).presence
+    end
 
+    def enum_code
+      code = []
+      @resource_config.enum&.each do |enum|
+        elements = enum.elements.map { |element| "#{element.key}: #{element.value}" }
+        code << "enum #{enum.field}: { #{elements.join(', ')} }, _prefix: true"
+      end
+      code << "\n" if code.present?
+      inset_indent(code.join("\n"), 2).presence
     end
 
     def delegate_code

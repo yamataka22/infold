@@ -6,8 +6,10 @@ module Admin
 
     <%= @writer.datetime_field_code&.gsub('[TAB]', '  ') %>
   <%- end -%>
-    <%= @writer.association_code&.gsub('[TAB]', '  ') %>
-    <%= @writer.active_storage_attachment_code&.gsub('[TAB]', '  ') %>
-    <%= @writer.validation_code&.gsub('[TAB]', '  ') %>
+    <%= @writer.association_code&.gsub('[TAB]', '  ') -%>
+    <%= @writer.active_storage_attachment_code&.gsub('[TAB]', '  ') -%>
+    <%= @writer.validation_code&.gsub('[TAB]', '  ') -%>
+    <%= @writer.datetime_validation_code -%>
+    <%= @writer.enum_code -%>
   end
 end

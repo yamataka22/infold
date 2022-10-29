@@ -67,6 +67,27 @@ module Infold
       end
     end
 
+    Enum = Struct.new( :field, :elements )
+    EnumElement = Struct.new( :key, :value, :color )
+    def enum
+      model&.enum&.map do |field, elements|
+        enum = Enum.new
+        enum.field = field
+        enum.elements = elements.map do |key, options|
+          element = EnumElement.new
+          element.key = key
+          if options.is_a?(Hashie::Mash)
+            element.value = options.value
+            element.color = options.color
+          else
+            element.value = options
+          end
+          element
+        end
+        enum
+      end
+    end
+
     private
 
       # Mashの直下のキー郡または配列を返す

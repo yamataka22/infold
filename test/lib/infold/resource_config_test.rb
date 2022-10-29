@@ -77,5 +77,49 @@ module Infold
       assert_equal(validates[2].conditions[1].to_h, { condition: 'range', options: { 'floor' => 0, 'ceil' => 100 } })
     end
 
+    test "enum should be return Enum (has no color)" do
+      setting = Hashie::Mash.new
+      setting.model = { enum: { status: {
+        ordered: 1,
+        charged: 2,
+        delivered: 3
+      } } }
+      resource_config = ResourceConfig.new('product', setting)
+      enum = resource_config.enum
+      assert_equal(enum.size, 1)
+      assert_equal(enum[0].field, 'status')
+      assert_equal(enum[0].elements.size, 3)
+      assert_equal(enum[0].elements[0].key, 'ordered')
+      assert_equal(enum[0].elements[0].value, 1)
+    end
+
+    test "enum should be return Enum (with color)" do
+      setting = Hashie::Mash.new
+      setting.model = { enum: {
+        status: {
+          ordered: { value: 1, color: 'red'  },
+          charged: { value: 2, color: 'blue' }
+        },
+        category: {
+          kitchen: 1,
+          dining: 2
+        }
+      } }
+      resource_config = ResourceConfig.new('product', setting)
+      enum = resource_config.enum
+      assert_equal(enum.size, 2)
+      assert_equal(enum[0].field, 'status')
+      assert_equal(enum[0].elements.size, 2)
+      assert_equal(enum[0].elements[0].key, 'ordered')
+      assert_equal(enum[0].elements[0].value, 1)
+      assert_equal(enum[0].elements[0].color, 'red')
+      assert_equal(enum[0].elements[1].key, 'charged')
+      assert_equal(enum[0].elements[1].value, 2)
+      assert_equal(enum[0].elements[1].color, 'blue')
+      assert_equal(enum[1].field, 'category')
+      assert_equal(enum[1].elements[0].key, 'kitchen')
+      assert_equal(enum[1].elements[0].value, 1)
+      assert_nil(  enum[1].elements[0].color)
+    end
   end
 end
