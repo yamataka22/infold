@@ -59,7 +59,20 @@ module Infold
     end
 
     def validation_code
-
+      code = ''
+      @resource_config.validates&.each do |validate|
+        code += "validates :#{validate.field}, "
+        code += "allow_blank: true, " unless validate.conditions.map(&:condition).include?('presence')
+        code += validate.conditions.map do |condition|
+          if condition.options.blank?
+            "#{condition.condition}: true"
+          else
+            "#{condition.condition}: { #{condition.options.map { |key, value| "#{key}: #{value}" }.join(', ')} }"
+          end
+        end.join(', ')
+        code += "\n"
+      end
+      inset_indent(code, 2).presence
     end
 
     def enum_code

@@ -55,5 +55,27 @@ module Infold
       assert_equal(active_storages[0].thumb.to_h, { kind: 'fill', width: 100, height: 200 })
     end
 
+    test "validates should be return Validate" do
+      setting = Hashie::Mash.new
+      setting.model = { validates: {
+        stock: 'presence',
+        name: %w(presence unique),
+        price: ['presence', { range: { floor: 0, ceil: 100 } }]
+      }}
+      resource_config = ResourceConfig.new('product', setting)
+      validates = resource_config.validates
+      assert_equal(validates.size, 3)
+      assert_equal(validates[0].field, 'stock')
+      assert_equal(validates[0].conditions.size, 1)
+      assert_equal(validates[0].conditions[0].to_h, { condition: 'presence', options: nil })
+      assert_equal(validates[1].field, 'name')
+      assert_equal(validates[1].conditions.size, 2)
+      assert_equal(validates[1].conditions[1].to_h, { condition: 'unique', options: nil })
+      assert_equal(validates[2].field, 'price')
+      assert_equal(validates[2].conditions.size, 2)
+      assert_equal(validates[2].conditions[0].to_h, { condition: 'presence', options: nil })
+      assert_equal(validates[2].conditions[1].to_h, { condition: 'range', options: { 'floor' => 0, 'ceil' => 100 } })
+    end
+
   end
 end

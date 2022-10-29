@@ -117,5 +117,34 @@ module Infold
       CODE
       assert_includes(code.gsub(/^\s+/, ''), expect_code)
     end
+
+    test "validation_code should generate presence validates" do
+      setting = Hashie::Mash.new
+      setting.model = { validates: { stock: 'presence' } }
+      resource_config = ResourceConfig.new('product', setting)
+      writer = ModelWriter.new(resource_config, @db_schema)
+      code = writer.validation_code
+      assert_equal(code.gsub(/^\s+|\n/, ''), "validates :stock, presence: true")
+    end
+
+    test "validation_code should generate multiple validates" do
+      setting = Hashie::Mash.new
+      setting.model = { validates: { stock: 'presence', name: %w(presence uniqueness), price: 'uniqueness' } }
+      resource_config = ResourceConfig.new('product', setting)
+      writer = ModelWriter.new(resource_config, @db_schema)
+      code = writer.validation_code
+      assert_includes(code.gsub(/^\s+/, ''), "validates :stock, presence: true")
+      assert_includes(code.gsub(/^\s+/, ''), "validates :name, presence: true, uniqueness: true")
+      assert_includes(code.gsub(/^\s+/, ''), "validates :price, allow_blank: true, uniqueness: true")
+    end
+
+    test "validation_code should generate validates include options" do
+      setting = Hashie::Mash.new
+      setting.model = { validates: { price: [ 'presence', numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 } ] } }
+      resource_config = ResourceConfig.new('product', setting)
+      writer = ModelWriter.new(resource_config, @db_schema)
+      code = writer.validation_code
+      assert_includes(code.gsub(/^\s+/, ''), "validates :price, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }")
+    end
   end
 end

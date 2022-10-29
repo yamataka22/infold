@@ -44,6 +44,29 @@ module Infold
       end
     end
 
+    Validate = Struct.new( :field, :conditions )
+    ValidateCondition = Struct.new( :condition, :options )
+    def validates
+      model&.validates&.map do |field, conditions|
+        validate = Validate.new
+        validate.field = field
+        if conditions.is_a?(Hashie::Array)
+          validate.conditions = conditions.map do |condition|
+            if condition.is_a?(Hashie::Mash)
+              ValidateCondition.new(condition.keys[0], condition.values[0])
+            else
+              ValidateCondition.new(condition)
+            end
+          end
+        elsif conditions.is_a?(Hashie::Mash)
+          validate.conditions = [ ValidateCondition.new(conditions.keys[0], conditions.values[0]) ]
+        else
+          validate.conditions = [ ValidateCondition.new(conditions) ]
+        end
+        validate
+      end
+    end
+
     private
 
       # Mashの直下のキー郡または配列を返す
