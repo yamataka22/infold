@@ -4,7 +4,7 @@ module Infold
   class ModelWriter < BaseWriter
 
     def self_table
-      db_schema.table(@resource_config.resource_name)
+      db_schema.table(@model_config.resource_name)
     end
 
     def model_name
@@ -13,15 +13,15 @@ module Infold
 
     def association_code
       code = ''
-      @resource_config.model_associations&.each do |model_association|
+      @model_config.model_associations&.each do |model_association|
         code += "#{model_association.kind} :#{model_association.field}"
         options = model_association.options&.map { |key, value| "#{key}: '#{value}'" }
         code += ", #{options.join(', ')}" if options.present?
         code += "\n"
       end
-      if @resource_config.form_associations.present?
+      if @model_config.form_associations.present?
         code += "\n"
-        @resource_config.form_associations.each do |form_association|
+        @model_config.form_associations.each do |form_association|
           code += "accepts_nested_attributes_for :#{form_association.field}, reject_if: :all_blank, allow_destroy: true\n"
         end
       end
@@ -38,7 +38,7 @@ module Infold
 
     def active_storage_attachment_code
       code = ''
-      @resource_config.active_storages&.each do |active_storage|
+      @model_config.active_storages&.each do |active_storage|
         base = "has_one_attached :#{active_storage.field}"
         if active_storage.thumb
           code += <<-CODE.gsub(/^\s+/, '')
@@ -60,7 +60,7 @@ module Infold
 
     def validation_code
       code = ''
-      @resource_config.validates&.each do |validate|
+      @model_config.validates&.each do |validate|
         code += "validates :#{validate.field}, "
         code += "allow_blank: true, " unless validate.conditions.map(&:condition).include?('presence')
         code += validate.conditions.map do |condition|
@@ -87,7 +87,7 @@ module Infold
 
     def enum_code
       code = []
-      @resource_config.enum&.each do |enum|
+      @model_config.enum&.each do |enum|
         elements = enum.elements.map { |element| "#{element.key}: #{element.value}" }
         code << "enum #{enum.field}: { #{elements.join(', ')} }, _prefix: true"
       end
@@ -95,12 +95,57 @@ module Infold
       inset_indent(code.join("\n"), 2).presence
     end
 
-    def delegate_code
-
-    end
-
     def scope_code
-
+      code = ''
+      table = @db_schema.table(@app_config.resource_name)
+      conditions = @app_config.index_conditions.to_a + @app_config.association_search_conditions.to_a
+      conditions.map { |c| { field: c.field, sign: c.sign } }.uniq.each do |condition|
+        field = condition[:field]
+        sign = condition[:sign]
+        column = table.columns.find { |c| c.name == field }
+        where =
+          if column&.type.to_s == 'datetime' && %w(eq full_like lteq).include?(sign)
+            if sign == 'lteq'
+              <<-CODE.gsub(/^\s+/, '')
+                return if v.blank?
+                [TAB]begin
+                [TAB][TAB]v = v.to_date.next_day
+                [TAB]rescue
+                [TAB]end
+                [TAB]where(arel_table[:#{field}].#{sign}(v))
+              CODE
+            else
+              <<-CODE.gsub(/^\s+/, '')
+                return if v.blank?
+                [TAB]begin
+                [TAB][TAB]where(#{field}: v.to_date.all_day)
+                [TAB]rescue
+                [TAB][TAB]where(arel_table[:#{field}].#{sign}(v))
+                [TAB]end
+              CODE
+            end
+          else
+            case sign
+            when 'eq'
+              "where(#{field}: v) if v.present?"
+            when 'full_like'
+              "where(arel_table[:#{field}].matches(" +'"%#{v}%"' + ")) if v.present?"
+            when 'start_with'
+              "where(arel_table[:#{field}].matches(" +'"#{v}%"' + ")) if v.present?"
+            when 'any'
+              "where(#{field}: v) if v.present?"
+            else
+              "where(arel_table[:#{field}].#{sign}(v)) if v.present?"
+            end
+          end
+        code +=  <<-CODE.gsub(/^\s+/, '')
+          scope :#{field}_#{sign}, ->(v) do
+          [TAB]#{where}
+          end
+        CODE
+        code += "\n"
+      end
+      inset_indent(code, 2).presence
     end
 
     private

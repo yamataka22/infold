@@ -11,5 +11,6 @@ module Admin
     <%= @writer.validation_code&.gsub('[TAB]', '  ') -%>
     <%= @writer.datetime_validation_code -%>
     <%= @writer.enum_code -%>
+    <%= @writer.scope_code&.gsub('[TAB]', '  ') -%>
   end
 end

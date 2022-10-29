@@ -1,6 +1,6 @@
 module Infold
   # resource.ymlをhashに展開する役割
-  class ResourceConfig
+  class ModelConfig
     attr_reader :resource_name,
                 :model,
                 :app

@@ -1,14 +1,16 @@
-# require 'infold/resource_config'
+# require 'infold/model_config'
 # require 'infold/db_schema'
 
 module Infold
   class BaseWriter
 
-    attr_reader :resource_config,
+    attr_reader :model_config,
+                :app_config,
                 :db_schema
 
-    def initialize(resource_config, db_schema)
-      @resource_config = resource_config
+    def initialize(model_config, app_config, db_schema)
+      @model_config = model_config
+      @app_config = app_config
       @db_schema = db_schema
     end
 
