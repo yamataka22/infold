@@ -14,18 +14,17 @@ module Infold
     def association_code
       code = ''
       @resource_config.model_associations&.each do |model_association|
-        code += "#{model_association[:kind]} :#{model_association[:name]}"
-        options = model_association[:options]&.map { |key, value| "#{key}: '#{value}'" }
+        code += "#{model_association.kind} :#{model_association.field}"
+        options = model_association.options&.map { |key, value| "#{key}: '#{value}'" }
         code += ", #{options.join(', ')}" if options.present?
         code += "\n"
       end
       if @resource_config.form_associations.present?
         code += "\n"
         @resource_config.form_associations.each do |form_association|
-          code += "accepts_nested_attributes_for :#{form_association}, reject_if: :all_blank, allow_destroy: true\n"
+          code += "accepts_nested_attributes_for :#{form_association.field}, reject_if: :all_blank, allow_destroy: true\n"
         end
       end
-
       inset_indent(code, 2).presence
     end
 
@@ -39,9 +38,24 @@ module Infold
 
     def active_storage_attachment_code
       code = ''
-      @resource_config.setting.model&.active_storage&.each do |field, options|
-        code += "has_one_attached :#{field}"
+      @resource_config.active_storages&.each do |active_storage|
+        base = "has_one_attached :#{active_storage.field}"
+        if active_storage.thumb
+          code += <<-CODE.gsub(/^\s+/, '')
+            #{base} do |attachable|
+            [TAB]attachable.variant :thumb, resize_to_#{active_storage.thumb.kind}: [#{active_storage.thumb.width}, #{active_storage.thumb.height}]
+            end
+          CODE
+        else
+          code += "#{base}\n"
+        end
+        code +=  <<-CODE.gsub(/^\s+/, '')
+          attr_accessor :remove_#{active_storage.field}
+          before_validation { self.#{active_storage.field} = nil if remove_#{active_storage.field}.to_s == '1' }
+        CODE
+        code += "\n"
       end
+      inset_indent(code, 2).presence
     end
 
     def validation_code

@@ -4,9 +4,10 @@ module Admin
   <%- if @writer.self_table.datetime_columns.present? -%>
     include DatetimeFieldConcern
 
-    <%= @writer.datetime_field_code %>
+    <%= @writer.datetime_field_code&.gsub('[TAB]', '  ') %>
   <%- end -%>
-    <%= @writer.association_code %>
-    <%= @writer.validation_code %>
+    <%= @writer.association_code&.gsub('[TAB]', '  ') %>
+    <%= @writer.active_storage_attachment_code&.gsub('[TAB]', '  ') %>
+    <%= @writer.validation_code&.gsub('[TAB]', '  ') %>
   end
 end

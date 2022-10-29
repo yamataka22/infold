@@ -70,7 +70,7 @@ module Infold
     end
     
     test "datetime_field_code should generate except timestamp filed" do
-      db_schema_content =  <<-"SCHEMA"
+      db_schema_content = <<-"SCHEMA"
         create_table "products" do |t|
           t.string "name"
           t.datetime "delivery_at", null: false
@@ -87,6 +87,35 @@ module Infold
       refute_includes(code, "datetime_field :created_at")
       refute_includes(code, "datetime_field :updated_at")
     end
-       
+
+    test "active_storage_attachment_code should generate active_storage field" do
+      setting = Hashie::Mash.new
+      setting.model = { active_storage: { image: { kind: 'image' }, pdf: nil } }
+      resource_config = ResourceConfig.new('product', setting)
+      writer = ModelWriter.new(resource_config, @db_schema)
+      code = writer.active_storage_attachment_code
+      expect_code = <<-CODE.gsub(/^\s+/, '')
+        has_one_attached :image
+        attr_accessor :remove_image
+        before_validation { self.image = nil if remove_image.to_s == '1' }
+      CODE
+      assert_includes(code.gsub(/^\s+/, ''), expect_code)
+      assert_includes(code, "has_one_attached :pdf")
+    end
+
+    test "active_storage_attachment_code should generate active_storage field with thumb" do
+      setting = Hashie::Mash.new
+      setting.model = { active_storage: { image: { kind: 'image', thumb: { kind: 'fit', width: 100, height: 200 } }, pdf: nil } }
+      resource_config = ResourceConfig.new('product', setting)
+      writer = ModelWriter.new(resource_config, @db_schema)
+      code = writer.active_storage_attachment_code
+      expect_code = <<-CODE.gsub(/^        /, '')
+        has_one_attached :image do |attachable|
+        [TAB]attachable.variant :thumb, resize_to_fit: [100, 200]
+        end
+        attr_accessor :remove_image
+      CODE
+      assert_includes(code.gsub(/^\s+/, ''), expect_code)
+    end
   end
 end
