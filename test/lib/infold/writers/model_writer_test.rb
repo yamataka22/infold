@@ -9,8 +9,8 @@ module Infold
 
     setup do
       setting = Hashie::Mash.new
-      @app_config = AppConfig.new('resource', setting)
-      @model_config = ModelConfig.new('resource', setting)
+      @app_config = AppConfig.new('products', setting)
+      @model_config = ModelConfig.new('products', setting)
       db_schema_content = File.read(Rails.root.join('db/schema.rb'))
       @db_schema = DbSchema.new(db_schema_content)
     end

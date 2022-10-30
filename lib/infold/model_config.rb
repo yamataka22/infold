@@ -88,6 +88,18 @@ module Infold
       end
     end
 
+    Decorator = Struct.new( :field, :append, :prepend, :digit )
+    def decorator
+      model&.decorates&.map do |field, options|
+        decorator = Decorator.new
+        decorator.field = field
+        decorator.append = options.append
+        decorator.prepend = options.prepend
+        decorator.digit = options.digit
+        decorator
+      end
+    end
+
     private
 
       # Mashの直下のキー郡または配列を返す

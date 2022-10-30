@@ -3,14 +3,6 @@ require 'infold/writers/base_writer'
 module Infold
   class ModelWriter < BaseWriter
 
-    def self_table
-      db_schema.table(@model_config.resource_name)
-    end
-
-    def model_name
-      self_table.model_name
-    end
-
     def association_code
       code = ''
       @model_config.model_associations&.each do |model_association|

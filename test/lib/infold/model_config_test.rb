@@ -120,5 +120,27 @@ module Infold
       assert_equal(enum[1].elements[0].value, 1)
       assert_nil(  enum[1].elements[0].color)
     end
+
+    test "decorator should be return Decorator" do
+      setting = Hashie::Mash.new
+      setting.model = { decorates: {
+        price: {
+          append: "円",
+          digit: true
+        },
+        phone: {
+          prepend: "TEL:"
+        }
+      }}
+      model_config = ModelConfig.new('product', setting)
+      decorator = model_config.decorator
+      assert_equal(decorator.size, 2)
+      assert_equal(decorator[0].field, 'price')
+      assert_equal(decorator[0].append, '円')
+      assert_nil(decorator[0].prepend)
+      assert(decorator[0].digit)
+      assert_equal(decorator[1].field, 'phone')
+      assert_equal(decorator[1].prepend, 'TEL:')
+    end
   end
 end

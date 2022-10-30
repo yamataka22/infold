@@ -14,6 +14,14 @@ module Infold
       @db_schema = db_schema
     end
 
+    def self_table
+      db_schema&.table(@model_config.resource_name)
+    end
+
+    def model_name
+      self_table&.model_name
+    end
+
     def inset_indent(code, size, first_row: false)
       return unless code
       indent = '  ' * size

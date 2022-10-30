@@ -1,0 +1,6 @@
+<%# encoding: utf-8 -%>
+module Admin
+  module <%= @writer.model_name %>Decorator
+    <%= @writer.decorator_code&.gsub('[TAB]', '  ') %>
+  end
+end
