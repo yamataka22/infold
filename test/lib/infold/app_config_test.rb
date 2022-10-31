@@ -51,5 +51,32 @@ module Infold
       assert_equal(association_search_conditions[2].field, 'price')
       assert_equal(association_search_conditions[2].sign, 'gteq')
     end
+
+    test "form_fields should be return FormField" do
+      setting = Hashie::Mash.new
+      setting.app = { form: { fields: [
+        'title',
+        { description: { kind: 'textarea' } },
+        { stock: { kind: 'reference' } },
+        { details: {
+          kind: 'associations',
+          fields: [
+            'amount',
+            unit_price: { kind: 'number' }
+          ] } }
+      ] } }
+      app_config = AppConfig.new('product', setting)
+      form_fields = app_config.form_fields
+      assert_equal(4, form_fields.size)
+      assert_equal('title', form_fields[0].field)
+      assert_equal('description', form_fields[1].field)
+      assert_equal('textarea', form_fields[1].kind)
+      assert_equal('details', form_fields[3].field)
+      assert_equal('associations', form_fields[3].kind)
+      assert_equal(2, form_fields[3].association_fields.size)
+      assert_equal('amount', form_fields[3].association_fields[0].field)
+      assert_equal('unit_price', form_fields[3].association_fields[1].field)
+      assert_equal('number', form_fields[3].association_fields[1].kind)
+    end
   end
 end

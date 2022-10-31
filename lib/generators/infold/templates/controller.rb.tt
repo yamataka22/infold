@@ -1,0 +1,21 @@
+<%# encoding: utf-8 -%>
+module Admin
+  class <%= @writer.model_name %>Controller < BaseController
+    before_action { @page_title = '<%= @writer.app_name %>' }
+
+    def index
+      @search = <%= @writer.model_name %>SearchForm.new(search_params)
+      @<%= @writer.model_name.pluralize %> = @search.perform(params[:page], limit: params[:limit], csv: request.format == :csv)
+    end
+
+    def show
+      @<%= @writer.model_name.underscore %> = <%= @writer.model_name %>.find(params[:id])
+    end
+
+    def new
+      @<%= @writer.model_name.underscore %> = <%= @writer.model_name %>.new
+      <%= @writer.build_new_association_code -%>
+    end
+
+  end
+end
