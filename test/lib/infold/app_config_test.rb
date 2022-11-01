@@ -1,6 +1,5 @@
 # require '/test/test_helper'
 require 'infold/app_config'
-require 'hashie'
 
 module Infold
   class AppConfigTest < ::ActiveSupport::TestCase

@@ -26,7 +26,7 @@ module Infold
 
     FormAssociation = Struct.new( :field )
     def form_associations
-      model_association_fields = model_associations.map { |ma| %w(has_many has_one).include?(ma.kind) ? ma.field : nil }.compact
+      model_association_fields = model_associations&.map { |ma| %w(has_many has_one).include?(ma.kind) ? ma.field : nil }&.compact
       @app.dig(:form, :fields)&.map do |form_field|
         field = hash_key_or_string(form_field)
         FormAssociation.new(field) if model_association_fields.include?(field)
