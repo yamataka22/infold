@@ -1,0 +1,30 @@
+<%# encoding: utf-8 -%>
+module Admin
+  class <%= @writer.model_name %>SearchForm < SearchFormBase
+
+    <%= @writer.set_conditions_code %>
+
+    def perform(page = nil, limit: nil, csv: false)
+      records = <%= @writer.model_name %><%= @view.code_includes_associations %>.distinct
+      records = apply_conditions(records,page,limit,csv)
+    <%- if @view.default_order_column_id.present? -%>
+      @sort_field ||= :<%= @view.default_order_column.name %>
+      @sort_kind  ||= :<%= @view.default_order_kind %>
+    <%- end -%>
+      apply_sort(records, <%= @writer.model_name %>.primary_key)
+    end
+
+<%- @view.search_conditions.each do |c| -%>
+<%- method = c.method_condition_label_name -%>
+<%- if method.present? -%>
+  <%= method %>
+<%- end -%>
+<%- end -%>
+<%- @view_modal&.modal_only_search_conditions&.each do |c| -%>
+<%- method = c.method_condition_label_name -%>
+<%- if method.present? -%>
+  <%= method %>
+<%- end -%>
+<%- end -%>
+  end
+end

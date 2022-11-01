@@ -81,7 +81,7 @@ module Infold
         [TAB]:price,
         [TAB]:sort_field,
         [TAB]:sort_kind,
-        [TAB]status: []
+        [TAB]statuses: []
         )
       CODE
       assert_match(expect_code.gsub(/^\s+/, ''), code.gsub(/^\s+/, '') + "\n")

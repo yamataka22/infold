@@ -23,11 +23,14 @@ module Infold
       end
     end
 
-    Condition = Struct.new( :field, :sign )
     def association_search_conditions
       app.dig(:association_search, :conditions)&.map do |condition|
         Condition.new( condition.keys[0], condition[condition.keys[0]] )
       end
+    end
+
+    def search_conditions
+      (index_conditions.to_a + association_search_conditions.to_a).uniq
     end
 
     FormField = Struct.new( :field, :kind, :association_fields )

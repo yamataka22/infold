@@ -24,10 +24,9 @@ module Infold
     def search_params_code
       fields = []
       any_fields = []
-      conditions = @app_config.index_conditions.to_a + @app_config.association_search_conditions.to_a
-      conditions.each do |condition|
+      @app_config.search_conditions.each do |condition|
         if condition.sign == 'any'
-          any_fields << "[TAB]#{condition.field}: []"
+          any_fields << "[TAB]#{condition.field.pluralize}: []"
         else
           fields << "[TAB]:#{condition.field}"
         end
