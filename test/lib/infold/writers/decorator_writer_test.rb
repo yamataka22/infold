@@ -1,14 +1,15 @@
-# require '/test/test_helper'
+require 'test_helper'
 require 'infold/writers/decorator_writer'
 require 'infold/model_config'
+require 'infold/app_config'
 require 'infold/db_schema'
 
 module Infold
   class ModelWriterTest < ::ActiveSupport::TestCase
 
     setup do
-      @model_config = ModelConfig.new(name, {})
-      @app_config = AppConfig.new(name, {})
+      @model_config = ModelConfig.new("products", {})
+      @app_config = AppConfig.new("products", {})
       db_schema_content = File.read(Rails.root.join('db/schema.rb'))
       @db_schema = DbSchema.new(db_schema_content)
     end
