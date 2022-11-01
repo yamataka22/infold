@@ -1,11 +1,11 @@
 <%# encoding: utf-8 -%>
 module Admin
   class <%= @writer.model_name %>Controller < BaseController
-    before_action { @page_title = '<%= @writer.app_name %>' }
+    before_action { @page_title = '<%= @writer.app_title %>' }
 
     def index
       @search = <%= @writer.model_name %>SearchForm.new(search_params)
-      @<%= @writer.model_name.pluralize %> = @search.perform(params[:page], limit: params[:limit], csv: request.format == :csv)
+      @<%= @writer.model_name.underscore.pluralize %> = @search.perform(params[:page], limit: params[:limit], csv: request.format == :csv)
     end
 
     def show
@@ -14,8 +14,63 @@ module Admin
 
     def new
       @<%= @writer.model_name.underscore %> = <%= @writer.model_name %>.new
-      <%= @writer.build_new_association_code -%>
+    <%- if @writer.build_new_association_code.present? -%>
+      <%= @writer.build_new_association_code %>
+    <%- end -%>
     end
 
+    def create
+      @<%= @writer.model_name.underscore %> = <%= @writer.model_name %>.new
+      @<%= @writer.model_name.underscore %>.assign_attributes(post_params)
+      if @<%= @writer.model_name.underscore %>.save
+        flash.now[:notice] = t('infold.flash.created')
+        render :form
+      else
+        flash.now[:alert] = t('infold.flash.invalid')
+      <%- if @writer.build_new_association_code.present? -%>
+        <%= @writer.build_new_association_code(if_blank: true) %>
+      <%- end -%>
+        render :form, status: :unprocessable_entity
+      end
+    end
+
+    def edit
+      @<%= @writer.model_name.underscore %> = <%= @writer.model_name %>.find(params[:id])
+    end
+
+    def update
+      @<%= @writer.model_name.underscore %> = <%= @writer.model_name %>.find(params[:id])
+      @<%= @writer.model_name.underscore %>.assign_attributes(post_params)
+      if @<%= @writer.model_name.underscore %>.save
+        flash.now[:notice] = t('infold.flash.updated')
+        render :form
+      else
+        flash.now[:alert] = t('infold.flash.invalid')
+      <%- if @writer.build_new_association_code.present? -%>
+        <%= @writer.build_new_association_code(if_blank: true) %>
+      <%- end -%>
+        render :form, status: :unprocessable_entity
+      end
+    end
+
+    def destroy
+      @<%= @writer.model_name.underscore %> = <%= @writer.model_name %>.find(params[:id])
+      if @<%= @writer.model_name.underscore %>.destroy
+        redirect_to <%= @writer.index_path %>, status: :see_other, flash: { notice: t('infold.flash.destroyed') }
+      else
+        flash.now[:alert] = t('flash.invalid_destroy')
+        render :show, status: :unprocessable_entity
+      end
+    end
+
+    private
+
+    def search_params
+      <%= @writer.search_params_code&.gsub('[TAB]', '  ') %>
+    end
+
+    def post_params
+      <%= @writer.post_params_code&.gsub('[TAB]', '  ') %>
+    end
   end
 end

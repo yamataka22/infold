@@ -5,7 +5,7 @@ require 'infold/app_config'
 require 'infold/db_schema'
 
 module Infold
-  class DecoratorGenerator < Rails::Generators::NamedBase
+  class ControllerGenerator < Rails::Generators::NamedBase
     source_root File.expand_path('templates', __dir__)
 
     def setup
@@ -14,7 +14,7 @@ module Infold
       app_config = AppConfig.new(name, yaml)
       db_schema_content = File.read(Rails.root.join('db/schema.rb'))
       db_schema = DbSchema.new(db_schema_content)
-      @writer = DecoratorWriter.new(model_config, app_config, db_schema)
+      @writer = ControllerWriter.new(model_config, app_config, db_schema)
     end
 
     def create_model_file

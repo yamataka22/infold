@@ -55,7 +55,7 @@ module Infold
               - description:
                   kind: textarea
               - details:
-                  kind: associations
+                  kind: association
                   fields:
                     - amount
                     - unit_price:
@@ -68,7 +68,7 @@ module Infold
       assert_equal('description', form_fields[1].field)
       assert_equal('textarea', form_fields[1].kind)
       assert_equal('details', form_fields[2].field)
-      assert_equal('associations', form_fields[2].kind)
+      assert_equal('association', form_fields[2].kind)
       assert_equal(2, form_fields[2].association_fields.size)
       assert_equal('amount', form_fields[2].association_fields[0].field)
       assert_equal('unit_price', form_fields[2].association_fields[1].field)

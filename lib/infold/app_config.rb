@@ -16,17 +16,17 @@ module Infold
       app.dig(:title)
     end
 
-    IndexCondition = Struct.new( :field, :sign )
+    Condition = Struct.new( :field, :sign )
     def index_conditions
       app.dig(:index, :conditions)&.map do |condition|
-        IndexCondition.new( condition.keys[0], condition[condition.keys[0]] )
+        Condition.new( condition.keys[0], condition[condition.keys[0]] )
       end
     end
 
-    AssociationSearchCondition = Struct.new( :field, :sign )
+    Condition = Struct.new( :field, :sign )
     def association_search_conditions
       app.dig(:association_search, :conditions)&.map do |condition|
-        AssociationSearchCondition.new( condition.keys[0], condition[condition.keys[0]] )
+        Condition.new( condition.keys[0], condition[condition.keys[0]] )
       end
     end
 
@@ -38,7 +38,7 @@ module Infold
         else
           field = field_config.keys[0]
           form_field = FormField.new(field, field_config[field].dig(:kind), [])
-          if form_field.kind == 'associations'
+          if form_field.kind == 'association'
             field_config[field].dig(:fields)&.each do |association_field_config|
               if association_field_config.is_a?(String)
                 form_field.association_fields << FormField.new(association_field_config)

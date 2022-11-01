@@ -29,5 +29,17 @@ module Infold
       code.sub!(indent, '') unless first_row
       code
     end
+
+    def association_table(association_name)
+      model_association = @model_config.model_associations&.
+        find { |model_association| model_association.field == association_name }
+      table_name = model_association&.options&.dig(:class_name)&.underscore&.pluralize ||
+        model_association.field.pluralize
+      db_schema.table(table_name)
+    end
+
+    def index_path
+      "admin_#{model_name.underscore.pluralize}_path"
+    end
   end
 end
