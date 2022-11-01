@@ -1,5 +1,4 @@
 require 'rails/generators/base'
-require 'hashie'
 require 'infold/writers/controller_writer'
 require 'infold/model_config'
 require 'infold/app_config'
@@ -10,9 +9,9 @@ module Infold
     source_root File.expand_path('templates', __dir__)
 
     def setup
-      setting = Hashie::Mash.load(Rails.root.join("infold/#{name}.yml"))
-      model_config = ModelConfig.new(name, setting)
-      app_config = AppConfig.new(name, setting)
+      yaml = YAML.load_file(Rails.root.join("infold/#{name}.yml"))
+      model_config = ModelConfig.new(name, yaml)
+      app_config = AppConfig.new(name, yaml)
       db_schema_content = File.read(Rails.root.join('db/schema.rb'))
       db_schema = DbSchema.new(db_schema_content)
       @writer = DecoratorWriter.new(model_config, app_config, db_schema)

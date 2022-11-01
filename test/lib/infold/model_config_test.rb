@@ -5,142 +5,193 @@ require 'hashie'
 module Infold
   class ModelConfigTest < ::ActiveSupport::TestCase
     test "model_associations should be return ModelAssociation" do
-      setting = Hashie::Mash.new
-      setting.model = { associations: { has_many: %w(one_details two_details),
-                                        has_one: { three_detail: { option: 'Option' } },
-                                        belongs_to: nil } }
-      model_config = ModelConfig.new('product', setting)
+      yaml = <<-"YAML"
+        model:
+          association:
+            one_details:
+              kind: has_many
+              dependent: destroy
+            two_details:
+              kind: has_many
+            three_detail:
+              kind: has_one
+            parent:
+              kind: belongs_to
+              foreign_key: parent_id
+      YAML
+      model_config = ModelConfig.new('product', YAML.load(yaml))
       model_associations = model_config.model_associations
-      assert_equal(model_associations.size, 3)
-      assert_equal(model_associations[0].kind, 'has_many')
-      assert_equal(model_associations[0].field, 'one_details')
-      assert_nil(  model_associations[0].options)
-      assert_equal(model_associations[1].field, 'two_details')
-      assert_equal(model_associations[2].kind, 'has_one')
-      assert_equal(model_associations[2].field, 'three_detail')
-      assert_equal(model_associations[2].options, { 'option' => 'Option' })
+      assert_equal(4, model_associations.size)
+      assert_equal('has_many', model_associations[0].kind)
+      assert_equal('one_details', model_associations[0].field)
+      assert_equal({ 'dependent' => 'destroy' }, model_associations[0].options)
+      assert_equal('two_details', model_associations[1].field)
+      assert_equal({}, model_associations[1].options)
+      assert_equal('has_one', model_associations[2].kind)
+      assert_equal('three_detail', model_associations[2].field)
+      assert_equal('belongs_to', model_associations[3].kind)
+      assert_equal('parent', model_associations[3].field)
+      assert_equal({ 'foreign_key' => 'parent_id' }, model_associations[3].options)
     end
 
     test "form_associations should be return FormAssociation" do
-      setting = Hashie::Mash.new
-      setting.model = { associations: { has_many: %w(one_details),
-                                        has_one: %w(two_details) }}
-      setting.app = { form: { fields: ['id', 'title', one_details: %w(name price)]} }
-      model_config = ModelConfig.new('product', setting)
+      yaml = <<-"YAML"
+        model:
+          association:
+            one_details:
+              kind: has_many
+            two_details:
+              kind: has_many
+        app:
+          form:
+            fields:
+              - title
+              - one_details:
+                  fields:
+                    - amount:
+                        kind: number
+                    - unit_price:
+                        kind: radio
+      YAML
+      model_config = ModelConfig.new('product', YAML.load(yaml))
       form_associations = model_config.form_associations
-      assert_equal(form_associations.size, 1)
-      assert_equal(form_associations[0].field, 'one_details')
+      assert_equal(1, form_associations.size)
+      assert_equal('one_details', form_associations[0].field)
     end
 
-    test "active_storages should be return ActiveStorage (no thumb)" do
-      setting = Hashie::Mash.new
-      setting.model = { active_storage: %w(image pdf) }
-      model_config = ModelConfig.new('product', setting)
+    test "active_storage should be return ActiveStorage (no thumb)" do
+      yaml = <<-"YAML"
+        model:
+          active_storage:
+            image:
+              kind: image
+            pdf:
+              kind: file
+      YAML
+      model_config = ModelConfig.new('product', YAML.load(yaml))
       active_storages = model_config.active_storages
-      assert_equal(active_storages.size, 2)
-      assert_equal(active_storages[0].field, 'image')
-      assert_equal(active_storages[0].kind,  'file')
+      assert_equal(2, active_storages.size)
+      assert_equal('image', active_storages[0].field)
+      assert_equal('image', active_storages[0].kind)
       assert_nil(active_storages[0].thumb)
+      assert_equal('pdf', active_storages[1].field)
+      assert_equal('file', active_storages[1].kind)
+      assert_nil(active_storages[1].thumb)
     end
 
     test "active_storages should be return ActiveStorage with thumb" do
-      setting = Hashie::Mash.new
-      setting.model = { active_storage: { image: { kind: 'image', thumb: { kind: 'fill', width: 100, height: 200 } } } }
-      model_config = ModelConfig.new('product', setting)
+      yaml = <<-"YAML"
+        model:
+          active_storage:
+            image:
+              kind: image
+              thumb:
+                kind: fill
+                width: 100
+                height: 200
+      YAML
+      model_config = ModelConfig.new('product', YAML.load(yaml))
       active_storages = model_config.active_storages
-      assert_equal(active_storages.size, 1)
-      assert_equal(active_storages[0].field, 'image')
-      assert_equal(active_storages[0].kind,  'image')
-      assert_equal(active_storages[0].thumb.to_h, { kind: 'fill', width: 100, height: 200 })
+      assert_equal(1, active_storages.size)
+      assert_equal('image', active_storages[0].field, )
+      assert_equal({ kind: 'fill', width: 100, height: 200 }, active_storages[0].thumb.to_h)
     end
 
     test "validates should be return Validate" do
-      setting = Hashie::Mash.new
-      setting.model = { validates: {
-        stock: 'presence',
-        name: %w(presence unique),
-        price: ['presence', { range: { floor: 0, ceil: 100 } }]
-      }}
-      model_config = ModelConfig.new('product', setting)
+      yaml = <<-"YAML"
+        model:
+          validate:
+            stock: presence
+            title:
+              - presence
+              - uniqueness
+            price:
+              - presence
+              - numericality:
+                  greater_than_or_equal_to: 0
+                  less_than_or_equal_to: 100
+      YAML
+      model_config = ModelConfig.new('product', YAML.load(yaml))
       validates = model_config.validates
-      assert_equal(validates.size, 3)
-      assert_equal(validates[0].field, 'stock')
-      assert_equal(validates[0].conditions.size, 1)
-      assert_equal(validates[0].conditions[0].to_h, { condition: 'presence', options: nil })
-      assert_equal(validates[1].field, 'name')
-      assert_equal(validates[1].conditions.size, 2)
-      assert_equal(validates[1].conditions[1].to_h, { condition: 'unique', options: nil })
-      assert_equal(validates[2].field, 'price')
-      assert_equal(validates[2].conditions.size, 2)
-      assert_equal(validates[2].conditions[0].to_h, { condition: 'presence', options: nil })
-      assert_equal(validates[2].conditions[1].to_h, { condition: 'range', options: { 'floor' => 0, 'ceil' => 100 } })
+      assert_equal(3, validates.size)
+      assert_equal('stock', validates[0].field)
+      assert_equal('presence', validates[0].conditions[0].condition)
+      assert_equal('title', validates[1].field)
+      assert_equal('presence', validates[1].conditions[0].condition)
+      assert_equal('uniqueness', validates[1].conditions[1].condition)
+      assert_equal('price', validates[2].field)
+      assert_equal('presence', validates[2].conditions[0].condition)
+      assert_equal('numericality', validates[2].conditions[1].condition)
+      assert_equal({ 'greater_than_or_equal_to' => 0, 'less_than_or_equal_to' => 100 },
+                   validates[2].conditions[1].options)
     end
 
     test "enum should be return Enum (has no color)" do
-      setting = Hashie::Mash.new
-      setting.model = { enum: { status: {
-        ordered: 1,
-        charged: 2,
-        delivered: 3
-      } } }
-      model_config = ModelConfig.new('product', setting)
+      yaml = <<-"YAML"
+        model:
+          enum:
+            status:
+              ordered: 1
+              charged: 2
+              delivered: 3
+      YAML
+      model_config = ModelConfig.new('product', YAML.load(yaml))
       enum = model_config.enum
-      assert_equal(enum.size, 1)
-      assert_equal(enum[0].field, 'status')
-      assert_equal(enum[0].elements.size, 3)
-      assert_equal(enum[0].elements[0].key, 'ordered')
-      assert_equal(enum[0].elements[0].value, 1)
+      assert_equal(1, enum.size)
+      assert_equal('status', enum[0].field)
+      assert_equal(3, enum[0].elements.size)
+      assert_equal('ordered', enum[0].elements[0].key)
+      assert_equal(1, enum[0].elements[0].value)
     end
 
     test "enum should be return Enum (with color)" do
-      setting = Hashie::Mash.new
-      setting.model = { enum: {
-        status: {
-          ordered: { value: 1, color: 'red'  },
-          charged: { value: 2, color: 'blue' }
-        },
-        category: {
-          kitchen: 1,
-          dining: 2
-        }
-      } }
-      model_config = ModelConfig.new('product', setting)
+      yaml = <<-"YAML"
+        model:
+          enum:
+            status:
+              ordered: 1
+              charged: 2
+              delivered: 3
+            category:
+              kitchen:
+                value: 1
+                color: red
+              dining:
+                value: 2
+                color: blue
+      YAML
+      model_config = ModelConfig.new('product', YAML.load(yaml))
       enum = model_config.enum
-      assert_equal(enum.size, 2)
-      assert_equal(enum[0].field, 'status')
-      assert_equal(enum[0].elements.size, 2)
-      assert_equal(enum[0].elements[0].key, 'ordered')
-      assert_equal(enum[0].elements[0].value, 1)
-      assert_equal(enum[0].elements[0].color, 'red')
-      assert_equal(enum[0].elements[1].key, 'charged')
-      assert_equal(enum[0].elements[1].value, 2)
-      assert_equal(enum[0].elements[1].color, 'blue')
-      assert_equal(enum[1].field, 'category')
-      assert_equal(enum[1].elements[0].key, 'kitchen')
-      assert_equal(enum[1].elements[0].value, 1)
-      assert_nil(  enum[1].elements[0].color)
+      assert_equal(2, enum.size)
+      assert_equal('status', enum[0].field)
+      assert_equal(3, enum[0].elements.size)
+      assert_equal('category', enum[1].field)
+      assert_equal(2, enum[1].elements.size)
+      assert_equal(1, enum[1].elements[0].value)
+      assert_equal('red', enum[1].elements[0].color)
+      assert_equal(2, enum[1].elements[1].value)
+      assert_equal('blue', enum[1].elements[1].color)
     end
 
     test "decorator should be return Decorator" do
-      setting = Hashie::Mash.new
-      setting.model = { decorates: {
-        price: {
-          append: "円",
-          digit: true
-        },
-        phone: {
-          prepend: "TEL:"
-        }
-      }}
-      model_config = ModelConfig.new('product', setting)
+      yaml = <<-"YAML"
+        model:
+          decorate:
+            price:
+              append: "円"
+              digit: true
+            stock:
+              prepend: "在庫:"
+      YAML
+      model_config = ModelConfig.new('product', YAML.load(yaml))
       decorator = model_config.decorator
-      assert_equal(decorator.size, 2)
-      assert_equal(decorator[0].field, 'price')
-      assert_equal(decorator[0].append, '円')
+      assert_equal(2, decorator.size)
+      assert_equal('price', decorator[0].field)
+      assert_equal('円', decorator[0].append)
       assert_nil(decorator[0].prepend)
       assert(decorator[0].digit)
-      assert_equal(decorator[1].field, 'phone')
-      assert_equal(decorator[1].prepend, 'TEL:')
+      assert_equal('stock', decorator[1].field)
+      assert_equal('在庫:', decorator[1].prepend)
     end
   end
 end

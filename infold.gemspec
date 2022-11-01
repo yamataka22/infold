@@ -23,6 +23,5 @@ Gem::Specification.new do |spec|
   end
 
   spec.add_dependency "rails", ">= 7.0.4"
-  spec.add_dependency "hashie", ">= 5.0.0"
   spec.add_development_dependency "factory_bot_rails"
 end
