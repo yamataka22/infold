@@ -2,29 +2,16 @@
 module Admin
   class <%= @writer.model_name %>SearchForm < SearchFormBase
 
-    <%= @writer.set_conditions_code %>
+    <%= @writer.set_conditions_code&.gsub('[TAB]', '  ') %>
 
     def perform(page = nil, limit: nil, csv: false)
-      records = <%= @writer.model_name %><%= @view.code_includes_associations %>.distinct
-      records = apply_conditions(records,page,limit,csv)
-    <%- if @view.default_order_column_id.present? -%>
-      @sort_field ||= :<%= @view.default_order_column.name %>
-      @sort_kind  ||= :<%= @view.default_order_kind %>
+      records = <%= @writer.model_name %><%= @writer.record_search_include_code %>.distinct
+      records = apply_conditions(records, page, limit, csv)
+    <%- if @writer.resource.index_default_order -%>
+      @sort_field ||= :<%= @writer.resource.index_default_order.field %>
+      @sort_kind  ||= :<%= @writer.resource.index_default_order.kind || 'asc' %>
     <%- end -%>
       apply_sort(records, <%= @writer.model_name %>.primary_key)
     end
-
-<%- @view.search_conditions.each do |c| -%>
-<%- method = c.method_condition_label_name -%>
-<%- if method.present? -%>
-  <%= method %>
-<%- end -%>
-<%- end -%>
-<%- @view_modal&.modal_only_search_conditions&.each do |c| -%>
-<%- method = c.method_condition_label_name -%>
-<%- if method.present? -%>
-  <%= method %>
-<%- end -%>
-<%- end -%>
   end
 end

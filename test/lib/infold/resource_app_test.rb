@@ -74,5 +74,42 @@ module Infold
       assert_equal('unit_price', form_fields[2].association_fields[1].field)
       assert_equal('number', form_fields[2].association_fields[1].kind)
     end
+
+    test "index_default_order and association_search_default_order should be return DefaultOrder" do
+      yaml = <<-"YAML"
+        app:
+          index:
+            list:
+              default_order:
+                field: id
+                kind: asc
+          association_search:
+            list:
+              default_order:
+                field: name
+                kind: desc
+      YAML
+      resource = Resource.new('product', YAML.load(yaml))
+      index_default_order = resource.index_default_order
+      assert_equal({ :field => 'id', :kind => 'asc' }, index_default_order.to_h)
+      association_default_order = resource.association_search_default_order
+      assert_equal({ :field => 'name', :kind => 'desc' }, association_default_order.to_h)
+    end
+
+    test "if default_order is blank, index_default_order and association_search_default_order should be return nil" do
+      yaml = <<-"YAML"
+        app:
+          index:
+            list:
+              default_order:
+          association_search:
+            list:
+      YAML
+      resource = Resource.new('product', YAML.load(yaml))
+      index_default_order = resource.index_default_order
+      association_default_order = resource.association_search_default_order
+      assert_nil(index_default_order)
+      assert_nil(association_default_order)
+    end
   end
 end

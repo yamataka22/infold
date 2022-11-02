@@ -5,10 +5,14 @@ module Infold
     def set_conditions_code
       fields = @resource.search_conditions.map{ |c| ":#{c.field}_#{c.sign}" }
       return if fields.blank?
-      code = "set_condition #{fields.join(",\n[TAB]")}\n"
+      code = "set_condition #{fields.join(",\n[TAB][TAB][TAB][TAB][TAB][TAB][TAB]")}\n"
       inset_indent(code, 2).presence
     end
 
-
+    def record_search_include_code
+      # includes belongs_to associations
+      includes = @resource.model_associations&.select { |ma| ma.kind == 'belongs_to' } &.map { |ma| ":#{ma.field}" }
+      ".includes(#{includes.join(', ')})" if includes.present?
+    end
   end
 end

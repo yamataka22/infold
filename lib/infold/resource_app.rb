@@ -24,6 +24,23 @@ module Infold
       (index_conditions.to_a + association_search_conditions.to_a).uniq
     end
 
+    DefaultOrder = Struct.new( :field, :kind )
+    def index_default_order
+      default_order = app.dig(:index, :list, :default_order)
+      if default_order&.dig(:field)
+        DefaultOrder.new(default_order.dig(:field),
+                         default_order.dig(:kind))
+      end
+    end
+
+    def association_search_default_order
+      default_order = app.dig(:association_search, :list, :default_order)
+      if default_order&.dig(:field)
+        DefaultOrder.new(default_order.dig(:field),
+                         default_order.dig(:kind))
+      end
+    end
+
     FormField = Struct.new( :field, :kind, :association_fields )
     def form_fields
       app.dig(:form, :fields)&.map do |field_config|
