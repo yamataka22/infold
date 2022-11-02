@@ -8,9 +8,7 @@ module Infold
     include ResourceModel
     include ResourceApp
 
-    attr_reader :name,
-                :resource_yaml,
-                :db_schema
+    attr_reader :name
 
     def initialize(name, resource_yaml, db_schema=nil)
       @name = name
@@ -19,19 +17,19 @@ module Infold
     end
 
     def model
-      resource_yaml.dig('model') || {}
+      @resource_yaml.dig('model') || {}
     end
 
     def app
-      resource_yaml.dig('app') || {}
+      @resource_yaml.dig('app') || {}
     end
 
     def table(name)
-      db_schema.table(name)
+      @db_schema.table(name)
     end
 
     def self_table
-      db_schema.table(name)
+      @db_schema.table(name)
     end
   end
 end
