@@ -1,8 +1,8 @@
-# require '/test/test_helper'
-require 'infold/app_config'
+require 'test_helper'
+require 'infold/resource'
 
 module Infold
-  class AppConfigTest < ::ActiveSupport::TestCase
+  class ResourceAppTest < ::ActiveSupport::TestCase
     test "index_conditions should be return IndexCondition" do
       yaml = <<-"YAML"
         app:
@@ -13,8 +13,8 @@ module Infold
               - price: gteq
               - price: lteq
       YAML
-      app_config = AppConfig.new('product', YAML.load(yaml))
-      index_conditions = app_config.index_conditions
+      resource = Resource.new('product', YAML.load(yaml))
+      index_conditions = resource.index_conditions
       assert_equal(4, index_conditions.size)
       assert_equal('id', index_conditions[0].field)
       assert_equal('eq', index_conditions[0].sign)
@@ -35,8 +35,8 @@ module Infold
               - price: gteq
               - price: lteq
       YAML
-      app_config = AppConfig.new('product', YAML.load(yaml))
-      association_search_conditions = app_config.association_search_conditions
+      resource = Resource.new('product', YAML.load(yaml))
+      association_search_conditions = resource.association_search_conditions
       assert_equal(3, association_search_conditions.size)
       assert_equal('id', association_search_conditions[0].field)
       assert_equal('eq', association_search_conditions[0].sign)
@@ -61,8 +61,8 @@ module Infold
                     - unit_price:
                         kind: number
       YAML
-      app_config = AppConfig.new('product', YAML.load(yaml))
-      form_fields = app_config.form_fields
+      resource = Resource.new('product', YAML.load(yaml))
+      form_fields = resource.form_fields
       assert_equal(3, form_fields.size)
       assert_equal('title', form_fields[0].field)
       assert_equal('description', form_fields[1].field)

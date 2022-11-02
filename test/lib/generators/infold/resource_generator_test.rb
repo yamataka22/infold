@@ -5,6 +5,7 @@ require "generators/infold/resource_generator"
 class ResourceGeneratorTest < ::Rails::Generators::TestCase
   tests Infold::ResourceGenerator
   destination Rails.root.join('infold')
+  # remove destination exist files
   setup :prepare_destination
 
   test "generates infold_resource" do

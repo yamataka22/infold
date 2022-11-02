@@ -1,20 +1,17 @@
-# require '/test/test_helper'
+require 'test_helper'
 require 'infold/writers/model_writer'
-require 'infold/model_config'
+require 'infold/resource'
 require 'infold/db_schema'
 
 module Infold
   class ModelWriterTest < ::ActiveSupport::TestCase
 
     setup do
-      @model_config = ModelConfig.new('product', {})
-      @app_config = AppConfig.new('product', {})
-      db_schema_content = File.read(Rails.root.join('db/schema.rb'))
-      @db_schema = DbSchema.new(db_schema_content)
+      @resource = Resource.new("product", {})
     end
 
     test "association_code should be nil if setting.associations is not defined" do
-      writer = ModelWriter.new(@model_config, @app_config, @db_schema)
+      writer = ModelWriter.new(@resource)
       code = writer.association_code
       assert_nil(code)
     end
@@ -24,8 +21,8 @@ module Infold
         model:
           association:
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      writer = ModelWriter.new(model_config, @app_config, @db_schema)
+      resource = Resource.new('product', YAML.load(yaml))
+      writer = ModelWriter.new(resource)
       code = writer.association_code
       assert_nil(code)
     end
@@ -41,8 +38,8 @@ module Infold
             parent:
               kind: belongs_to
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      writer = ModelWriter.new(model_config, @app_config, @db_schema)
+      resource = Resource.new('product', YAML.load(yaml))
+      writer = ModelWriter.new(resource)
       code = writer.association_code
       assert_match("has_many :children", code)
       assert_match("has_one :child", code)
@@ -62,8 +59,8 @@ module Infold
               class_name: 'TwoDetail'
               dependent: 'destroy'
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      writer = ModelWriter.new(model_config, @app_config, @db_schema)
+      resource = Resource.new('product', YAML.load(yaml))
+      writer = ModelWriter.new(resource)
       code = writer.association_code
       assert_match("has_many :one_details, class_name: 'OneDetail', dependent: 'destroy'", code)
       assert_match("has_many :two_details, class_name: 'TwoDetail', dependent: 'destroy'", code)
@@ -86,9 +83,8 @@ module Infold
                     - id
                     - name
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-
-      writer = ModelWriter.new(model_config, @app_config, @db_schema)
+      resource = Resource.new('product', YAML.load(yaml))
+      writer = ModelWriter.new(resource)
       code = writer.association_code
       assert_match("has_many :one_details", code)
       assert_match("accepts_nested_attributes_for :one_details", code)
@@ -96,16 +92,17 @@ module Infold
     end
     
     test "datetime_field_code should generate except timestamp filed" do
-      db_schema_content = <<-"SCHEMA"
+      db_schema_content = <<-"RUBY"
         create_table "products" do |t|
           t.string "name"
           t.datetime "delivery_at", null: false
           t.datetime "created_at", null: false
           t.datetime "updated_at", null: false
         end
-      SCHEMA
+      RUBY
       db_schema = DbSchema.new(db_schema_content)
-      writer = ModelWriter.new(@model_config, @app_config, db_schema)
+      resource = Resource.new('product', {}, db_schema)
+      writer = ModelWriter.new(resource)
       code = writer.datetime_field_code
       assert_match("datetime_field :delivery_at", code)
       refute_match("datetime_field :created_at", code)
@@ -121,15 +118,15 @@ module Infold
             pdf:
               kind: file
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      writer = ModelWriter.new(model_config, @app_config, @db_schema)
+      resource = Resource.new('product', YAML.load(yaml))
+      writer = ModelWriter.new(resource)
       code = writer.active_storage_attachment_code
-      expect_code = <<-CODE.gsub(/^\s+/, '')
+      expect_code = <<-RUBY.gsub(/^\s+/, '')
         has_one_attached :image
         attr_accessor :remove_image
         before_validation { self.image = nil if remove_image.to_s == '1' }
-      CODE
-      assert_match(expect_code, code.gsub(/^\s+/, ''))
+      RUBY
+      assert_match(expect_code, code.gsub(/^\s+|\[TAB\]/, ''))
       assert_match("has_one_attached :pdf", code)
     end
 
@@ -146,16 +143,16 @@ module Infold
             pdf:
               kind: file
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      writer = ModelWriter.new(model_config, @app_config, @db_schema)
+      resource = Resource.new('product', YAML.load(yaml))
+      writer = ModelWriter.new(resource)
       code = writer.active_storage_attachment_code
-      expect_code = <<-CODE.gsub(/^        /, '')
+      expect_code = <<-RUBY.gsub(/^\s+/, '')
         has_one_attached :image do |attachable|
-        [TAB]attachable.variant :thumb, resize_to_fit: [100, 200]
+          attachable.variant :thumb, resize_to_fit: [100, 200]
         end
         attr_accessor :remove_image
-      CODE
-      assert_match(expect_code, code.gsub(/^\s+/, ''))
+      RUBY
+      assert_match(expect_code, code.gsub(/^\s+|\[TAB\]/, ''))
     end
 
     test "validation_code should generate presence validates" do
@@ -164,8 +161,8 @@ module Infold
           validate:
             stock: presence
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      writer = ModelWriter.new(model_config, @app_config, @db_schema)
+      resource = Resource.new('product', YAML.load(yaml))
+      writer = ModelWriter.new(resource)
       code = writer.validation_code
       assert_equal("validates :stock, presence: true", code.gsub(/^\s+|\n/, ''))
     end
@@ -181,12 +178,12 @@ module Infold
             price:
               - uniqueness
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      writer = ModelWriter.new(model_config, @app_config, @db_schema)
+      resource = Resource.new('product', YAML.load(yaml))
+      writer = ModelWriter.new(resource)
       code = writer.validation_code
-      assert_match("validates :stock, presence: true", code.gsub(/^\s+/, ''))
-      assert_match("validates :name, presence: true, uniqueness: true", code.gsub(/^\s+/, ''))
-      assert_match("validates :price, allow_blank: true, uniqueness: true", code.gsub(/^\s+/, ''))
+      assert_match("validates :stock, presence: true", code.gsub(/^\s+|\[TAB\]/, ''))
+      assert_match("validates :name, presence: true, uniqueness: true", code.gsub(/^\s+|\[TAB\]/, ''))
+      assert_match("validates :price, allow_blank: true, uniqueness: true", code.gsub(/^\s+|\[TAB\]/, ''))
     end
 
     test "validation_code should generate validates include options" do
@@ -199,11 +196,11 @@ module Infold
                   greater_than_or_equal_to: 0
                   less_than_or_equal_to: 100
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      writer = ModelWriter.new(model_config, @app_config, @db_schema)
+      resource = Resource.new('product', YAML.load(yaml))
+      writer = ModelWriter.new(resource)
       code = writer.validation_code
       assert_match("validates :price, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }",
-                   code.gsub(/^\s+/, ''))
+                   code.gsub(/^\s+|\[TAB\]/, ''))
     end
 
     test "enum_code should generate enum" do
@@ -217,11 +214,11 @@ module Infold
               kitchen: 1
               living: 2
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      writer = ModelWriter.new(model_config, @app_config, @db_schema)
+      resource = Resource.new('product', YAML.load(yaml))
+      writer = ModelWriter.new(resource)
       code = writer.enum_code
-      assert_match("enum status: { ordered: 1, charged: 2 }, _prefix: true", code.gsub(/^\s+/, ''))
-      assert_match("enum category: { kitchen: 1, living: 2 }, _prefix: true", code.gsub(/^\s+/, ''))
+      assert_match("enum status: { ordered: 1, charged: 2 }, _prefix: true", code.gsub(/^\s+|\[TAB\]/, ''))
+      assert_match("enum category: { kitchen: 1, living: 2 }, _prefix: true", code.gsub(/^\s+|\[TAB\]/, ''))
     end
 
     test "scope_code should generate scope (only index_conditions, except datetime)" do
@@ -236,16 +233,10 @@ module Infold
               - status: any
               - address: start_with
       YAML
-      app_config = AppConfig.new('product', YAML.load(yaml))
-      writer = ModelWriter.new(@db_config, app_config, @db_schema)
-      expect_code = <<-CODE.gsub(/^\s+/, '')
-        scope :id_eq, ->(v) do
-        [TAB]where(id: v) if v.present?
-        end
-      CODE
+      resource = Resource.new('product', YAML.load(yaml))
+      writer = ModelWriter.new(resource)
       code = writer.scope_code
-      scopes = code.split("scope")
-      assert_equal(expect_code.gsub('scope ', ''), scopes[1].gsub(/^\s+/, ''))
+      assert_match('where(id: v) if v.present?', code)
       assert_match('where(arel_table[:name].matches("%#{v}%")) if v.present?', code)
       assert_match('where(arel_table[:price].lteq(v)) if v.present?', code)
       assert_match('where(arel_table[:price].gteq(v)) if v.present?', code)
@@ -265,8 +256,8 @@ module Infold
               - id: eq
               - name: full_like
       YAML
-      app_config = AppConfig.new('product', YAML.load(yaml))
-      writer = ModelWriter.new(@db_config, app_config, @db_schema)
+      resource = Resource.new('product', YAML.load(yaml))
+      writer = ModelWriter.new(resource)
       code = writer.scope_code
       scopes = code.split("scope")
       assert_equal(4, scopes.size)
@@ -283,17 +274,17 @@ module Infold
               - delivery_at: eq
               - delivery_at: lteq
       YAML
-      app_config = AppConfig.new('product', YAML.load(yaml))
-      db_schema_content = <<-"SCHEMA"
+      db_schema_content = <<-"RUBY"
         create_table "products" do |t|
           t.string "name"
           t.datetime "delivery_at", null: false
         end
-      SCHEMA
+      RUBY
       db_schema = DbSchema.new(db_schema_content)
-      writer = ModelWriter.new(@db_config, app_config, db_schema)
+      resource = Resource.new('product', YAML.load(yaml), db_schema)
+      writer = ModelWriter.new(resource)
       code = writer.scope_code
-      expect_code = <<-CODE.gsub(/^\s+/, '')
+      expect_code = <<-RUBY.gsub(/^\s+/, '')
         scope :delivery_at_eq, ->(v) do
           return if v.blank?
           begin
@@ -302,10 +293,10 @@ module Infold
             where(arel_table[:delivery_at].eq(v))
           end
         end
-      CODE
+      RUBY
       assert_match(expect_code, code.gsub(/^\s+|\[TAB\]/, ''))
 
-      expect_code = <<-CODE.gsub(/^\s+/, '')
+      expect_code = <<-RUBY.gsub(/^\s+/, '')
         scope :delivery_at_lteq, ->(v) do
           return if v.blank?
           begin
@@ -314,7 +305,7 @@ module Infold
           end
           where(arel_table[:delivery_at].lteq(v))
         end
-      CODE
+      RUBY
       assert_match(expect_code, code.gsub(/^\s+|\[TAB\]/, ''))
     end
   end

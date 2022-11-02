@@ -1,5 +1,5 @@
-# require '/test/test_helper'
-require 'infold/model_config'
+require 'test_helper'
+require 'infold/resource'
 
 module Infold
   class ModelConfigTest < ::ActiveSupport::TestCase
@@ -18,8 +18,8 @@ module Infold
               kind: belongs_to
               foreign_key: parent_id
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      model_associations = model_config.model_associations
+      resource = Resource.new('product', YAML.load(yaml))
+      model_associations = resource.model_associations
       assert_equal(4, model_associations.size)
       assert_equal('has_many', model_associations[0].kind)
       assert_equal('one_details', model_associations[0].field)
@@ -52,8 +52,8 @@ module Infold
                     - unit_price:
                         kind: radio
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      form_associations = model_config.form_associations
+      resource = Resource.new('product', YAML.load(yaml))
+      form_associations = resource.form_associations
       assert_equal(1, form_associations.size)
       assert_equal('one_details', form_associations[0].field)
     end
@@ -67,8 +67,8 @@ module Infold
             pdf:
               kind: file
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      active_storages = model_config.active_storages
+      resource = Resource.new('product', YAML.load(yaml))
+      active_storages = resource.active_storages
       assert_equal(2, active_storages.size)
       assert_equal('image', active_storages[0].field)
       assert_equal('image', active_storages[0].kind)
@@ -89,8 +89,8 @@ module Infold
                 width: 100
                 height: 200
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      active_storages = model_config.active_storages
+      resource = Resource.new('product', YAML.load(yaml))
+      active_storages = resource.active_storages
       assert_equal(1, active_storages.size)
       assert_equal('image', active_storages[0].field, )
       assert_equal({ kind: 'fill', width: 100, height: 200 }, active_storages[0].thumb.to_h)
@@ -110,8 +110,8 @@ module Infold
                   greater_than_or_equal_to: 0
                   less_than_or_equal_to: 100
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      validates = model_config.validates
+      resource = Resource.new('product', YAML.load(yaml))
+      validates = resource.validates
       assert_equal(3, validates.size)
       assert_equal('stock', validates[0].field)
       assert_equal('presence', validates[0].conditions[0].condition)
@@ -134,8 +134,8 @@ module Infold
               charged: 2
               delivered: 3
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      enum = model_config.enum
+      resource = Resource.new('product', YAML.load(yaml))
+      enum = resource.enum
       assert_equal(1, enum.size)
       assert_equal('status', enum[0].field)
       assert_equal(3, enum[0].elements.size)
@@ -159,8 +159,8 @@ module Infold
                 value: 2
                 color: blue
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      enum = model_config.enum
+      resource = Resource.new('product', YAML.load(yaml))
+      enum = resource.enum
       assert_equal(2, enum.size)
       assert_equal('status', enum[0].field)
       assert_equal(3, enum[0].elements.size)
@@ -182,8 +182,8 @@ module Infold
             stock:
               prepend: "在庫:"
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      decorator = model_config.decorator
+      resource = Resource.new('product', YAML.load(yaml))
+      decorator = resource.decorator
       assert_equal(2, decorator.size)
       assert_equal('price', decorator[0].field)
       assert_equal('円', decorator[0].append)

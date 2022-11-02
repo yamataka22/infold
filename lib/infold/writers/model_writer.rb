@@ -5,15 +5,15 @@ module Infold
 
     def association_code
       code = ''
-      @model_config.model_associations&.each do |model_association|
+      @resource.model_associations&.each do |model_association|
         code += "#{model_association.kind} :#{model_association.field}"
         options = model_association.options&.map { |key, value| "#{key}: '#{value}'" }
         code += ", #{options.join(', ')}" if options.present?
         code += "\n"
       end
-      if @model_config.form_associations.present?
+      if @resource.form_associations.present?
         code += "\n"
-        @model_config.form_associations.each do |form_association|
+        @resource.form_associations.each do |form_association|
           code += "accepts_nested_attributes_for :#{form_association.field}, reject_if: :all_blank, allow_destroy: true\n"
         end
       end
@@ -22,7 +22,7 @@ module Infold
 
     def datetime_field_code
       code = ''
-      self_table.datetime_columns.each do |column|
+      @resource.self_table.datetime_columns.each do |column|
         code += "datetime_field :#{column}\n"
       end
       inset_indent(code, 2).presence
@@ -30,7 +30,7 @@ module Infold
 
     def active_storage_attachment_code
       code = ''
-      @model_config.active_storages&.each do |active_storage|
+      @resource.active_storages&.each do |active_storage|
         base = "has_one_attached :#{active_storage.field}"
         if active_storage.thumb
           code += <<-CODE.gsub(/^\s+/, '')
@@ -52,7 +52,7 @@ module Infold
 
     def validation_code
       code = ''
-      @model_config.validates&.each do |validate|
+      @resource.validates&.each do |validate|
         code += "validates :#{validate.field}, "
         code += "allow_blank: true, " unless validate.conditions.map(&:condition).include?('presence')
         code += validate.conditions.map do |condition|
@@ -69,7 +69,7 @@ module Infold
 
     def datetime_validation_code
       code = []
-      self_table.datetime_columns&.each do |column|
+      @resource.self_table.datetime_columns&.each do |column|
         code << "validates :#{column}_date, presence: true, if: -> { #{column}_time.present? }"
         code << "validates :#{column}_time, presence: true, if: -> { #{column}_date.present? }"
       end
@@ -79,7 +79,7 @@ module Infold
 
     def enum_code
       code = []
-      @model_config.enum&.each do |enum|
+      @resource.enum&.each do |enum|
         elements = enum.elements.map { |element| "#{element.key}: #{element.value}" }
         code << "enum #{enum.field}: { #{elements.join(', ')} }, _prefix: true"
       end
@@ -89,8 +89,8 @@ module Infold
 
     def scope_code
       code = ''
-      table = @db_schema.table(@app_config.resource_name)
-      conditions = @app_config.index_conditions.to_a + @app_config.association_search_conditions.to_a
+      table = @resource.table(@resource.name)
+      conditions = @resource.index_conditions.to_a + @resource.association_search_conditions.to_a
       conditions.map { |c| { field: c.field, sign: c.sign } }.uniq.each do |condition|
         field = condition[:field]
         sign = condition[:sign]

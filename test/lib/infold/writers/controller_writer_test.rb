@@ -1,17 +1,13 @@
 require 'test_helper'
 require 'infold/writers/controller_writer'
-require 'infold/model_config'
-require 'infold/app_config'
+require 'infold/resource'
 require 'infold/db_schema'
 
 module Infold
   class ControllerWriterTest < ::ActiveSupport::TestCase
 
     setup do
-      @model_config = ModelConfig.new("products", {})
-      @app_config = AppConfig.new("products", {})
-      db_schema_content = File.read(Rails.root.join('db/schema.rb'))
-      @db_schema = DbSchema.new(db_schema_content)
+      @resource = Resource.new("product", {})
     end
 
     test "build_new_association_code should generate association build code" do
@@ -31,9 +27,8 @@ module Infold
               - member:
                   kind: association
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      app_config = AppConfig.new('product', YAML.load(yaml))
-      writer = ControllerWriter.new(model_config, app_config, @db_schema)
+      resource = Resource.new('product', YAML.load(yaml))
+      writer = ControllerWriter.new(resource)
       code = writer.build_new_association_code
       assert_match(/@product.details.build$/, code.gsub(/^\s+/, ''))
       assert_match(/@product.build_member$/, code.gsub(/^\s+/, ''))
@@ -51,9 +46,8 @@ module Infold
               - details:
                   kind: association
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      app_config = AppConfig.new('product', YAML.load(yaml))
-      writer = ControllerWriter.new(model_config, app_config, @db_schema)
+      resource = Resource.new('product', YAML.load(yaml))
+      writer = ControllerWriter.new(resource)
       code = writer.build_new_association_code(if_blank: true)
       assert_match("@product.details.build if @product.details.blank?", code.gsub(/^\s+/, ''))
     end
@@ -71,24 +65,24 @@ module Infold
               - id: eq
               - price: gteq
       YAML
-      app_config = AppConfig.new('product', YAML.load(yaml))
-      writer = ControllerWriter.new(@model_config, app_config, @db_schema)
+      resource = Resource.new('product', YAML.load(yaml))
+      writer = ControllerWriter.new(resource)
       code = writer.search_params_code
-      expect_code = <<-CODE.gsub(/^\s+/, '')
+      expect_code = <<-RUBY.gsub(/^\s+/, '')
         params[:search]&.permit(
-        [TAB]:id,
-        [TAB]:name,
-        [TAB]:price,
-        [TAB]:sort_field,
-        [TAB]:sort_kind,
-        [TAB]statuses: []
+          :id,
+          :name,
+          :price,
+          :sort_field,
+          :sort_kind,
+          statuses: []
         )
-      CODE
-      assert_match(expect_code.gsub(/^\s+/, ''), code.gsub(/^\s+/, '') + "\n")
+      RUBY
+      assert_match(expect_code, code.gsub(/^\s+|\[TAB\]/, '') + "\n")
     end
 
     test "post_params_code should generate post params" do
-      db_schema_content = <<-"SCHEMA"
+      db_schema_content = <<-"RUBY"
         create_table "products" do |t|
           t.string "name"
           t.integer "price"
@@ -110,8 +104,7 @@ module Infold
           t.string "name"
           t.datetime "removed_at"
         end
-      SCHEMA
-      db_schema = DbSchema.new(db_schema_content)
+      RUBY
       yaml = <<-"YAML"
         model:
           association:
@@ -155,37 +148,37 @@ module Infold
                         kind: file
                     - removed_at
       YAML
-      model_config = ModelConfig.new('product', YAML.load(yaml))
-      app_config = AppConfig.new('product', YAML.load(yaml))
-      writer = ControllerWriter.new(model_config, app_config, db_schema)
+      db_schema = DbSchema.new(db_schema_content)
+      resource = Resource.new('product', YAML.load(yaml), db_schema)
+      writer = ControllerWriter.new(resource)
       code = writer.post_params_code
-      expect_code = <<-CODE.gsub(/^\s+/, '')
+      expect_code = <<-RUBY.gsub(/^\s+/, '')
         params.require(:admin_product).permit(
-        [TAB]:name,
-        [TAB]:price,
-        [TAB]:published_at_date,
-        [TAB]:published_at_time,
-        [TAB]:image,
-        [TAB]:remove_image,
-        [TAB]:description,
-        [TAB]one_details_attributes: [
-        [TAB][TAB]:title,
-        [TAB][TAB]:stock
-        [TAB]],
-        [TAB]two_details_attributes: [
-        [TAB][TAB]:birthday,
-        [TAB][TAB]:address
-        [TAB]],
-        [TAB]three_detail_attributes: [
-        [TAB][TAB]:name,
-        [TAB][TAB]:pdf,
-        [TAB][TAB]:remove_pdf,
-        [TAB][TAB]:removed_at_date,
-        [TAB][TAB]:removed_at_time
-        [TAB]]
+          :name,
+          :price,
+          :published_at_date,
+          :published_at_time,
+          :image,
+          :remove_image,
+          :description,
+          one_details_attributes: [
+            :title,
+            :stock
+          ],
+          two_details_attributes: [
+            :birthday,
+            :address
+          ],
+          three_detail_attributes: [
+            :name,
+            :pdf,
+            :remove_pdf,
+            :removed_at_date,
+            :removed_at_time
+          ]
         )
-      CODE
-      assert_match(expect_code.gsub(/^\s+/, ''), code.gsub(/^\s+/, '') + "\n")
+      RUBY
+      assert_match(expect_code, code.gsub(/^\s+|\[TAB\]/, '') + "\n")
     end
   end
 end

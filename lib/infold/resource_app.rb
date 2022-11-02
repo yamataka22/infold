@@ -1,16 +1,7 @@
 require "active_support/core_ext/hash/indifferent_access"
 
 module Infold
-  class AppConfig
-    attr_reader :resource_name,
-                :model,
-                :app
-
-    def initialize(resource_name, yaml)
-      @resource_name = resource_name
-      @model = yaml.dig('model').to_h.with_indifferent_access
-      @app = yaml.dig('app').to_h.with_indifferent_access
-    end
+  module ResourceApp
 
     def app_title
       app.dig(:title)

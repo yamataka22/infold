@@ -6,7 +6,7 @@ module Infold
 
     def create_resource_file
       @name = name
-      template "resource.yml", Rails.root.join("infold", "#{@name}.yml")
+      template "resource.yml", Rails.root.join("infold", "#{@name}.yml"), skip: true
     end
   end
 end

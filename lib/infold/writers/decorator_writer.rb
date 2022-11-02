@@ -3,12 +3,12 @@ require 'infold/writers/base_writer'
 module Infold
   class DecoratorWriter < BaseWriter
     def decorator_code
-      code = self_table&.columns&.map do |column|
-        enum = @model_config.enum&.find { |e| e.field == column.name }
+      code = @resource.self_table&.columns&.map do |column|
+        enum = @resource.enum&.find { |e| e.field == column.name }
         if enum
           enum_code(column.name, enum)
         else
-          option = @model_config.decorator&.find { |d| d.field == column.name }
+          option = @resource.decorator&.find { |d| d.field == column.name }
           case column.type
           when 'boolean'
             boolean_code(column.name)

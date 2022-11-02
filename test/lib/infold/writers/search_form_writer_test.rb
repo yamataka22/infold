@@ -1,17 +1,13 @@
 require 'test_helper'
 require 'infold/writers/search_form_writer'
-require 'infold/model_config'
-require 'infold/app_config'
+require 'infold/resource'
 require 'infold/db_schema'
 
 module Infold
-  class ControllerWriterTest < ::ActiveSupport::TestCase
+  class SearchFormWriterTest < ::ActiveSupport::TestCase
 
     setup do
-      @model_config = ModelConfig.new("products", {})
-      @app_config = AppConfig.new("products", {})
-      db_schema_content = File.read(Rails.root.join('db/schema.rb'))
-      @db_schema = DbSchema.new(db_schema_content)
+      @resource = Resource.new("product", {})
     end
 
     test "set_conditions_code should generate set condition each field" do
@@ -28,17 +24,17 @@ module Infold
               - status: eq
               - price: gteq
       YAML
-      app_config = AppConfig.new('product', YAML.load(yaml))
-      writer = SearchFormWriter.new(@model_config, app_config, @db_schema)
+      resource = Resource.new('product', YAML.load(yaml))
+      writer = SearchFormWriter.new(resource)
       code = writer.set_conditions_code
-      expect_code = <<-CODE.gsub(/^\s+/, '')
+      expect_code = <<-RUBY.gsub(/^\s+/, '')
         set_condition :id_eq,
-        [TAB]:name_full_like,
-        [TAB]:status_any,
-        [TAB]:status_eq,
-        [TAB]:price_gteq
-      CODE
-      assert_match(expect_code.gsub(/^\s+/, ''), code.gsub(/^\s+/, ''))
+          :name_full_like,
+          :status_any,
+          :status_eq,
+          :price_gteq
+      RUBY
+      assert_match(expect_code, code.gsub(/^\s+|\[TAB\]/, ''))
     end
   end
 end

@@ -3,14 +3,14 @@ require 'infold/writers/base_writer'
 module Infold
   class ControllerWriter < BaseWriter
     def app_title
-      @app_config.app_title
+      @resource.app_title
     end
 
     def build_new_association_code(if_blank: false)
       code = ''
-      @app_config.form_fields&.select { |ff| ff.kind == 'association' }&.map do |form_field|
+      @resource.form_fields&.select { |ff| ff.kind == 'association' }&.map do |form_field|
         code +=
-          if @model_config.model_associations.find { |ma| ma.field == form_field.field && ma.kind == 'has_one' }
+          if @resource.model_associations.find { |ma| ma.field == form_field.field && ma.kind == 'has_one' }
             "@#{model_name.underscore}.build_#{form_field.field}"
           else
             "@#{model_name.underscore}.#{form_field.field}.build"
@@ -24,7 +24,7 @@ module Infold
     def search_params_code
       fields = []
       any_fields = []
-      @app_config.search_conditions.each do |condition|
+      @resource.search_conditions.each do |condition|
         if condition.sign == 'any'
           any_fields << "[TAB]#{condition.field.pluralize}: []"
         else
@@ -37,7 +37,7 @@ module Infold
     end
 
     def post_params_code
-      fields = post_params_fields(self_table, @app_config.form_fields)
+      fields = post_params_fields(@resource.self_table, @resource.form_fields)
       fields = fields.join(",\n") if fields.present?
       code = "params.require(:admin_#{model_name.underscore}).permit(\n" + fields.to_s + "\n)"
       inset_indent(code, 3) if fields.present?
@@ -48,7 +48,7 @@ module Infold
       def post_params_fields(table, form_fields)
         fields = []
         form_fields&.sort_by{ |f| f.kind == 'association' ? 9 : 0 }&.each do |form_field|
-          column = table.columns.find { |column| column.name == form_field.field }
+          column = table&.columns&.find { |column| column.name == form_field.field }
           if form_field.kind == 'file'
             fields += %W(:#{form_field.field} :remove_#{form_field.field})
           elsif form_field.kind == 'association'
