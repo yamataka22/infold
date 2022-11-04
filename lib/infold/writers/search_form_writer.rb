@@ -11,7 +11,7 @@ module Infold
 
     def record_search_include_code
       # includes belongs_to associations
-      includes = @resource.model_associations&.select { |ma| ma.kind == 'belongs_to' } &.map { |ma| ":#{ma.field}" }
+      includes = @resource.model_associations&.select { |ma| ma.kind == 'belongs_to' } &.map { |ma| ":#{ma.association_name}" }
       ".includes(#{includes.join(', ')})" if includes.present?
     end
   end

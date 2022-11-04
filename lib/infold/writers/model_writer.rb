@@ -6,9 +6,10 @@ module Infold
     def association_code
       code = ''
       @resource.model_associations&.each do |model_association|
-        code += "#{model_association.kind} :#{model_association.field}"
-        options = model_association.options&.map { |key, value| "#{key}: '#{value}'" }
-        code += ", #{options.join(', ')}" if options.present?
+        code += "#{model_association.kind} :#{model_association.association_name}"
+        code += ", class_name: '#{model_association.class_name}'" if model_association.class_name.present?
+        code += ", foreign_key: '#{model_association.foreign_key}'" if model_association.foreign_key.present?
+        code += ", dependent: :#{model_association.dependent}" if model_association.dependent.present?
         code += "\n"
       end
       if @resource.form_associations.present?
@@ -79,7 +80,7 @@ module Infold
 
     def enum_code
       code = []
-      @resource.enum&.each do |enum|
+      @resource.enums&.each do |enum|
         elements = enum.elements.map { |element| "#{element.key}: #{element.value}" }
         code << "enum #{enum.field}: { #{elements.join(', ')} }, _prefix: true"
       end
@@ -90,8 +91,7 @@ module Infold
     def scope_code
       code = ''
       table = @resource.table(@resource.name)
-      conditions = @resource.index_conditions.to_a + @resource.association_search_conditions.to_a
-      conditions.map { |c| { field: c.field, sign: c.sign } }.uniq.each do |condition|
+      @resource.search_conditions.map { |c| { field: c.field, sign: c.sign } }.uniq.each do |condition|
         field = condition[:field]
         sign = condition[:sign]
         column = table.columns.find { |c| c.name == field }

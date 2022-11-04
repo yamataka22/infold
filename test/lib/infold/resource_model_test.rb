@@ -12,6 +12,7 @@ module Infold
               dependent: destroy
             two_details:
               kind: has_many
+              class_name: TwoDetail
             three_detail:
               kind: has_one
             parent:
@@ -22,15 +23,15 @@ module Infold
       model_associations = resource.model_associations
       assert_equal(4, model_associations.size)
       assert_equal('has_many', model_associations[0].kind)
-      assert_equal('one_details', model_associations[0].field)
-      assert_equal({ 'dependent' => 'destroy' }, model_associations[0].options)
-      assert_equal('two_details', model_associations[1].field)
-      assert_equal({}, model_associations[1].options)
+      assert_equal('one_details', model_associations[0].association_name)
+      assert_equal('destroy', model_associations[0].dependent)
+      assert_equal('two_details', model_associations[1].association_name)
+      assert_equal('TwoDetail', model_associations[1].class_name)
       assert_equal('has_one', model_associations[2].kind)
-      assert_equal('three_detail', model_associations[2].field)
+      assert_equal('three_detail', model_associations[2].association_name)
       assert_equal('belongs_to', model_associations[3].kind)
-      assert_equal('parent', model_associations[3].field)
-      assert_equal({ 'foreign_key' => 'parent_id' }, model_associations[3].options)
+      assert_equal('parent', model_associations[3].association_name)
+      assert_equal('parent_id', model_associations[3].foreign_key)
     end
 
     test "form_associations should be return FormAssociation" do
@@ -135,7 +136,7 @@ module Infold
               delivered: 3
       YAML
       resource = Resource.new('product', YAML.load(yaml))
-      enum = resource.enum
+      enum = resource.enums
       assert_equal(1, enum.size)
       assert_equal('status', enum[0].field)
       assert_equal(3, enum[0].elements.size)
@@ -160,7 +161,7 @@ module Infold
                 color: blue
       YAML
       resource = Resource.new('product', YAML.load(yaml))
-      enum = resource.enum
+      enum = resource.enums
       assert_equal(2, enum.size)
       assert_equal('status', enum[0].field)
       assert_equal(3, enum[0].elements.size)
@@ -183,7 +184,7 @@ module Infold
               prepend: "在庫:"
       YAML
       resource = Resource.new('product', YAML.load(yaml))
-      decorator = resource.decorator
+      decorator = resource.decorators
       assert_equal(2, decorator.size)
       assert_equal('price', decorator[0].field)
       assert_equal('円', decorator[0].append)

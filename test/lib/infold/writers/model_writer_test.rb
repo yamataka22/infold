@@ -52,18 +52,18 @@ module Infold
           association:
             one_details:
               kind: has_many
-              class_name: 'OneDetail'
+              foreign_key: 'one_detail_id'
               dependent: 'destroy'
             two_details:
               kind: has_many
               class_name: 'TwoDetail'
-              dependent: 'destroy'
+              dependent: 'delete_all'
       YAML
       resource = Resource.new('product', YAML.load(yaml))
       writer = ModelWriter.new(resource)
       code = writer.association_code
-      assert_match("has_many :one_details, class_name: 'OneDetail', dependent: 'destroy'", code)
-      assert_match("has_many :two_details, class_name: 'TwoDetail', dependent: 'destroy'", code)
+      assert_match("has_many :one_details, foreign_key: 'one_detail_id', dependent: :destroy", code)
+      assert_match("has_many :two_details, class_name: 'TwoDetail', dependent: :delete_all", code)
     end
 
     test "association_code should generate accepts_nested_attributes_for if resource.form contains associations" do
@@ -226,19 +226,26 @@ module Infold
         app:
           index:
             conditions:
-              - id: eq
-              - name: full_like
-              - price: gteq
-              - price: lteq
-              - status: any
-              - address: start_with
+              - id:
+                  sign: eq
+              - name:
+                  sign: full_like
+              - price:
+                  sign: gteq
+              - company_id:
+                  sign: eq
+                  form_kind: association
+              - status:
+                  sign: any
+              - address:
+                  sign: start_with
       YAML
       resource = Resource.new('product', YAML.load(yaml))
       writer = ModelWriter.new(resource)
       code = writer.scope_code
       assert_match('where(id: v) if v.present?', code)
       assert_match('where(arel_table[:name].matches("%#{v}%")) if v.present?', code)
-      assert_match('where(arel_table[:price].lteq(v)) if v.present?', code)
+      assert_match('where(company_id: v) if v.present?', code)
       assert_match('where(arel_table[:price].gteq(v)) if v.present?', code)
       assert_match('where(status: v) if v.present?', code)
       assert_match('where(arel_table[:address].matches("#{v}%")) if v.present?', code)
@@ -249,18 +256,24 @@ module Infold
         app:
           index:
             conditions:
-              - id: eq
-              - status: any
+              - id:
+                  sign: eq
+              - company_id:
+                  sign: eq
+                  form_kind: association
+              - status:
+                  sign: any
           association_search:
             conditions:
-              - id: eq
-              - name: full_like
+              - id: 
+                  sign: eq
+              - name:
+                  sign: full_like
       YAML
       resource = Resource.new('product', YAML.load(yaml))
       writer = ModelWriter.new(resource)
       code = writer.scope_code
-      scopes = code.split("scope")
-      assert_equal(4, scopes.size)
+      assert_equal(4, code.scan('scope').size)
       assert_match('where(id: v) if v.present?', code)
       assert_match('where(status: v) if v.present?', code)
       assert_match('where(arel_table[:name].matches("%#{v}%")) if v.present?', code)
@@ -271,8 +284,10 @@ module Infold
         app:
           index:
             conditions:
-              - delivery_at: eq
-              - delivery_at: lteq
+              - delivery_at:
+                  sign: eq
+              - delivery_at:
+                  sign: lteq
       YAML
       db_schema_content = <<-"RUBY"
         create_table "products" do |t|

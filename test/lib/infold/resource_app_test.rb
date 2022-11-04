@@ -8,22 +8,20 @@ module Infold
         app:
           index:
             conditions:
-              - id: eq
-              - title: full_like
-              - price: gteq
-              - price: lteq
+              - id:
+                  sign: eq
+              - company_id:
+                  sign: eq
+                  form_kind: association
       YAML
       resource = Resource.new('product', YAML.load(yaml))
       index_conditions = resource.index_conditions
-      assert_equal(4, index_conditions.size)
+      assert_equal(2, index_conditions.size)
       assert_equal('id', index_conditions[0].field)
       assert_equal('eq', index_conditions[0].sign)
-      assert_equal('title', index_conditions[1].field)
-      assert_equal('full_like', index_conditions[1].sign)
-      assert_equal('price', index_conditions[2].field)
-      assert_equal('gteq', index_conditions[2].sign)
-      assert_equal('price', index_conditions[3].field)
-      assert_equal('lteq', index_conditions[3].sign)
+      assert_equal('company_id', index_conditions[1].field)
+      assert_equal('eq', index_conditions[1].sign)
+      assert_equal('association', index_conditions[1].form_kind)
     end
 
     test "association_search_conditions should be return AssociationCondition" do
@@ -31,19 +29,20 @@ module Infold
         app:
           association_search:
             conditions:
-              - id: eq
-              - price: gteq
-              - price: lteq
+              - id:
+                  sign: eq
+              - company_id:
+                  sign: eq
+                  form_kind: association
       YAML
       resource = Resource.new('product', YAML.load(yaml))
       association_search_conditions = resource.association_search_conditions
-      assert_equal(3, association_search_conditions.size)
+      assert_equal(2, association_search_conditions.size)
       assert_equal('id', association_search_conditions[0].field)
       assert_equal('eq', association_search_conditions[0].sign)
-      assert_equal('price', association_search_conditions[1].field)
-      assert_equal('gteq', association_search_conditions[1].sign)
-      assert_equal('price', association_search_conditions[2].field)
-      assert_equal('lteq', association_search_conditions[2].sign)
+      assert_equal('company_id', association_search_conditions[1].field)
+      assert_equal('eq', association_search_conditions[1].sign)
+      assert_equal('association', association_search_conditions[1].form_kind)
     end
 
     test "form_fields should be return FormField" do

@@ -10,7 +10,7 @@ module Infold
       code = ''
       @resource.form_fields&.select { |ff| ff.kind == 'association' }&.map do |form_field|
         code +=
-          if @resource.model_associations.find { |ma| ma.field == form_field.field && ma.kind == 'has_one' }
+          if @resource.model_associations.find { |ma| ma.association_name == form_field.field.gsub('_id', '') && ma.kind == 'has_one' }
             "@#{model_name.underscore}.build_#{form_field.field}"
           else
             "@#{model_name.underscore}.#{form_field.field}.build"

@@ -57,13 +57,18 @@ module Infold
         app:
           index:
             conditions:
-              - id: eq
-              - name: full_like
-              - status: any
+              - id:
+                  sign: eq
+              - name:
+                  sign: full_like
+              - status:
+                  sign: any
           association_search:
             conditions:
-              - id: eq
-              - price: gteq
+              - id:
+                  sign: eq
+              - price:
+                  sign: gteq
       YAML
       resource = Resource.new('product', YAML.load(yaml))
       writer = ControllerWriter.new(resource)

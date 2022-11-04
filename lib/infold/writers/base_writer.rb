@@ -24,14 +24,18 @@ module Infold
 
     def association_table(association_name)
       model_association = @resource.model_associations&.
-        find { |model_association| model_association.field == association_name }
-      table_name = model_association&.options&.dig(:class_name)&.underscore&.pluralize ||
-        model_association.field.pluralize
+        find { |model_association| model_association.association_name == association_name }
+      table_name = model_association&.class_name&.underscore&.pluralize ||
+        model_association.association_name.pluralize
       @resource.table(table_name)
     end
 
     def index_path
       "admin_#{model_name.underscore.pluralize}_path"
+    end
+
+    def new_path
+      "new_admin_#{model_name.underscore}_path"
     end
   end
 end

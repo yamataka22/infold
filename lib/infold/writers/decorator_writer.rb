@@ -4,11 +4,11 @@ module Infold
   class DecoratorWriter < BaseWriter
     def decorator_code
       code = @resource.self_table&.columns&.map do |column|
-        enum = @resource.enum&.find { |e| e.field == column.name }
+        enum = @resource.enums&.find { |e| e.field == column.name }
         if enum
           enum_code(column.name, enum)
         else
-          option = @resource.decorator&.find { |d| d.field == column.name }
+          option = @resource.decorators&.find { |d| d.field == column.name }
           case column.type
           when 'boolean'
             boolean_code(column.name)
