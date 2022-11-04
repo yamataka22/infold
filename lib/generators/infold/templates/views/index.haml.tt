@@ -2,50 +2,43 @@
 %nav.navbar.navbar-light
   .container-fluid
     %ol.breadcrumb
-      %li.breadcrumb-item.active <%= @writer.app_title %>
+      %li.breadcrumb-item.active <%= @writer.resource.app_title %>
     .ms-auto
       = link_to t('infold.operation.new'), <%= @writer.new_path %>, class: 'btn btn-warning', data: { turbo_frame: "modal_main" }
-.index_page.d-md-flex{ data: { controller: 'index-page', index_page_target: 'wrapper' } }
-  .left_conditions.bg-white.container-fluid.border-end.pe-3.py-3
+#index_page.d-md-flex{ data: { controller: 'index-page', index_page_target: 'wrapper' } }
+  #conditions.bg-white.container-fluid.border-end.pe-3.py-3
     = form_with model: @search, url: <%= @writer.index_path %>, method: :get, scope: 'search',
       data: { index_page_target: 'searchForm' } do |form|
       = form.hidden_field :sort_field, data: { index_page_target: 'sortField' }
       = form.hidden_field :sort_kind, data: { index_page_target: 'sortKind' }
     <%- @writer.resource.index_conditions&.each do |condition| -%>
-      .mb-3
-        <%= @writer.search_condition_form_component_code(condition) %>
+      .mb-3<%= @writer.search_condition_form_code(condition) %>
     <%- end -%>
       %hr.my-3
-      .row
+      .row.gx-2
         .col-6.order-2.d-grid
           = form.submit t('infold.operation.search'), class: 'btn btn-primary'
         .col-6.d-grid
-          = link_to t('infold.operation.clear'), <%= @view.code_search_path(@ns_snake) %>, class: 'btn btn-light'
-  .right_results.flex-fill.container-fluid.ps-3.py-3{ data: { index_page_target: 'resultArea' } }
-    - if @<%= @app.model.name_pluralize %>.blank?
+          = link_to t('infold.operation.clear'), <%= @writer.index_path %>, class: 'btn btn-secondary'
+  #result.flex-fill.container-fluid.ps-3.py-3{ data: { index_page_target: 'resultArea' } }
+    - if @<%= @writer.model_name.underscore.pluralize %>.blank?
       .alert#no_data= t('infold.no_data')
-    .card
+    .card.border-top-0
       .table_wrapper.table-responsive.bg-secondary-lt{ data: { index_page_target: 'resultTableWrapper' } }
         %table.table.table-bordered.table-hover.mb-0.bg-white
           %thead{ data: { index_page_target: 'thead' } }
             %tr
               %th.icon_cell
-            <%- @view.search_result_fields.select(&:display?).sort_by(&:seq).each do |result| -%>
-            <%- if result.is_a?(Infold::SearchResultColumn) -%>
-              = render <%= @ns_camel %>::SortableThComponent.new(@search, :<%= result.model_column.name %>, '<%= result.model_column.locale_or_name_with_foreign_key %>')
-            <%- else -%>
-              %th <%= result.attachment_field.locale_or_name %>
+            <%- @writer.resource.index_list_fields.each do |field| -%>
+              %th<%= @writer.list_field_header_code(field) %>
             <%- end -%>
-            <%- end -%>
-            <%- if @app.app_view_form.present? -%>
               %th.icon_cell
-            <%- end -%>
-          %tbody#<%= @app.model.name_pluralize %>
-            = render partial: "index_row", collection: @<%= @app.model.name_pluralize %>, as: '<%= @app.model.name.underscore %>'
-      - if @<%= @app.model.name_pluralize %>.present?
+          %tbody#<%= @writer.model_name.underscore.pluralize %>
+            = render partial: "index_row", collection: @<%= @writer.model_name.underscore.pluralize %>, as: '<%= @writer.model_name.underscore %>'
+      - if @<%= @writer.model_name.underscore.pluralize %>.present?
         .card-body.d-md-flex.align-items-center.justify-content-between
           .mb-3.mb-md-0
-            = <%= @ns_snake %>_search_result_count(@<%= @app.model.name_pluralize %>)
+            = <%= @ns_snake %>_search_result_count(@<%= @writer.model_name.underscore.pluralize %>)
           .mb-3.mb-md-0
-            = paginate(@<%= @app.model.name_pluralize %>, views_prefix: "<%= @ns_snake %>")
+            = paginate(@<%= @writer.model_name.underscore.pluralize %>, views_prefix: "Admin")
           = link_to t('infold.operation.output_csv'), '#', class: 'btn btn-info', data: { action: 'index-page#outputCsv' }

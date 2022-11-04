@@ -110,5 +110,60 @@ module Infold
       assert_nil(index_default_order)
       assert_nil(association_default_order)
     end
+
+    test "index_list_fields should be return index list fields" do
+      yaml = <<-"YAML"
+        app:
+          index:
+            list:
+              fields:
+                - id
+                - name
+                - address
+          association_search:
+            list:
+              fields:
+                - id
+                - address
+      YAML
+      resource = Resource.new('product', YAML.load(yaml))
+      index_list_fields = resource.index_list_fields
+      assert_equal(3, index_list_fields.size)
+      assert_equal('name', index_list_fields[1].field)
+
+      association_search_list_fields = resource.association_search_list_fields
+      assert_equal(2, association_search_list_fields.size)
+      assert_equal('address', association_search_list_fields[1].field)
+    end
+
+    test "index_list_fields should be return table top several columns if index list field is blank" do
+      yaml = <<-"YAML"
+        app:
+          index:
+            list:
+          association_search:
+            list:
+      YAML
+      db_schema_content = <<-"RUBY"
+        create_table "products" do |t|
+          t.bigint "id", null: false
+          t.string "category"
+          t.string "name"
+          t.datetime "delivery_at", null: false
+          t.datetime "created_at", null: false
+          t.datetime "updated_at", null: false
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      resource = Resource.new('product', YAML.load(yaml), db_schema)
+      index_list_fields = resource.index_list_fields
+      assert_equal(5, index_list_fields.size)
+      assert_equal('category', index_list_fields[1].field)
+      assert_equal('created_at', index_list_fields[4].field)
+
+      association_search_list_fields = resource.association_search_list_fields
+      assert_equal(2, association_search_list_fields.size)
+      assert_equal('category', association_search_list_fields[1].field)
+    end
   end
 end

@@ -49,6 +49,19 @@ module Infold
       end
     end
 
+    ListField = Struct.new( :field )
+    def index_list_fields
+      fields = app.dig(:index, :list, :fields)
+      fields ||= self_table.columns[0, 5].map(&:name)
+      fields.map { |f| ListField.new(f) }
+    end
+
+    def association_search_list_fields
+      fields = app.dig(:association_search, :list, :fields)
+      fields ||= self_table.columns[0, 2].map(&:name)
+      fields.map { |f| ListField.new(f) }
+    end
+
     FormField = Struct.new( :field, :kind, :association_fields )
     def form_fields
       app.dig(:form, :fields)&.map do |field_config|

@@ -43,6 +43,10 @@ module Infold
       end
     end
 
+    def list_field_header_code(list_field)
+      "= render Admin::SortableComponent.new(@search, :#{list_field.field})"
+    end
+
     def sign_label(sign)
       case sign.to_s
       when 'lteq' then 'or less'

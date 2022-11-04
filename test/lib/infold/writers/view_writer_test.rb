@@ -215,5 +215,22 @@ module Infold
       assert_equal("= render Admin::FieldsetComponent.new(form, :price_eq, :text, " +
                      "prepend: '#{writer.sign_label('eq')}', append: 'YEN')", code)
     end
+
+    test "list_field_header_code should be return field code" do
+      yaml = <<-"YAML"
+        app:
+          index:
+            list:
+              fields:
+                - id
+                - name
+                - category
+      YAML
+      resource = Resource.new('product', YAML.load(yaml))
+      list_field = resource.index_list_fields.last
+      writer = ViewWriter.new(resource)
+      code = writer.list_field_header_code(list_field)
+      assert_equal("= render Admin::SortableComponent.new(@search, :category)", code)
+    end
   end
 end
