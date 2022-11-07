@@ -1,0 +1,26 @@
+<%# encoding: utf-8 -%>
+%tr{ id: dom_id(<%= @writer.model_name.underscore %>) }
+  %td.tac
+    = link_to <%= @writer.show_path(@writer.model_name.underscore) %>, class: 'd-block', data: { turbo_frame: 'modal_main' } do
+      %i.bi.bi-file-text
+<%- @writer.resource.index_list_fields.each do |field| -%>
+  %td<%=  %>
+<%- end -%>
+  %td.tac
+    = link_to <%= @writer.edit_path(@writer.model_name.underscore) %>, class: 'd-block', data: { turbo_frame: "modal_main" } do
+      %i.bi.bi-pencil-square
+
+<%- @app.app_view_index.search_result_fields.select(&:display?).sort_by(&:seq).each do |result| -%>
+<%- if result.is_a?(Infold::SearchResultColumn) -%>
+  %td
+    = <%= result.code_flash_display(@ns_snake, @app.model.name.underscore) %>
+<%- else -%>
+  %td<%= '.image_cell' if result.attachment_field.kind_image? %>
+    <%= result.attachment_field.file_display_code(@app.model.name.underscore, '    ', thumb: true) %>
+<%- end -%>
+<%- end -%>
+<%- if @app.app_view_form.present? -%>
+  %td.tac
+    = link_to <%= @app.app_view_form.edit_path(@ns_snake, @app.model.name.underscore) %>, class: 'd-block', data: { turbo_frame: "modal_main" } do
+      %i.bi.bi-pencil-square
+<%- end -%>

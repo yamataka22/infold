@@ -15,5 +15,9 @@ module Infold
     def index_file
       template "views/index.haml", Rails.root.join("infold/model", "#{name}_view_index.html.haml"), force: true
     end
+
+    def index_row_file
+      template "views/_index_row.haml", Rails.root.join("infold/model", "#{name}_view_index_row.html.haml"), force: true
+    end
   end
 end

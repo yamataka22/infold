@@ -3,38 +3,20 @@ require "active_support/core_ext/hash/indifferent_access"
 module Infold
   module ResourceModel
 
-    ModelAssociation = Struct.new( :kind, :association_name, :class_name, :foreign_key, :dependent, :name_field )
+    ModelAssociation = Struct.new( :kind, :association_name, :class_name, :foreign_key, :dependent, :name_field, :search_path )
     def model_associations
       model.dig(:association)&.map do |association_name, options|
         model_association =  ModelAssociation.new
         model_association.association_name = association_name
         model_association.kind = options.dig(:kind)
-        model_association.class_name = options.dig(:class_name)
+        model_association.class_name = options.dig(:class_name).presence || association_name.singularize.camelize
         model_association.foreign_key = options.dig(:foreign_key)
         model_association.dependent = options.dig(:dependent)
-        model_association.name_field = options.dig(:name_field)
+        model_association.name_field =
+          options.dig(:name_field).presence || options.dig(:foreign_key).presence || "#{association_name.singularize}_id"
+        model_association.search_path = "admin_#{association_name.pluralize}_path"
         model_association
       end
-    end
-
-    def model_association(association_name)
-      model_associations&.find { |ma| ma.kind == 'belongs_to' && ma.association_name == association_name }
-    end
-
-    def model_association_class_name(association_name)
-      model_association = model_association(association_name)
-      model_association&.class_name.presence || association_name.singularize.camelize
-    end
-
-    def model_association_name_field(association_name)
-      model_association = model_association(association_name)
-      model_association&.name_field.presence ||
-        model_association&.foreign_key.presence ||
-        "#{association_name.singularize}_id"
-    end
-
-    def model_association_search_path(association_name)
-      "admin_#{association_name.pluralize}_path"
     end
 
     FormAssociation = Struct.new( :field )

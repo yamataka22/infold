@@ -30,7 +30,7 @@
             %tr
               %th.icon_cell
             <%- @writer.resource.index_list_fields.each do |field| -%>
-              %th<%= @writer.list_field_header_code(field) %>
+              %th<%= @writer.index_list_header_code(field) %>
             <%- end -%>
               %th.icon_cell
           %tbody#<%= @writer.model_name.underscore.pluralize %>

@@ -6,19 +6,18 @@ module Infold
       scope = "#{condition.field}_#{condition.sign.presence || 'eq'}"
       code = "= render Admin::FieldsetComponent.new(form, :#{scope}, "
       association_name = condition.association_name.presence || condition.field.gsub('_id', '')
-      association_class_name = resource.model_association_class_name(association_name)
-      association_name_field = resource.model_association_name_field(association_name)
+      model_association = resource.model_associations&.find { |ma| ma.association_name == association_name }
 
-      if condition.form_kind == 'association_search' && association_class_name
-        code + ":association, association: :#{association_class_name.underscore.pluralize}, " +
-          "search_path: #{resource.model_association_search_path(association_name)}, " +
-          "name_field: :#{association_class_name.underscore.singularize}_#{association_name_field})"
+      if condition.form_kind == 'association_search' && model_association
+        code + ":association, association: :#{model_association.class_name.underscore.pluralize}, " +
+          "search_path: #{model_association.search_path}, " +
+          "name_field: :#{model_association.class_name.underscore.singularize}_#{model_association.name_field})"
       elsif condition.form_kind == 'select'
         list =
           if resource.enum?(condition.field)
             "Admin::#{model_name}.#{condition.field.pluralize}_i18n.invert"
-          elsif association_class_name
-            "Admin::#{association_class_name}.all.pluck(:#{association_name_field}, :id)"
+          elsif model_association
+            "Admin::#{model_association.class_name}.all.pluck(:#{model_association.name_field}, :id)"
           end
         code + ":select, list: #{list}, selected_value: form.object.#{scope})"
       elsif condition.form_kind == 'radio'
@@ -43,8 +42,16 @@ module Infold
       end
     end
 
-    def list_field_header_code(list_field)
+    def index_list_header_code(list_field)
       "= render Admin::SortableComponent.new(@search, :#{list_field.field})"
+    end
+
+    def index_row_code(list_field)
+      column = self_table.columns.find { |c| c.name == list_field.field }
+      return "= #{list_field}" unless column
+      if column.type == ''
+        'aaa'
+      end
     end
 
     def sign_label(sign)

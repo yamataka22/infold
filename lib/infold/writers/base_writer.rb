@@ -37,5 +37,13 @@ module Infold
     def new_path
       "new_admin_#{model_name.underscore}_path"
     end
+
+    def show_path(object)
+      "admin_#{model_name.underscore}_path(#{object})"
+    end
+
+    def edit_path(object)
+      "edit_admin_#{model_name.underscore}_path(#{object})"
+    end
   end
 end
