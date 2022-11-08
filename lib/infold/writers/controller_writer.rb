@@ -6,16 +6,16 @@ module Infold
       @resource.app_title
     end
 
-    def build_new_association_code(if_blank: false)
+    def association_new_code(if_blank: false)
       code = ''
-      @resource.form_fields&.select { |ff| ff.kind == 'association' }&.map do |form_field|
+      @resource.association_fields&.select { |af| af.form_element.present?  } &.each do |association_field|
         code +=
-          if @resource.model_associations.find { |ma| ma.association_name == form_field.field.gsub('_id', '') && ma.kind == 'has_one' }
-            "@#{model_name.underscore}.build_#{form_field.field}"
+          if association_field.association.has_one?
+            "@#{model_name(:snake)}.build_#{association_field.name}"
           else
-            "@#{model_name.underscore}.#{form_field.field}.build"
+            "@#{model_name(:snake)}.#{association_field.name}.build"
           end
-        code += " if @#{model_name.underscore}.#{form_field.field}.blank?" if if_blank
+        code += " if @#{model_name(:snake)}.#{association_field.name}.blank?" if if_blank
         code += "\n"
       end
       inset_indent(code, 3) if code.present?
@@ -24,11 +24,11 @@ module Infold
     def search_params_code
       fields = []
       any_fields = []
-      @resource.search_conditions.each do |condition|
-        if condition.sign == 'any'
-          any_fields << "[TAB]#{condition.field.pluralize}: []"
+      @resource.conditions.each do |condition|
+        if condition.sign == :any
+          any_fields << "[TAB]#{condition.field.name(:multi)}: []"
         else
-          fields << "[TAB]:#{condition.field}"
+          fields << "[TAB]:#{condition.field.name}"
         end
       end
       fields += %w([TAB]:sort_field [TAB]:sort_kind)
@@ -37,7 +37,7 @@ module Infold
     end
 
     def post_params_code
-      fields = post_params_fields(@resource.self_table, @resource.form_fields)
+      fields = post_params_fields(@resource.form_element_fields)
       fields = fields.join(",\n") if fields.present?
       code = "params.require(:admin_#{model_name.underscore}).permit(\n" + fields.to_s + "\n)"
       inset_indent(code, 3) if fields.present?
@@ -45,20 +45,20 @@ module Infold
 
     private
 
-      def post_params_fields(table, form_fields)
+      def post_params_fields(form_element_fields)
         fields = []
-        form_fields&.sort_by{ |f| f.kind == 'association' ? 9 : 0 }&.each do |form_field|
-          column = table&.columns&.find { |column| column.name == form_field.field }
-          if form_field.kind == 'file'
-            fields += %W(:#{form_field.field} :remove_#{form_field.field})
-          elsif form_field.kind == 'association'
-            association_fields = post_params_fields(association_table(form_field.field), form_field.association_fields)
-            fields << "#{form_field.field}_attributes: [\n[TAB]" + association_fields.join(",\n[TAB]") + "\n[TAB]]"
-          elsif column&.type == 'datetime'
+        form_element_fields&.sort_by{ |f| f.form_element.kind_association? ? 9 : 0 }&.each do |form_element_field|
+          form_element = form_element_field.form_element
+          if form_element.kind_file?
+            fields += %W(:#{form_element_field.name} :remove_#{form_element_field.name})
+          elsif form_element.kind_association?
+            association_fields = post_params_fields(form_element.association_fields)
+            fields << "#{form_element_field.name}_attributes: [\n[TAB]" + association_fields.join(",\n[TAB]") + "\n[TAB]]"
+          elsif form_element.kind_datetime?
             # datetimeはdateとtimeに分ける
-            fields += %W(:#{column.name}_date :#{column.name}_time)
+            fields += %W(:#{form_element_field.name}_date :#{form_element_field.name}_time)
           else
-            fields << ":#{form_field.field}"
+            fields << ":#{form_element_field.name}"
           end
         end
         fields.map{ |f| "[TAB]#{f}"}

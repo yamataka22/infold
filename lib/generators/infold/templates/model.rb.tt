@@ -1,12 +1,13 @@
 <%# encoding: utf-8 -%>
 module Admin
   class <%= @writer.model_name %> < ::<%= @writer.model_name %>
-  <%- if @writer.resource.self_table.datetime_columns.present? -%>
+  <%- if @writer.resource.table.datetime_columns.present? -%>
     include DatetimeFieldConcern
 
-    <%= @writer.datetime_field_code&.gsub('[TAB]', '  ') %>
+    <%= @writer.datetime_field_code&.gsub('[TAB]', '  ') -%>
   <%- end -%>
-    <%= @writer.association_code&.gsub('[TAB]', '  ') -%>
+    <%= @writer.association_code %>
+    <%= @writer.accepts_nested_attributes_code -%>
     <%= @writer.active_storage_attachment_code&.gsub('[TAB]', '  ') -%>
     <%= @writer.validation_code&.gsub('[TAB]', '  ') -%>
     <%= @writer.datetime_validation_code -%>

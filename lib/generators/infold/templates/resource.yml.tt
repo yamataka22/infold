@@ -1,8 +1,8 @@
 <%# encoding: utf-8 -%>
 model:
-  validates:
-  decorates:
-  associations:
+  validate:
+  decorator:
+  association:
   enum:
   active_storage:
 app:

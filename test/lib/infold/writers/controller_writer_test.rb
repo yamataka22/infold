@@ -1,6 +1,6 @@
 require 'test_helper'
 require 'infold/writers/controller_writer'
-require 'infold/resource'
+require 'infold/property/resource'
 require 'infold/db_schema'
 
 module Infold
@@ -27,9 +27,21 @@ module Infold
               - member:
                   kind: association
       YAML
-      resource = Resource.new('product', YAML.load(yaml))
+      db_schema_content = <<-"RUBY"
+        create_table "products" do |t|
+          t.string "name"
+        end
+        create_table "details" do |t|
+          t.bigint "product_id"
+        end
+        create_table "members" do |t|
+          t.bigint "product_id"
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      resource = Resource.new('product', YAML.load(yaml), db_schema)
       writer = ControllerWriter.new(resource)
-      code = writer.build_new_association_code
+      code = writer.association_new_code
       assert_match(/@product.details.build$/, code.gsub(/^\s+/, ''))
       assert_match(/@product.build_member$/, code.gsub(/^\s+/, ''))
     end
@@ -46,9 +58,18 @@ module Infold
               - details:
                   kind: association
       YAML
-      resource = Resource.new('product', YAML.load(yaml))
+      db_schema_content = <<-"RUBY"
+        create_table "products" do |t|
+          t.string "name"
+        end
+        create_table "details" do |t|
+          t.bigint "product_id"
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      resource = Resource.new('product', YAML.load(yaml), db_schema)
       writer = ControllerWriter.new(resource)
-      code = writer.build_new_association_code(if_blank: true)
+      code = writer.association_new_code(if_blank: true)
       assert_match("@product.details.build if @product.details.blank?", code.gsub(/^\s+/, ''))
     end
 
@@ -163,9 +184,9 @@ module Infold
           :price,
           :published_at_date,
           :published_at_time,
+          :description,
           :image,
           :remove_image,
-          :description,
           one_details_attributes: [
             :title,
             :stock

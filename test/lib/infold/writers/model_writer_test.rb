@@ -1,6 +1,6 @@
 require 'test_helper'
 require 'infold/writers/model_writer'
-require 'infold/resource'
+require 'infold/property/resource'
 require 'infold/db_schema'
 
 module Infold
@@ -10,39 +10,38 @@ module Infold
       @resource = Resource.new("product", {})
     end
 
-    test "association_code should be nil if setting.associations is not defined" do
-      writer = ModelWriter.new(@resource)
-      code = writer.association_code
-      assert_nil(code)
-    end
-
-    test "association_code should be nil if resource.associations is defined but empty" do
-      yaml = <<-"YAML"
-        model:
-          association:
-      YAML
-      resource = Resource.new('product', YAML.load(yaml))
-      writer = ModelWriter.new(resource)
-      code = writer.association_code
-      assert_nil(code)
-    end
-
     test "association_code should generate has_many, has_one, belongs_to" do
       yaml = <<-"YAML"
         model:
           association:
-            children:
+            one_children:
               kind: has_many
-            child:
+            two_child:
               kind: has_one
             parent:
               kind: belongs_to
       YAML
-      resource = Resource.new('product', YAML.load(yaml))
+      db_schema_content = <<-"RUBY"
+        create_table "products" do |t|
+          t.string "name"
+          t.bigint "parent_id"
+        end
+        create_table "one_children" do |t|
+          t.bigint "product_id"
+        end
+        create_table "two_children" do |t|
+          t.bigint "product_id"
+        end
+        create_table "parents" do |t|
+          t.name "parent_name"
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      resource = Resource.new('product', YAML.load(yaml), db_schema)
       writer = ModelWriter.new(resource)
       code = writer.association_code
-      assert_match("has_many :children", code)
-      assert_match("has_one :child", code)
+      assert_match("has_many :one_children", code)
+      assert_match("has_one :two_child", code)
       assert_match("belongs_to :parent", code)
     end
 
@@ -59,14 +58,26 @@ module Infold
               class_name: 'TwoDetail'
               dependent: 'delete_all'
       YAML
-      resource = Resource.new('product', YAML.load(yaml))
+      db_schema_content = <<-"RUBY"
+        create_table "products" do |t|
+          t.string "name"
+        end
+        create_table "one_details" do |t|
+          t.bigint "product_id"
+        end
+        create_table "two_details" do |t|
+          t.bigint "product_id"
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      resource = Resource.new('product', YAML.load(yaml), db_schema)
       writer = ModelWriter.new(resource)
       code = writer.association_code
       assert_match("has_many :one_details, foreign_key: 'one_detail_id', dependent: :destroy", code)
       assert_match("has_many :two_details, class_name: 'TwoDetail', dependent: :delete_all", code)
     end
 
-    test "association_code should generate accepts_nested_attributes_for if resource.form contains associations" do
+    test "accepts_nested_attributes_code should generate accepts_nested_attributes_for if resource.form contains associations" do
       yaml = <<-"YAML"
         model:
           association:
@@ -83,10 +94,21 @@ module Infold
                     - id
                     - name
       YAML
-      resource = Resource.new('product', YAML.load(yaml))
+      db_schema_content = <<-"RUBY"
+        create_table "products" do |t|
+          t.string "name"
+        end
+        create_table "one_details" do |t|
+          t.bigint "product_id"
+        end
+        create_table "two_details" do |t|
+          t.bigint "product_id"
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      resource = Resource.new('product', YAML.load(yaml), db_schema)
       writer = ModelWriter.new(resource)
-      code = writer.association_code
-      assert_match("has_many :one_details", code)
+      code = writer.accepts_nested_attributes_code
       assert_match("accepts_nested_attributes_for :one_details", code)
       refute_match("accepts_nested_attributes_for :two_details", code)
     end

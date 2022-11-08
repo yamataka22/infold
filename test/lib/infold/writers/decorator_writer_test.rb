@@ -1,6 +1,6 @@
 require 'test_helper'
 require 'infold/writers/decorator_writer'
-require 'infold/resource'
+require 'infold/property/resource'
 require 'infold/db_schema'
 
 module Infold
@@ -76,7 +76,7 @@ module Infold
       RUBY
       yaml = <<-"YAML"
         model:
-          decorate:
+          decorator:
             price:
               append: "YEN"
               digit: true
@@ -102,7 +102,7 @@ module Infold
       RUBY
       yaml = <<-"YAML"
         model:
-          decorate:
+          decorator:
             price:
               prepend: "$"
               digit: true
@@ -127,7 +127,7 @@ module Infold
       RUBY
       yaml = <<-"YAML"
         model:
-          decorate:
+          decorator:
             price:
               prepend: "$"
               digit: true
@@ -155,7 +155,7 @@ module Infold
       RUBY
       yaml = <<-"YAML"
         model:
-          decorate:
+          decorator:
             stock:
               digit: true
             price:
@@ -184,7 +184,7 @@ module Infold
       RUBY
       yaml = <<-"YAML"
         model:
-          decorate:
+          decorator:
             name:
               prepend: "NAME:"
       YAML

@@ -8,7 +8,9 @@ module Infold
         row = row.strip
         if row.start_with?('create_table')
           table_name = row.split('"').second.strip
-          @tables << Table.new(table_name)
+          table = Table.new(table_name)
+          @tables << table
+          table.add_columns('id', 'bigint') unless row.include?('id: false')
         elsif @tables.present? && row.start_with?('t.')
           table = @tables.last
           name = row.split('"').second.strip
@@ -18,7 +20,7 @@ module Infold
       end
     end
 
-    def table(target)
+    def find_table(target)
       target = target.underscore.singularize
       tables.find { |t| t.name.underscore.singularize == target }
     end

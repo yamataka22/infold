@@ -10,10 +10,6 @@ module Infold
       @resource = resource
     end
 
-    def model_name
-      @resource.self_table&.model_name
-    end
-
     def inset_indent(code, size, first_row: false)
       return unless code
       indent = '  ' * size
@@ -22,13 +18,13 @@ module Infold
       code
     end
 
-    def association_table(association_name)
-      model_association = @resource.model_associations&.
-        find { |model_association| model_association.association_name == association_name }
-      table_name = model_association&.class_name&.underscore&.pluralize ||
-        model_association.association_name.pluralize
-      @resource.table(table_name)
-    end
+    # def association_table(association_name)
+    #   model_association = @resource.model_associations&.
+    #     find { |model_association| model_association.association_name == association_name }
+    #   table_name = model_association&.class_name&.underscore&.pluralize ||
+    #     model_association.association_name.pluralize
+    #   @resource.table(table_name)
+    # end
 
     def index_path
       "admin_#{model_name.underscore.pluralize}_path"
@@ -44,6 +40,15 @@ module Infold
 
     def edit_path(object)
       "edit_admin_#{model_name.underscore}_path(#{object})"
+    end
+
+    def model_name(*attr)
+      name = @resource.table.model_name
+      name = name.underscore if attr.include?(:snake)
+      name = name.camelize if attr.include?(:camel)
+      name = name.singularize if attr.include?(:single)
+      name = name.pluralize if attr.include?(:multi)
+      name
     end
   end
 end
