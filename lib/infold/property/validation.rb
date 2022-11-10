@@ -1,3 +1,5 @@
+require "active_support/core_ext/hash/indifferent_access"
+
 module Infold
   class Validation
     include ActiveModel::Model
@@ -10,8 +12,8 @@ module Infold
       self.conditions = []
     end
 
-    def add_conditions(**attrs)
-      self.conditions << ValidateCondition.new(**attrs)
+    def add_conditions(condition, options)
+      self.conditions << ValidateCondition.new(condition, options)
     end
 
     def has_presence_validation?
@@ -21,8 +23,12 @@ module Infold
     class ValidateCondition
       include ActiveModel::Model
 
-      attr_writer :condition
       attr_accessor :options
+
+      def initialize(condition, options)
+        @condition = condition
+        @options = options&.with_indifferent_access
+      end
 
       def condition
         @condition.to_sym

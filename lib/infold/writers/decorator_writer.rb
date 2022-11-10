@@ -4,7 +4,7 @@ module Infold
   class DecoratorWriter < BaseWriter
     def decorator_code
       code = @resource.decorator_fields&.map do |field|
-        case field.decorator.kind.to_sym
+        case field.decorator.kind
         when :enum
           enum_code(field)
         when :boolean

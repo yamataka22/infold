@@ -26,8 +26,8 @@ module Infold
 
     def datetime_field_code
       code = ''
-      @resource.table.datetime_columns.each do |column|
-        code += "datetime_field :#{column}\n"
+      @resource.datetime_fields&.each do |field|
+        code += "datetime_field :#{field.name}\n"
       end
       inset_indent(code, 2).presence
     end
@@ -75,9 +75,9 @@ module Infold
 
     def datetime_validation_code
       code = []
-      @resource.table.datetime_columns&.each do |column|
-        code << "validates :#{column}_date, presence: true, if: -> { #{column}_time.present? }"
-        code << "validates :#{column}_time, presence: true, if: -> { #{column}_date.present? }"
+      @resource.datetime_fields&.each do |field|
+        code << "validates :#{field.name}_date, presence: true, if: -> { #{field.name}_time.present? }"
+        code << "validates :#{field.name}_time, presence: true, if: -> { #{field.name}_date.present? }"
       end
       code << "\n" if code.present?
       inset_indent(code.join("\n"), 2).presence

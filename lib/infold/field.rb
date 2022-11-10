@@ -8,14 +8,13 @@ require 'infold/property/decorator'
 
 module Infold
   class Field
-    attr_reader :type,
-                :validation,
+    attr_reader :validation,
                 :enum,
                 :active_storage,
                 :form_element,
                 :decorator,
-                :search_conditions
-    attr_accessor :association
+                :search_conditions,
+                :association
 
     attr_writer :in_index_list,
                 :in_csv,
@@ -37,8 +36,8 @@ module Infold
       name
     end
 
-    def build_validation
-      @validation = Validation.new(self)
+    def type
+      @type&.to_sym
     end
 
     def build_active_storage(**attrs)
@@ -68,6 +67,11 @@ module Infold
     def active_storage?; @active_storage.present? end
     def form_element?; @form_element.present? end
 
+    def add_validation(condition, options = {})
+      @validation ||= Validation.new(self)
+      @validation.add_conditions(condition, options)
+    end
+
     def add_search_condition(view_kind, sign:, form_kind:, association_name: nil)
       form_kind = 'text' if form_kind.blank?
       condition = @search_conditions.find{ |sc| sc.sign == sign.to_sym }
@@ -78,10 +82,15 @@ module Infold
         condition.association_search_form_kind = form_kind
       end
       condition.index_association_name = association_name
+      condition
     end
 
     def datepicker?
       %w(date datetime).include?(type.to_s)
+    end
+
+    def number?
+      %w(integer float decimal).include?(type.to_s)
     end
 
     def in_index_list?; @in_index_list end

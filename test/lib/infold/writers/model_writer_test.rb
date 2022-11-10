@@ -1,76 +1,51 @@
 require 'test_helper'
 require 'infold/writers/model_writer'
-require 'infold/property/resource'
-require 'infold/db_schema'
+require 'infold/table'
+require 'infold/field'
+require 'infold/resource'
 
 module Infold
   class ModelWriterTest < ::ActiveSupport::TestCase
 
-    setup do
-      @resource = Resource.new("product", {})
-    end
-
     test "association_code should generate has_many, has_one, belongs_to" do
-      yaml = <<-"YAML"
-        model:
-          association:
-            one_children:
-              kind: has_many
-            two_child:
-              kind: has_one
-            parent:
-              kind: belongs_to
-      YAML
-      db_schema_content = <<-"RUBY"
-        create_table "products" do |t|
-          t.string "name"
-          t.bigint "parent_id"
-        end
-        create_table "one_children" do |t|
-          t.bigint "product_id"
-        end
-        create_table "two_children" do |t|
-          t.bigint "product_id"
-        end
-        create_table "parents" do |t|
-          t.name "parent_name"
-        end
-      RUBY
-      db_schema = DbSchema.new(db_schema_content)
-      resource = Resource.new('product', YAML.load(yaml), db_schema)
+      fields = []
+      field = Field.new('one_details')
+      field.build_association(kind: :has_many, association_table: Table.new('one_details'))
+      fields << field
+
+      field = Field.new('tow_detail')
+      field.build_association(kind: :has_one, association_table: Table.new('one_details'))
+      fields << field
+
+      field = Field.new('parent_id')
+      field.build_association(kind: :belongs_to, association_table: Table.new('parents'), name: 'parent')
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ModelWriter.new(resource)
       code = writer.association_code
-      assert_match("has_many :one_children", code)
-      assert_match("has_one :two_child", code)
+      assert_match("has_many :one_details", code)
+      assert_match("has_one :tow_detail", code)
       assert_match("belongs_to :parent", code)
     end
 
     test "association_code should generate association with options if resource.associations defined in hash" do
-      yaml = <<-"YAML"
-        model:
-          association:
-            one_details:
-              kind: has_many
-              foreign_key: 'one_detail_id'
-              dependent: 'destroy'
-            two_details:
-              kind: has_many
-              class_name: 'TwoDetail'
-              dependent: 'delete_all'
-      YAML
-      db_schema_content = <<-"RUBY"
-        create_table "products" do |t|
-          t.string "name"
-        end
-        create_table "one_details" do |t|
-          t.bigint "product_id"
-        end
-        create_table "two_details" do |t|
-          t.bigint "product_id"
-        end
-      RUBY
-      db_schema = DbSchema.new(db_schema_content)
-      resource = Resource.new('product', YAML.load(yaml), db_schema)
+      fields = []
+      field = Field.new('one_details')
+      field.build_association(kind: :has_many,
+                              association_table: Table.new('one_details'),
+                              foreign_key: 'one_detail_id',
+                              dependent: 'destroy')
+      fields << field
+
+      field = Field.new('two_details')
+      field.build_association(kind: :has_many,
+                              association_table: Table.new('one_details'),
+                              class_name: 'TwoDetail',
+                              dependent: 'delete_all')
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ModelWriter.new(resource)
       code = writer.association_code
       assert_match("has_many :one_details, foreign_key: 'one_detail_id', dependent: :destroy", code)
@@ -78,52 +53,30 @@ module Infold
     end
 
     test "accepts_nested_attributes_code should generate accepts_nested_attributes_for if resource.form contains associations" do
-      yaml = <<-"YAML"
-        model:
-          association:
-            one_details:
-              kind: has_many
-            two_details:
-              kind: has_many
-        app:
-          form:
-            fields:
-              - one_details:
-                  kind: associations
-                  fields:
-                    - id
-                    - name
-      YAML
-      db_schema_content = <<-"RUBY"
-        create_table "products" do |t|
-          t.string "name"
-        end
-        create_table "one_details" do |t|
-          t.bigint "product_id"
-        end
-        create_table "two_details" do |t|
-          t.bigint "product_id"
-        end
-      RUBY
-      db_schema = DbSchema.new(db_schema_content)
-      resource = Resource.new('product', YAML.load(yaml), db_schema)
+      fields = []
+      field = Field.new('one_details')
+      field.build_association(kind: :has_many, association_table: Table.new('one_details'))
+      field.build_form_element(form_kind: :associations)
+      fields << field
+
+      field = Field.new('tow_details')
+      field.build_association(kind: :has_many, association_table: Table.new('one_details'))
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ModelWriter.new(resource)
       code = writer.accepts_nested_attributes_code
       assert_match("accepts_nested_attributes_for :one_details", code)
       refute_match("accepts_nested_attributes_for :two_details", code)
     end
-    
+
     test "datetime_field_code should generate except timestamp filed" do
-      db_schema_content = <<-"RUBY"
-        create_table "products" do |t|
-          t.string "name"
-          t.datetime "delivery_at", null: false
-          t.datetime "created_at", null: false
-          t.datetime "updated_at", null: false
-        end
-      RUBY
-      db_schema = DbSchema.new(db_schema_content)
-      resource = Resource.new('product', {}, db_schema)
+      fields = []
+      fields << Field.new('delivery_at', 'datetime')
+      fields << Field.new('created_at', 'datetime')
+      fields << Field.new('updated_at', 'datetime')
+
+      resource = Resource.new('Product', fields)
       writer = ModelWriter.new(resource)
       code = writer.datetime_field_code
       assert_match("datetime_field :delivery_at", code)
@@ -132,15 +85,16 @@ module Infold
     end
 
     test "active_storage_attachment_code should generate active_storage field" do
-      yaml = <<-"YAML"
-        model:
-          active_storage:
-            image:
-              kind: image
-            pdf:
-              kind: file
-      YAML
-      resource = Resource.new('product', YAML.load(yaml))
+      fields = []
+      field = Field.new('image')
+      field.build_active_storage(kind: :image)
+      fields << field
+
+      field = Field.new('pdf')
+      field.build_active_storage(kind: :file)
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ModelWriter.new(resource)
       code = writer.active_storage_attachment_code
       expect_code = <<-RUBY.gsub(/^\s+/, '')
@@ -153,19 +107,13 @@ module Infold
     end
 
     test "active_storage_attachment_code should generate active_storage field with thumb" do
-      yaml = <<-"YAML"
-        model:
-          active_storage:
-            image:
-              kind: image
-              thumb:
-                kind: fit
-                width: 100
-                height: 200
-            pdf:
-              kind: file
-      YAML
-      resource = Resource.new('product', YAML.load(yaml))
+      fields = []
+      field = Field.new('image')
+      active_storage = field.build_active_storage(kind: :image)
+      active_storage.build_thumb(kind: :fit, width: 100, height: 200)
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ModelWriter.new(resource)
       code = writer.active_storage_attachment_code
       expect_code = <<-RUBY.gsub(/^\s+/, '')
@@ -178,29 +126,33 @@ module Infold
     end
 
     test "validation_code should generate presence validates" do
-      yaml = <<-"YAML"
-        model:
-          validate:
-            stock: presence
-      YAML
-      resource = Resource.new('product', YAML.load(yaml))
+      fields = []
+      field = Field.new('stock')
+      field.add_validation(:presence)
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ModelWriter.new(resource)
       code = writer.validation_code
       assert_equal("validates :stock, presence: true", code.gsub(/^\s+|\n/, ''))
     end
 
     test "validation_code should generate multiple validates" do
-      yaml = <<-"YAML"
-        model:
-          validate:
-            stock: presence
-            name:
-              - presence
-              - uniqueness
-            price:
-              - uniqueness
-      YAML
-      resource = Resource.new('product', YAML.load(yaml))
+      fields = []
+      field = Field.new('stock')
+      field.add_validation(:presence)
+      fields << field
+
+      field = Field.new('name')
+      field.add_validation(:presence)
+      field.add_validation(:uniqueness)
+      fields << field
+
+      field = Field.new('price')
+      field.add_validation(:uniqueness)
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ModelWriter.new(resource)
       code = writer.validation_code
       assert_match("validates :stock, presence: true", code.gsub(/^\s+|\[TAB\]/, ''))
@@ -209,16 +161,13 @@ module Infold
     end
 
     test "validation_code should generate validates include options" do
-      yaml = <<-"YAML"
-        model:
-          validate:
-            price:
-              - presence
-              - numericality:
-                  greater_than_or_equal_to: 0
-                  less_than_or_equal_to: 100
-      YAML
-      resource = Resource.new('product', YAML.load(yaml))
+      fields = []
+      field = Field.new('price')
+      field.add_validation(:presence)
+      field.add_validation(:numericality, { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 })
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ModelWriter.new(resource)
       code = writer.validation_code
       assert_match("validates :price, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }",
@@ -226,17 +175,20 @@ module Infold
     end
 
     test "enum_code should generate enum" do
-      yaml = <<-"YAML"
-        model:
-          enum:
-            status:
-              ordered: 1
-              charged: 2
-            category:
-              kitchen: 1
-              living: 2
-      YAML
-      resource = Resource.new('product', YAML.load(yaml))
+      fields = []
+      field = Field.new('status')
+      enum = field.build_enum
+      enum.add_elements(key: :ordered, value: 1)
+      enum.add_elements(key: :charged, value: 2)
+      fields << field
+
+      field = Field.new('category')
+      enum = field.build_enum
+      enum.add_elements(key: :kitchen, value: 1)
+      enum.add_elements(key: :living, value: 2)
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ModelWriter.new(resource)
       code = writer.enum_code
       assert_match("enum status: { ordered: 1, charged: 2 }, _prefix: true", code.gsub(/^\s+|\[TAB\]/, ''))
@@ -244,25 +196,32 @@ module Infold
     end
 
     test "scope_code should generate scope (only index_conditions, except datetime)" do
-      yaml = <<-"YAML"
-        app:
-          index:
-            conditions:
-              - id:
-                  sign: eq
-              - name:
-                  sign: full_like
-              - price:
-                  sign: gteq
-              - company_id:
-                  sign: eq
-                  form_kind: association
-              - status:
-                  sign: any
-              - address:
-                  sign: start_with
-      YAML
-      resource = Resource.new('product', YAML.load(yaml))
+      fields = []
+      field = Field.new('id')
+      field.add_search_condition(:index, sign: :eq, form_kind: :text)
+      fields << field
+
+      field = Field.new('name')
+      field.add_search_condition(:index, sign: :full_like, form_kind: :text)
+      fields << field
+
+      field = Field.new('price')
+      field.add_search_condition(:index, sign: :gteq, form_kind: :text)
+      fields << field
+
+      field = Field.new('company_id')
+      field.add_search_condition(:index, sign: :eq, form_kind: :association)
+      fields << field
+
+      field = Field.new('status')
+      field.add_search_condition(:index, sign: :any, form_kind: :checkbox)
+      fields << field
+
+      field = Field.new('address')
+      field.add_search_condition(:index, sign: :start_with, form_kind: :text)
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ModelWriter.new(resource)
       code = writer.scope_code
       assert_match('where(id: v) if v.present?', code)
@@ -274,25 +233,25 @@ module Infold
     end
 
     test "scope_code should generate scope (index_conditions and association_conditions, except datetime)" do
-      yaml = <<-"YAML"
-        app:
-          index:
-            conditions:
-              - id:
-                  sign: eq
-              - company_id:
-                  sign: eq
-                  form_kind: association
-              - status:
-                  sign: any
-          association_search:
-            conditions:
-              - id: 
-                  sign: eq
-              - name:
-                  sign: full_like
-      YAML
-      resource = Resource.new('product', YAML.load(yaml))
+      fields = []
+      field = Field.new('id')
+      field.add_search_condition(:index, sign: :eq, form_kind: :text)
+      field.add_search_condition(:association_search, sign: :eq, form_kind: :text)
+      fields << field
+
+      field = Field.new('company_id')
+      field.add_search_condition(:index, sign: :eq, form_kind: :association)
+      fields << field
+
+      field = Field.new('status')
+      field.add_search_condition(:index, sign: :any, form_kind: :checkbox)
+      fields << field
+
+      field = Field.new('name')
+      field.add_search_condition(:association_search, sign: :full_like, form_kind: :text)
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ModelWriter.new(resource)
       code = writer.scope_code
       assert_equal(4, code.scan('scope').size)
@@ -302,23 +261,13 @@ module Infold
     end
 
     test "scope_code should generate scope (about datetime)" do
-      yaml = <<-"YAML"
-        app:
-          index:
-            conditions:
-              - delivery_at:
-                  sign: eq
-              - delivery_at:
-                  sign: lteq
-      YAML
-      db_schema_content = <<-"RUBY"
-        create_table "products" do |t|
-          t.string "name"
-          t.datetime "delivery_at", null: false
-        end
-      RUBY
-      db_schema = DbSchema.new(db_schema_content)
-      resource = Resource.new('product', YAML.load(yaml), db_schema)
+      fields = []
+      field = Field.new('delivery_at', :datetime)
+      field.add_search_condition(:index, sign: :eq, form_kind: :text)
+      field.add_search_condition(:index, sign: :lteq, form_kind: :text)
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ModelWriter.new(resource)
       code = writer.scope_code
       expect_code = <<-RUBY.gsub(/^\s+/, '')

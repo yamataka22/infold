@@ -9,19 +9,19 @@ module Infold
         case condition.form_kind(:index)
         when :association_search
           association = condition.field.association
-          "association_name: :#{association.association_name}, " +
+          "association_name: :#{association.name}, " +
             "search_path: #{association.search_path}, " +
             "name_field: :#{association.model_name(:single, :snake)}_#{association.name_field})"
         when :select
           list =
             if field.enum?
-              "Admin::#{model_name}.#{field.name(:multi)}_i18n.invert"
+              "Admin::#{resource_name}.#{field.name(:multi)}_i18n.invert"
             elsif field.association?
               "Admin::#{field.association.model_name}.all.pluck(:#{field.association.name_field}, :id)"
             end
           "list: #{list}, selected_value: form.object.#{condition.scope})"
         when :checkbox
-          "list: Admin::#{model_name}.#{field.name(:multi)}_i18n, checked_values: form.object.#{condition.scope})"
+          "list: Admin::#{resource_name}.#{field.name(:multi)}_i18n, checked_values: form.object.#{condition.scope})"
         when :switch
           "include_hidden: true)"
         else
@@ -38,11 +38,11 @@ module Infold
     end
 
     def index_list_header_code(list_field)
-      "= render Admin::SortableComponent.new(@search, :#{list_field.field})"
+      "= render Admin::SortableComponent.new(@search, :#{list_field.name})"
     end
 
     def index_row_code(list_field)
-      column = table.columns.find { |c| c.name == list_field.field }
+      column = table.columns.find { |c| c.name == list_field.name }
       return "= #{list_field}" unless column
       if column.type == ''
         'aaa'

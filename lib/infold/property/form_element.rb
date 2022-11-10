@@ -14,6 +14,11 @@ module Infold
       super(**attrs)
     end
 
+    def add_association_fields(field, **attrs)
+      field.build_form_element(**attrs)
+      @association_fields << field
+    end
+
     def kind_association?
       field.association.present? || @form_kind.to_s == 'association'
     end
@@ -34,12 +39,8 @@ module Infold
       elsif kind_association?
         :association
       else
-        @form_kind.to_s.to_sym.presence || :text
+        (@form_kind.presence || :text).to_sym
       end
-    end
-
-    def add_association_fields(association_field)
-      @association_fields << association_field
     end
   end
 end

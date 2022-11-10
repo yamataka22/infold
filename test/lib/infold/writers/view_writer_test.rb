@@ -1,93 +1,60 @@
 require 'test_helper'
 require 'infold/writers/view_writer'
-require 'infold/property/resource'
-require 'infold/db_schema'
+require 'infold/table'
+require 'infold/field'
+require 'infold/resource'
 
 module Infold
   class ViewWriterTest < ::ActiveSupport::TestCase
 
-    setup do
-      @resource = Resource.new("product", {})
-    end
-
     test "condition has association_search, search_condition_form_code should be return FieldsetComponent(:association)" do
-      yaml = <<-"YAML"
-        model:
-          association:
-            staff:
-              kind: belongs_to
-              name_field: name
-        app:
-          index:
-            conditions:
-              - staff_id:
-                  sign: eq
-                  form_kind: association_search
-      YAML
-      db_schema_content = <<-"RUBY"
-        create_table "products" do |t|
-          t.string "staff_id"
-        end
-        create_table "staffs" do |t|
-          t.string "name"
-        end
-      RUBY
-      db_schema = DbSchema.new(db_schema_content)
-      resource = Resource.new('product', YAML.load(yaml), db_schema)
+      fields = []
+      field = Field.new('parent_id')
+      field.build_association(kind: :belongs_to,
+                              association_table: Table.new('parents'),
+                              name: 'parent',
+                              name_field: 'name')
+      field.add_search_condition(:index, sign: :eq, form_kind: 'association_search')
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ViewWriter.new(resource)
       condition = resource.conditions.first
       code = writer.search_condition_form_code(condition)
-      assert_equal("= render Admin::FieldsetComponent.new(form, :staff_id_eq, :association_search, " +
-                  "association_name: :staff, search_path: admin_staffs_path, name_field: :staff_name)", code)
+      assert_equal("= render Admin::FieldsetComponent.new(form, :parent_id_eq, :association_search, " +
+                  "association_name: :parent, search_path: admin_parents_path, name_field: :parent_name)", code)
     end
 
     test "condition has select association, search_condition_form_code should be return select component" do
-      yaml = <<-"YAML"
-        model:
-          association:
-            staff:
-              kind: belongs_to
-              name_field: name
-        app:
-          index:
-            conditions:
-              - staff_id:
-                  sign: eq
-                  form_kind: select
-      YAML
-      db_schema_content = <<-"RUBY"
-        create_table "products" do |t|
-          t.string "staff_id"
-        end
-        create_table "staffs" do |t|
-          t.string "name"
-        end
-      RUBY
-      db_schema = DbSchema.new(db_schema_content)
-      resource = Resource.new('product', YAML.load(yaml), db_schema)
+      fields = []
+      field = Field.new('parent_id')
+      field.build_association(kind: :belongs_to,
+                              association_table: Table.new('parents'),
+                              class_name: 'ParentClass',
+                              name: 'parent',
+                              name_field: 'name')
+      field.add_search_condition(:index, sign: :eq, form_kind: 'select')
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ViewWriter.new(resource)
       condition = resource.conditions.first
       code = writer.search_condition_form_code(condition)
-      assert_equal("= render Admin::FieldsetComponent.new(form, :staff_id_eq, :select, " +
-                     "list: Admin::Staff.all.pluck(:name, :id), selected_value: form.object.staff_id_eq)", code)
+      assert_equal("= render Admin::FieldsetComponent.new(form, :parent_id_eq, :select, " +
+                     "list: Admin::ParentClass.all.pluck(:name, :id), selected_value: form.object.parent_id_eq)", code)
     end
 
     test "condition has select enum, search_condition_form_code should be return select component" do
-      yaml = <<-"YAML"
-        model:
-          enum:
-            status:
-              ordered: 1
-              charged: 2
-              delivered: 3
-        app:
-          index:
-            conditions:
-              - status:
-                  sign: eq
-                  form_kind: select
-      YAML
-      resource = Resource.new('product', YAML.load(yaml))
+      fields = []
+      field = Field.new('status')
+      enum = field.build_enum
+      enum.add_elements(key: :ordered, value: 1)
+      enum.add_elements(key: :charged, value: 2)
+      enum.add_elements(key: :delivered, value: 3)
+      field.add_search_condition(:index, sign: :eq, form_kind: :select)
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ViewWriter.new(resource)
       condition = resource.conditions.first
       code = writer.search_condition_form_code(condition)
@@ -96,20 +63,16 @@ module Infold
     end
 
     test "condition has any enum, search_condition_form_code should be return checkbox component" do
-      yaml = <<-"YAML"
-        model:
-          enum:
-            status:
-              ordered: 1
-              charged: 2
-              delivered: 3
-        app:
-          index:
-            conditions:
-              - status:
-                  sign: any
-      YAML
-      resource = Resource.new('product', YAML.load(yaml))
+      fields = []
+      field = Field.new('status')
+      enum = field.build_enum
+      enum.add_elements(key: :ordered, value: 1)
+      enum.add_elements(key: :charged, value: 2)
+      enum.add_elements(key: :delivered, value: 3)
+      field.add_search_condition(:index, sign: :any, form_kind: :checkbox)
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ViewWriter.new(resource)
       condition = resource.conditions.first
       code = writer.search_condition_form_code(condition)
@@ -118,14 +81,12 @@ module Infold
     end
 
     test "condition has boolean, search_condition_form_code should be return switch component" do
-      yaml = <<-"YAML"
-        app:
-          index:
-            conditions:
-              - removed:
-                  form_kind: switch
-      YAML
-      resource = Resource.new('product', YAML.load(yaml))
+      fields = []
+      field = Field.new('removed', :boolean)
+      field.add_search_condition(:index, sign: :eq, form_kind: :switch)
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ViewWriter.new(resource)
       condition = resource.conditions.first
       code = writer.search_condition_form_code(condition)
@@ -133,21 +94,12 @@ module Infold
     end
 
     test "condition has date, search_condition_form_code should be return text with datepicker" do
-      yaml = <<-"YAML"
-        app:
-          index:
-            conditions:
-              - published_on:
-                  sign: gteq
-      YAML
-      db_schema_content = <<-"RUBY"
-        create_table "products" do |t|
-          t.string "name"
-          t.date "published_on"
-        end
-      RUBY
-      db_schema = DbSchema.new(db_schema_content)
-      resource = Resource.new('product', YAML.load(yaml), db_schema)
+      fields = []
+      field = Field.new('published_on', :date)
+      field.add_search_condition(:index, sign: :gteq, form_kind: :text)
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ViewWriter.new(resource)
       condition = resource.conditions.first
       code = writer.search_condition_form_code(condition)
@@ -156,21 +108,12 @@ module Infold
     end
 
     test "condition has datetime, search_condition_form_code should be return text with datepicker" do
-      yaml = <<-"YAML"
-        app:
-          index:
-            conditions:
-              - delivered_at:
-                  sign: lteq
-      YAML
-      db_schema_content = <<-"RUBY"
-        create_table "products" do |t|
-          t.string "name"
-          t.datetime "delivered_at"
-        end
-      RUBY
-      db_schema = DbSchema.new(db_schema_content)
-      resource = Resource.new('product', YAML.load(yaml), db_schema)
+      fields = []
+      field = Field.new('delivered_at', :datetime)
+      field.add_search_condition(:index, sign: :lteq, form_kind: :text)
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ViewWriter.new(resource)
       condition = resource.conditions.first
       code = writer.search_condition_form_code(condition)
@@ -179,26 +122,13 @@ module Infold
     end
 
     test "condition has decorator(prepend), search_condition_form_code should be return text with prepend" do
-      yaml = <<-"YAML"
-        model:
-          decorator:
-            price:
-              prepend: $
-              digit: true
-        app:
-          index:
-            conditions:
-              - price:
-                  sign: eq
-      YAML
-      db_schema_content = <<-"RUBY"
-        create_table "products" do |t|
-          t.integer "price"
-          t.datetime "delivered_at"
-        end
-      RUBY
-      db_schema = DbSchema.new(db_schema_content)
-      resource = Resource.new('product', YAML.load(yaml), db_schema)
+      fields = []
+      field = Field.new('price', :int)
+      field.build_decorator(prepend: '$', digit: true)
+      field.add_search_condition(:index, sign: :eq, form_kind: :text)
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ViewWriter.new(resource)
       condition = resource.conditions.first
       code = writer.search_condition_form_code(condition)
@@ -207,26 +137,13 @@ module Infold
     end
 
     test "condition has decorator(append), search_condition_form_code should be return text with prepend" do
-      yaml = <<-"YAML"
-        model:
-          decorator:
-            price:
-              append: YEN
-              digit: true
-        app:
-          index:
-            conditions:
-              - price:
-                  sign: eq
-      YAML
-      db_schema_content = <<-"RUBY"
-        create_table "products" do |t|
-          t.integer "price"
-          t.datetime "delivered_at"
-        end
-      RUBY
-      db_schema = DbSchema.new(db_schema_content)
-      resource = Resource.new('product', YAML.load(yaml), db_schema)
+      fields = []
+      field = Field.new('price', :int)
+      field.build_decorator(append: 'YEN', digit: true)
+      field.add_search_condition(:index, sign: :eq, form_kind: :text)
+      fields << field
+
+      resource = Resource.new('Product', fields)
       writer = ViewWriter.new(resource)
       condition = resource.conditions.first
       code = writer.search_condition_form_code(condition)
@@ -234,21 +151,19 @@ module Infold
                      "prepend: '#{condition.sign_label}', append: 'YEN')", code)
     end
 
-    # test "index_list_header_code should be return field code" do
-    #   yaml = <<-"YAML"
-    #     app:
-    #       index:
-    #         list:
-    #           fields:
-    #             - id
-    #             - name
-    #             - category
-    #   YAML
-    #   resource = Resource.new('product', YAML.load(yaml))
-    #   writer = ViewWriter.new(resource)
-    #   list_field = resource.index_list_fields.last
-    #   code = writer.index_list_header_code(list_field)
-    #   assert_equal("= render Admin::SortableComponent.new(@search, :category)", code)
-    # end
+    test "index_list_header_code should be return field code" do
+      fields = []
+      %w(id name category).each do |name|
+        field = Field.new(name)
+        field.in_index_list = true
+        fields << field
+      end
+
+      resource = Resource.new('Product', fields)
+      writer = ViewWriter.new(resource)
+      list_field = resource.index_list_fields.last
+      code = writer.index_list_header_code(list_field)
+      assert_equal("= render Admin::SortableComponent.new(@search, :category)", code)
+    end
   end
 end
