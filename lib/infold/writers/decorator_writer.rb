@@ -3,23 +3,23 @@ require 'infold/writers/base_writer'
 module Infold
   class DecoratorWriter < BaseWriter
     def decorator_code
-      code = @resource.decorator_fields&.map do |field|
+      codes = @resource.decorator_fields&.map do |field|
         case field.decorator.kind
         when :enum
-          enum_code(field)
+          enum_code(field).presence
         when :boolean
-          boolean_code(field.name)
+          boolean_code(field.name).presence
         when :datetime
-          datetime_code(field.name)
+          datetime_code(field.name).presence
         when :date
-          date_code(field.name)
+          date_code(field.name).presence
         when :number
-          number_code(field.name, field.decorator)
+          number_code(field.name, field.decorator).presence
         else
-          string_code(field.name, field.decorator)
+          string_code(field.name, field.decorator).presence
         end
       end
-      inset_indent(code.join("\n"), 2) if code.present?
+      indent(codes.compact.join("\n"), 2) if codes.present?
     end
 
     private
@@ -77,14 +77,14 @@ module Infold
       end
 
       def enum_code(field)
-        code = field.enum.elements.select{ |e| e.color.present? }.map do |e|
+        codes = field.enum.elements.select{ |e| e.color.present? }.map do |e|
           "[TAB]when '#{e.key}' then '#{e.color}'"
         end
-        return nil if code.blank?
+        return nil if codes.blank?
         <<-CODE.gsub(/^\s+/, '')
           def #{field.name}_color
           [TAB]case #{field.name}.to_s
-          #{code.join("\n")}
+          #{codes.join("\n")}
           [TAB]else ''
           [TAB]end
           end

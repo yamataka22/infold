@@ -7,10 +7,10 @@ module Infold
       @resource = resource
     end
 
-    def inset_indent(code, size, first_row: false)
+    def indent(code, size, first_row: false)
       return unless code
       indent = '  ' * size
-      code.gsub!(/^/, indent)
+      code = code.each_line.map { |line| line.blank? ? line : "#{indent}#{line}" }.join
       code.sub!(indent, '') unless first_row
       code
     end
@@ -32,7 +32,9 @@ module Infold
     end
 
     def resource_name(*attr)
-      name = @resource.name
+      name = @resource.name.singularize.camelize
+      return name if attr.include?(:model)
+      return name.pluralize.underscore if attr.include?(:table)
       name = name.underscore if attr.include?(:snake)
       name = name.camelize if attr.include?(:camel)
       name = name.singularize if attr.include?(:single)

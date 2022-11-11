@@ -2,7 +2,7 @@
 %nav.navbar.navbar-light
   .container-fluid
     %ol.breadcrumb
-      %li.breadcrumb-item.active <%= @writer.resource.app_title %>
+      %li.breadcrumb-item.active <%= @writer.app_title %>
     .ms-auto
       = link_to t('infold.operation.new'), <%= @writer.new_path %>, class: 'btn btn-warning', data: { turbo_frame: "modal_main" }
 #index_page.d-md-flex{ data: { controller: 'index-page', index_page_target: 'wrapper' } }
@@ -11,7 +11,7 @@
       data: { index_page_target: 'searchForm' } do |form|
       = form.hidden_field :sort_field, data: { index_page_target: 'sortField' }
       = form.hidden_field :sort_kind, data: { index_page_target: 'sortKind' }
-    <%- @writer.resource.index_conditions&.each do |condition| -%>
+    <%- @writer.index_conditions&.each do |condition| -%>
       .mb-3<%= @writer.search_condition_form_code(condition) %>
     <%- end -%>
       %hr.my-3
@@ -21,7 +21,7 @@
         .col-6.d-grid
           = link_to t('infold.operation.clear'), <%= @writer.index_path %>, class: 'btn btn-secondary'
   #result.flex-fill.container-fluid.ps-3.py-3{ data: { index_page_target: 'resultArea' } }
-    - if @<%= @writer.model_name.underscore.pluralize %>.blank?
+    - if @<%= @writer.resource_name(:table) %>.blank?
       .alert#no_data= t('infold.no_data')
     .card.border-top-0
       .table_wrapper.table-responsive.bg-secondary-lt{ data: { index_page_target: 'resultTableWrapper' } }
@@ -29,16 +29,16 @@
           %thead{ data: { index_page_target: 'thead' } }
             %tr
               %th.icon_cell
-            <%- @writer.resource.index_list_fields.each do |field| -%>
+            <%- @writer.index_list_fields.each do |field| -%>
               %th<%= @writer.index_list_header_code(field) %>
             <%- end -%>
               %th.icon_cell
-          %tbody#<%= @writer.model_name.underscore.pluralize %>
-            = render partial: "index_row", collection: @<%= @writer.model_name.underscore.pluralize %>, as: '<%= @writer.model_name.underscore %>'
-      - if @<%= @writer.model_name.underscore.pluralize %>.present?
+          %tbody#<%= @writer.resource_name(:table) %>
+            = render partial: "index_row", collection: @<%= @writer.resource_name(:table) %>, as: '<%= @writer.resource_name(:snake) %>'
+      - if @<%= @writer.resource_name(:table) %>.present?
         .card-body.d-md-flex.align-items-center.justify-content-between
           .mb-3.mb-md-0
-            = <%= @ns_snake %>_search_result_count(@<%= @writer.model_name.underscore.pluralize %>)
+            = <%= @ns_snake %>_search_result_count(@<%= @writer.resource_name(:table) %>)
           .mb-3.mb-md-0
-            = paginate(@<%= @writer.model_name.underscore.pluralize %>, views_prefix: "Admin")
+            = paginate(@<%= @writer.resource_name(:table) %>, views_prefix: "Admin")
           = link_to t('infold.operation.output_csv'), '#', class: 'btn btn-info', data: { action: 'index-page#outputCsv' }

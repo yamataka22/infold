@@ -2,23 +2,27 @@ require 'infold/writers/base_writer'
 
 module Infold
   class ControllerWriter < BaseWriter
-    def app_title
-      @resource.app_title
+
+    attr_reader :app_title
+
+    def initialize(resource, app_title=nil)
+      @resource = resource
+      @app_title = app_title || @resource.name
     end
 
     def association_build_code(if_blank: false)
-      code = ''
+      codes = []
       @resource.association_fields&.select { |af| af.form_element.present?  } &.each do |association_field|
-        code +=
+        code =
           if association_field.association.has_one?
             "@#{resource_name(:snake)}.build_#{association_field.name}"
           else
             "@#{resource_name(:snake)}.#{association_field.name}.build"
           end
         code += " if @#{resource_name(:snake)}.#{association_field.name}.blank?" if if_blank
-        code += "\n"
+        codes << code
       end
-      inset_indent(code, 3) if code.present?
+      indent(codes.join("\n"), 3) if codes.present?
     end
 
     def search_params_code
@@ -33,14 +37,14 @@ module Infold
       end
       fields += %w([TAB]:sort_field [TAB]:sort_kind)
       code = "params[:search]&.permit(\n" + (fields + any_fields).uniq.join(",\n") + "\n)"
-      inset_indent(code, 3) if fields.present?
+      indent(code, 3) if fields.present?
     end
 
     def post_params_code
       fields = post_params_fields(@resource.form_element_fields)
       fields = fields.join(",\n") if fields.present?
       code = "params.require(:admin_#{resource_name(:snake)}).permit(\n" + fields.to_s + "\n)"
-      inset_indent(code, 3) if fields.present?
+      indent(code, 3) if fields.present?
     end
 
     private

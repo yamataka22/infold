@@ -9,10 +9,10 @@ class ResourceGeneratorTest < ::Rails::Generators::TestCase
   setup :prepare_destination
 
   test "generates infold_resource" do
-    run_generator ['product']
+    run_generator ['Product']
     assert_file Rails.root.join("infold/product.yml") do |content|
       assert_match /title: Product/, content
-      assert_match /- id: eq/, content
+      assert_match /- id:\n\s+sign: eq/, content
     end
   end
 end

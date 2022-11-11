@@ -14,6 +14,10 @@ module Infold
       (@elements << EnumElement.new(**attrs)).last
     end
 
+    def has_color?
+      elements.any? { |e| e.color.present? }
+    end
+
     class EnumElement
       include ActiveModel::Model
 

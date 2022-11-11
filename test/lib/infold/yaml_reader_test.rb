@@ -377,12 +377,9 @@ module Infold
                 kind: desc
       YAML
       yaml_reader = YamlReader.new('product', YAML.load(yaml), @db_schema)
-      default_order = yaml_reader.default_order(:index)
+      default_order = yaml_reader.default_order
       assert_equal('id', default_order.field.name)
       assert_equal('asc', default_order.order_kind)
-      default_order = yaml_reader.default_order(:association_search)
-      assert_equal('name', default_order.field.name)
-      assert_equal('desc', default_order.order_kind)
     end
 
     test "if default_order is blank, index_default_order and association_search_default_order should be return nil" do
@@ -395,10 +392,8 @@ module Infold
             list:
       YAML
       yaml_reader = YamlReader.new('product', YAML.load(yaml), @db_schema)
-      index_default_order = yaml_reader.default_order(:index)
-      association_default_order = yaml_reader.default_order(:association_search)
-      assert_nil(index_default_order)
-      assert_nil(association_default_order)
+      default_order = yaml_reader.default_order
+      assert_nil(default_order)
     end
 
     test "index_list_fields should be return index list fields" do

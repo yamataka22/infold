@@ -51,8 +51,8 @@ module Infold
       end
     end
 
-    def conditions
-      condition_fields.map(&:search_conditions)&.flatten
+    def conditions(kind=nil)
+      condition_fields(kind).map(&:search_conditions)&.flatten
     end
 
     def form_element_fields

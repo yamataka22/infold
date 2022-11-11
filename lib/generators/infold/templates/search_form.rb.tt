@@ -1,17 +1,16 @@
 <%# encoding: utf-8 -%>
 module Admin
-  class <%= @writer.model_name %>SearchForm < SearchFormBase
+  class <%= @writer.resource_name(:model) %>SearchForm < SearchFormBase
 
     <%= @writer.set_conditions_code&.gsub('[TAB]', '  ') %>
-
     def perform(page = nil, limit: nil, csv: false)
-      records = <%= @writer.model_name %><%= @writer.record_search_include_code %>.distinct
+      records = <%= @writer.resource_name(:model) %><%= @writer.record_search_includes_code %>.distinct
       records = apply_conditions(records, page, limit, csv)
-    <%- if @writer.resource.index_default_order -%>
-      @sort_field ||= :<%= @writer.resource.index_default_order.field %>
-      @sort_kind  ||= :<%= @writer.resource.index_default_order.kind || 'asc' %>
+    <%- if default_order = @writer.default_order -%>
+      @sort_field ||= :<%= default_order.field.name %>
+      @sort_kind  ||= :<%= default_order.order_kind || 'asc' %>
     <%- end -%>
-      apply_sort(records, <%= @writer.model_name %>.primary_key)
+      apply_sort(records, <%= @writer.resource_name(:model) %>.primary_key)
     end
   end
 end

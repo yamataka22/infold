@@ -23,6 +23,10 @@ module Infold
       !kind_image?
     end
 
+    def thumb?
+      @thumb.present?
+    end
+
     class ActiveStorageThumb
       include ActiveModel::Model
 

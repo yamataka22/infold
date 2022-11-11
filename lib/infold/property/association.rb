@@ -63,7 +63,7 @@ module Infold
     private
 
     def set_association_fields
-      @association_fields = @association_table.columns.map { |column| Field.new(column.name, column.type) }
+      @association_fields = @association_table&.columns&.map { |column| Field.new(column.name, column.type) }.to_a
     end
   end
 end

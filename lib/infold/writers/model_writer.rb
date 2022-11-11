@@ -13,7 +13,7 @@ module Infold
         code += ", dependent: :#{association.dependent}" if association.dependent.present?
         code += "\n"
       end
-      inset_indent(code, 2).presence
+      indent(code, 2).presence
     end
 
     def accepts_nested_attributes_code
@@ -21,7 +21,7 @@ module Infold
       @resource.association_fields&.select { |af| af.form_element.present?  } &.each do |association_field|
         code += "accepts_nested_attributes_for :#{association_field.name}, reject_if: :all_blank, allow_destroy: true\n"
       end
-      inset_indent(code, 2).presence
+      indent(code, 2).presence
     end
 
     def datetime_field_code
@@ -29,7 +29,7 @@ module Infold
       @resource.datetime_fields&.each do |field|
         code += "datetime_field :#{field.name}\n"
       end
-      inset_indent(code, 2).presence
+      indent(code, 2).presence
     end
 
     def active_storage_attachment_code
@@ -52,7 +52,7 @@ module Infold
         CODE
         code += "\n"
       end
-      inset_indent(code, 2).presence
+      indent(code, 2).presence
     end
 
     def validation_code
@@ -70,7 +70,7 @@ module Infold
         end.join(', ')
         code += "\n"
       end
-      inset_indent(code, 2).presence
+      indent(code, 2).presence
     end
 
     def datetime_validation_code
@@ -79,8 +79,8 @@ module Infold
         code << "validates :#{field.name}_date, presence: true, if: -> { #{field.name}_time.present? }"
         code << "validates :#{field.name}_time, presence: true, if: -> { #{field.name}_date.present? }"
       end
-      code << "\n" if code.present?
-      inset_indent(code.join("\n"), 2).presence
+      code << "" if code.present?
+      indent(code.join("\n"), 2).presence
     end
 
     def enum_code
@@ -91,7 +91,7 @@ module Infold
         code << "enum #{enum_field.name}: { #{elements.join(', ')} }, _prefix: true"
       end
       code << "\n" if code.present?
-      inset_indent(code.join("\n"), 2).presence
+      indent(code.join("\n"), 2).presence
     end
 
     def scope_code
@@ -104,21 +104,21 @@ module Infold
             if field.type == :datetime && %i(eq full_like lteq).include?(sign)
               if sign == :lteq
                 <<-CODE.gsub(/^\s+/, '')
-                return if v.blank?
-                [TAB]begin
-                [TAB][TAB]v = v.to_date.next_day
-                [TAB]rescue
-                [TAB]end
-                [TAB]where(arel_table[:#{field_name}].#{sign}(v))
+                  return if v.blank?
+                  [TAB]begin
+                  [TAB][TAB]v = v.to_date.next_day
+                  [TAB]rescue
+                  [TAB]end
+                  [TAB]where(arel_table[:#{field_name}].#{sign}(v))
                 CODE
               else
                 <<-CODE.gsub(/^\s+/, '')
-                return if v.blank?
-                [TAB]begin
-                [TAB][TAB]where(#{field_name}: v.to_date.all_day)
-                [TAB]rescue
-                [TAB][TAB]where(arel_table[:#{field_name}].#{sign}(v))
-                [TAB]end
+                  return if v.blank?
+                  [TAB]begin
+                  [TAB][TAB]where(#{field_name}: v.to_date.all_day)
+                  [TAB]rescue
+                  [TAB][TAB]where(arel_table[:#{field_name}].#{sign}(v))
+                  [TAB]end
                 CODE
               end
             else
@@ -136,14 +136,14 @@ module Infold
               end
             end
           code +=  <<-CODE.gsub(/^\s+/, '')
-          scope :#{field_name}_#{sign}, ->(v) do
-          [TAB]#{where}
-          end
+            scope :#{field_name}_#{sign}, ->(v) do
+            [TAB]#{where}
+            end
           CODE
           code += "\n"
         end
       end
-      inset_indent(code, 2).presence
+      indent(code, 2).presence
     end
   end
 end

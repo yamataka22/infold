@@ -25,12 +25,16 @@ module Infold
       @fields
     end
 
-    def default_order(view)
-      default_order = app.dig(view, :list, :default_order)
+    def default_order
+      default_order = app.dig(:index, :list, :default_order)
       if default_order&.dig(:field)
         field = find_or_initialize_field(default_order.dig(:field))
         DefaultOrder.new(self, field, default_order.dig(:kind))
       end
+    end
+
+    def app_title
+      app.dig(:title)
     end
 
     private

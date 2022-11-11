@@ -1,17 +1,31 @@
 <%# encoding: utf-8 -%>
 module Admin
-  class <%= @writer.model_name %> < ::<%= @writer.model_name %>
-  <%- if @writer.resource.table.datetime_columns.present? -%>
+  class <%= @writer.resource_name(:model) %> < ::<%= @writer.resource_name(:model) %>
+  <%- if @writer.resource.datetime_fields.present? -%>
     include DatetimeFieldConcern
 
-    <%= @writer.datetime_field_code&.gsub('[TAB]', '  ') -%>
+    <%= @writer.datetime_field_code&.gsub('[TAB]', '  ') %>
   <%- end -%>
-    <%= @writer.association_code %>
-    <%= @writer.accepts_nested_attributes_code -%>
-    <%= @writer.active_storage_attachment_code&.gsub('[TAB]', '  ') -%>
-    <%= @writer.validation_code&.gsub('[TAB]', '  ') -%>
-    <%= @writer.datetime_validation_code -%>
-    <%= @writer.enum_code -%>
-    <%= @writer.scope_code&.gsub('[TAB]', '  ') -%>
+  <%- if association_code = @writer.association_code.presence -%>
+    <%= association_code %>
+  <%- end -%>
+  <%- if accepts_nested_attributes_code = @writer.accepts_nested_attributes_code.presence -%>
+    <%= accepts_nested_attributes_code %>
+  <%- end -%>
+  <%- if active_storage_attachment_code = @writer.active_storage_attachment_code.presence -%>
+    <%= active_storage_attachment_code.gsub('[TAB]', '  ') %>
+  <%- end -%>
+  <%- if validation_code = @writer.validation_code.presence -%>
+    <%= validation_code.gsub('[TAB]', '  ') %>
+  <%- end -%>
+  <%- if datetime_validation_code = @writer.datetime_validation_code.presence -%>
+    <%= datetime_validation_code %>
+  <%- end -%>
+  <%- if enum_code = @writer.enum_code.presence -%>
+    <%= enum_code %>
+  <%- end -%>
+  <%- if scope_code = @writer.scope_code.presence -%>
+    <%= scope_code.gsub('[TAB]', '  ') %>
+  <%- end -%>
   end
 end

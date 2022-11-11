@@ -16,7 +16,7 @@ module Infold
           invoke 'infold:decorator',   [ resource ]
           invoke 'infold:controller',  [ resource ]
           invoke 'infold:search_form', [ resource ]
-          invoke 'infold:view',        [ resource ]
+          invoke 'infold:views',       [ resource ]
         end
       end
     end

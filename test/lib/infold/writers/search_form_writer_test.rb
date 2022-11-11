@@ -34,7 +34,7 @@ module Infold
       fields << field
 
       resource = Resource.new('Product', fields)
-      writer = SearchFormWriter.new(resource)
+      writer = SearchFormWriter.new(resource, nil)
       code = writer.set_conditions_code
       expect_code = <<-RUBY.gsub(/^\s+/, '')
         set_condition :id_eq,
@@ -46,7 +46,7 @@ module Infold
       assert_match(expect_code, code.gsub(/^\s+|\[TAB\]/, ''))
     end
 
-    test "record_search_include_code should generate 'include belongs_to associations'" do
+    test "record_search_includes_code should generate 'include belongs_to associations'" do
       fields = []
       field = Field.new('details')
       field.build_association(kind: :has_many, association_table: Table.new('details'))
@@ -61,21 +61,21 @@ module Infold
       fields << field
 
       resource = Resource.new('Product', fields)
-      writer = SearchFormWriter.new(resource)
-      code = writer.record_search_include_code
+      writer = SearchFormWriter.new(resource, nil)
+      code = writer.record_search_includes_code
       assert_match("includes(:one_parent, :two_parent)", code)
       refute_match("details", code)
     end
 
-    test "if belongs_to association is blank, record_search_include_code should return nil" do
+    test "if belongs_to association is blank, record_search_includes_code should return nil" do
       fields = []
       field = Field.new('details')
       field.build_association(kind: :has_many, association_table: Table.new('details'))
       fields << field
 
       resource = Resource.new('Product', fields)
-      writer = SearchFormWriter.new(resource)
-      code = writer.record_search_include_code
+      writer = SearchFormWriter.new(resource, nil)
+      code = writer.record_search_includes_code
       assert_nil(code)
     end
   end

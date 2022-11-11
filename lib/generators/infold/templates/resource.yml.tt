@@ -6,21 +6,24 @@ model:
   enum:
   active_storage:
 app:
-  title: <%= @name.camelize %>
+  title: <%= @name %>
   index:
     conditions:
-      - id: eq
+      - id:
+          sign: eq
     list:
       fields:
       default_order:
     csv:
+      fields:
   show:
     fields:
   form:
     fields:
-  reference_search:
+  association_search:
     conditions:
-      - id: eq
+      - id:
+          sign: eq
     list:
       fields:
       default_order:
