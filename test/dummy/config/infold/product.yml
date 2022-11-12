@@ -1,0 +1,88 @@
+model:
+  validate:
+    name:
+      - presence
+    category:
+      - presence
+    price:
+      - numericality:
+          greater_than_or_equal_to: 0
+    stock:
+      - numericality
+  decorator:
+    price:
+      prepend: $
+      digit: true
+    stock:
+      digit: true
+  association:
+    purchase_details:
+      kind: has_many
+      dependent: restrict_with_error
+  enum:
+    category:
+      kitchen: 1
+      dining: 2
+      bedroom: 3
+      bathroom: 4
+  active_storage:
+    image:
+      kind: image
+app:
+  title: Product
+  index:
+    conditions:
+      - id:
+          sign: eq
+      - name:
+          sign: full_like
+      - category:
+          sign: any
+      - published_at:
+          sign: gteq
+      - published_at:
+          sign: lteq
+      - removed:
+          sign: eq
+    list:
+      fields:
+        - id
+        - name
+        - category
+        - price
+        - removed
+      default_order:
+        field: id
+        kind: desc
+    csv:
+      fields:
+  show:
+    fields:
+      - name
+      - description
+      - category
+      - price
+      - stock
+      - published_at
+      - removed
+  form:
+    fields:
+      - name
+      - description:
+          kind: textarea
+      - category:
+          kind: radio
+      - price
+      - stock
+      - published_at
+      - removed
+  association_search:
+    conditions:
+      - id:
+          sign: eq
+      - name:
+          sign: full_like
+    list:
+      fields:
+        - id
+        - name
