@@ -1,0 +1,85 @@
+model:
+  validate:
+    customer:
+      presence: true
+    status:
+      presence: true
+  association:
+    purchase_details:
+      kind: has_many
+      dependent: destroy
+    customer:
+      kind: belongs_to
+  enum:
+    status:
+      ordered:
+        value: 1
+        color: info
+      charged:
+        value: 2
+        color: danger
+      delivered:
+        value: 3
+        color: success
+      canceled:
+        value: 9
+        color: secondary
+app:
+  title: Purchase
+  index:
+    conditions:
+      - id:
+          sign: eq
+      - status:
+          sign: any
+          kind: checkbox
+      - customer_id:
+          sign: eq
+          kind: association_search
+    list:
+      fields:
+        - id
+        - customer.name
+        - status
+        - total_price
+        - delivered_at
+    csv:
+      fields:
+  show:
+    fields:
+      - id
+      - customer.name
+      - status
+      - total_price
+      - purchase_details:
+          fields:
+            - product.name
+            - amount
+            - unit_price
+      - delivery_zipcode
+      - delivery_address
+      - delivery_name
+      - delivered_at
+      - remarks
+  form:
+    fields:
+      - id
+      - customer_id:
+          kind: association_search
+      - status:
+          kind: radio
+      - total_price:
+          kind: number
+      - purchase_details:
+          kind: associations
+          fields:
+            - product_id:
+                kind: association_search
+            - amount
+            - unit_price
+      - delivery_zipcode
+      - delivery_address
+      - delivery_name
+      - delivered_at
+      - remarks:
+          kind: textarea

@@ -1,0 +1,70 @@
+model:
+  validate:
+    email:
+      - presence
+      - uniqueness
+    name:
+      - presence
+  association:
+    purchases:
+      kind: has_many
+      dependent: restrict_with_error
+  enum:
+    gender:
+      man: 1
+      female: 2
+app:
+  title: Customer
+  index:
+    conditions:
+      - id:
+          sign: eq
+      - name:
+          sign: full_like
+      - email:
+          sign: start_with
+    list:
+      fields:
+        - email
+        - name
+        - phone
+        - gender
+    csv:
+      fields:
+  show:
+    fields:
+      - id
+      - email
+      - name
+      - purchases:
+          fields:
+            - id
+            - status
+            - total_price
+            - delivered_at
+      - phone
+      - zipcode
+      - address
+      - gender
+      - birthday
+  form:
+    fields:
+      - email
+      - name
+      - phone
+      - zipcode
+      - address
+      - gender
+      - birthday
+  association_search:
+    conditions:
+      - name:
+          sign: full_like
+      - email:
+          sign: start_with
+    list:
+      fields:
+        - id
+        - name
+        - email
+      default_order:
