@@ -4,8 +4,6 @@ module Infold
   class ScaffoldGenerator < Rails::Generators::NamedBase
     source_root File.expand_path('templates', __dir__)
 
-    class_option :resource, type: :string, default: ''
-
     def perform
       resource_name = name.camelize.singularize
       invoke 'infold:model',       [ resource_name ]
