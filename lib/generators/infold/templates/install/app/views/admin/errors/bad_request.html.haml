@@ -1,0 +1,11 @@
+.my-5
+  .container
+    .row.justify-content-center
+      .col-lg-5
+        .card
+          .card-body.p-4
+            .text-center
+              %h1.text-error 400
+              %h4.text-danger Bad Request
+              %p.text-muted.mt-3 不正な要求のため処理できません
+              = link_to 'トップへ戻る', root_path, class: 'btn btn-info mt-3'

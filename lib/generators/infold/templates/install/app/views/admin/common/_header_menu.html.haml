@@ -1,0 +1,11 @@
+%ul.navbar-nav.me-auto.mb-2.mb-lg-0
+  %li.nav-item
+    = link_to '注文管理', admin_purchases_path, class: 'nav-link'
+  %li.nav-item.dropdown
+    %a.nav-link.dropdown-toggle{ role: :button, data: { bs_toggle: :dropdown } }
+      マスタ管理
+    %ul.dropdown-menu.dropdown-menu-arrow
+      %li
+        = link_to '商品管理', admin_products_path, class: 'dropdown-item'
+      %li
+        = link_to '顧客管理', admin_customers_path, class: 'dropdown-item'

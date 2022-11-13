@@ -1,0 +1,13 @@
+.row.align-items-center.gx-2
+  .col-7
+    .input-group
+      %span.input-group-text
+        %i.bi.bi-calendar-date
+      = render Admin::TextComponent.new(@form, "#{@field}_date", datepicker: true)
+  .col-5
+    .input-group
+      %span.input-group-text
+        %i.bi.bi-clock
+      = render Admin::TextComponent.new(@form, "#{@field}_time", timepicker: true)
+= render Admin::InvalidMessageComponent.new(@form, "#{@field}_date")
+= render Admin::InvalidMessageComponent.new(@form, "#{@field}_time")

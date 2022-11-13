@@ -1,0 +1,6 @@
+- flash.each do |k,v|
+  - k = 'info' if k == 'notice'
+  - k = 'warning' if k == 'alert'
+  .alert.alert-important.alert-dismissible.rounded-0.text-center{ class: "alert-#{k}", data: { controller: "flash" } }
+    = v
+    %a.btn-close.btn-close-white{"aria-label" => "close", "data-bs-dismiss" => "alert"}

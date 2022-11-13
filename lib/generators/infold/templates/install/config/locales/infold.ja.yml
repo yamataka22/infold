@@ -1,0 +1,28 @@
+---
+ja:
+  infold:
+    operation:
+      create: 登録
+      edit: 編集
+      update: 更新
+      delete: 削除
+      submit: 登録
+      cancel: キャンセル
+      clear: クリア
+      new: 新規作成
+      add: 追加
+      search: 検索
+      setting: 設定
+      output_csv: CSV出力
+      confirm: "%{submit}してよろしいでしょうか？"
+    flash:
+      created: 登録しました
+      updated: 更新しました
+      destroyed: 削除しました
+      invalid: 入力内容をご確認ください
+      invalid_destroy: 削除できません
+      build_completed: ビルドが完了しました
+      db_synced: DBの同期が完了しました
+    badge:
+      required: 必須
+    no_data: データがありません

@@ -1,0 +1,28 @@
+---
+en:
+  infold:
+    operation:
+      create: Create
+      edit: Edit
+      update: Update
+      delete: Delete
+      submit: Submit
+      cancel: Cancel
+      clear: Clear
+      new: Create New
+      add: Add
+      search: Search
+      setting: Setting
+      output_csv: Output CSV
+      confirm: "Are you sure you want to %{submit} it?"
+    flash:
+      created: Successfully created
+      updated: Successfully updated
+      destroyed: Successfully destroyed
+      invalid: Cannot save record
+      invalid_destroy: Cannot delete record
+      build_completed: Build completed
+      db_synced: DB sync is complete
+    badge:
+      required: Required
+    no_data: There is no data

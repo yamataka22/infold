@@ -1,0 +1,11 @@
+.my-5
+  .container
+    .row.justify-content-center
+      .col-lg-5
+        .card
+          .card-body.p-4
+            .text-center
+              %h1.text-error 404
+              %h4.text-danger Not Found
+              %p.text-muted.mt-3 お探しのページは見つかりませんでした
+              = link_to 'トップへ戻る', root_path, class: 'btn btn-info mt-3'

@@ -1,0 +1,8 @@
+.mb-2.d-flex
+  - if @form.object.send(@field)&.attached?
+    = link_to @form.object.send(@field).filename, rails_blob_url(@form.object.send(@field)), target: '_blank'
+    .mx-3.form-check.form-switch
+      = @form.check_box("remove_#{@field}", class: 'form-check-input')
+      = @form.label("remove_#{@field}", "remove")
+    = @form.hidden_field @field, value: @form.object.send(@field).signed_id
+  = @form.file_field(@field, direct_upload: true)

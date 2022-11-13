@@ -1,0 +1,8 @@
+.modal.remote_modal.right_justified{ data: { controller: 'remote-modal', bs_backdrop: @backdrop, modal_kind: @remote_modal_kind } }
+  .modal-dialog.modal_h100.modal-dialog-scrollable.rounded-0{ class: @remote_modal_kind }
+    .modal-content.rounded-0
+      .modal-header
+        = header
+        %button.btn-close{ type: "button", data: { bs_dismiss: "modal" }, 'aria-label' => "Close" }
+      = body
+      = footer

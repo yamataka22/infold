@@ -1,0 +1,6 @@
+.input-group
+  - if @prepend
+    %span.input-group-text.px-1= @prepend
+  = content
+  - if @append
+    %span.input-group-text.px-1= @append
