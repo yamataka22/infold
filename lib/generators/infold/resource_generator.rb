@@ -6,7 +6,7 @@ module Infold
 
     def create_resource_file
       @name = name.camelize.singularize
-      template "resource.yml", Rails.root.join("infold", "#{@name.underscore}.yml"), skip: true
+      template "resource.yml", Rails.root.join("config/infold", "#{@name.underscore}.yml"), skip: true
     end
   end
 end

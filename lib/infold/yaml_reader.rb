@@ -214,8 +214,9 @@ module Infold
               else
                 association_field =
                   association.find_or_initialize_association_field(association_field_config.keys[0])
-                form_element.add_association_fields(association_field,
-                                                    form_kind: association_field_config.dig(association_field.name, :kind))
+                form_element.add_association_fields(
+                  association_field,
+                  form_kind: association_field_config.dig(association_field.name, :kind))
               end
             end
           end
