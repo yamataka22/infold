@@ -30,9 +30,9 @@ module Infold
       any_fields = []
       @resource.conditions.each do |condition|
         if condition.sign == :any
-          any_fields << "[TAB]#{condition.field.name(:multi)}: []"
+          any_fields << "[TAB]#{condition.scope}: []"
         else
-          fields << "[TAB]:#{condition.field.name}"
+          fields << "[TAB]:#{condition.scope}"
         end
       end
       fields += %w([TAB]:sort_field [TAB]:sort_kind)

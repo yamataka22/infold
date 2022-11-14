@@ -59,11 +59,11 @@ module Infold
       code = writer.search_params_code
       expect_code = <<-RUBY.gsub(/^\s+/, '')
         params[:search]&.permit(
-          :id,
-          :price,
+          :id_eq,
+          :price_gteq,
           :sort_field,
           :sort_kind,
-          statuses: []
+          status_any: []
         )
       RUBY
       assert_match(expect_code, code.gsub(/^\s+|\[TAB\]/, '') + "\n")
