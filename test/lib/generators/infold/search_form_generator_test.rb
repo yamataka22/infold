@@ -13,7 +13,7 @@ module Infold
       run_generator ['products']
       assert_file Rails.root.join("app/forms/admin/product_search_form.rb") do |content|
         assert_match /module Admin/, content
-        assert_match /class ProductSearchForm < SearchFormBase/, content
+        assert_match /class ProductSearchForm < BaseSearchForm/, content
         assert_match /set_condition :id_eq/, content
         assert_match /records = Product.distinct/, content
       end

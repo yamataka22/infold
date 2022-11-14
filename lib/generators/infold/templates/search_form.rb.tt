@@ -1,6 +1,6 @@
 <%# encoding: utf-8 -%>
 module Admin
-  class <%= @writer.resource_name(:model) %>SearchForm < SearchFormBase
+  class <%= @writer.resource_name(:model) %>SearchForm < BaseSearchForm
 
     <%= @writer.set_conditions_code&.gsub('[TAB]', '  ') %>
     def perform(page = nil, limit: nil, csv: false)

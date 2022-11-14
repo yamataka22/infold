@@ -1,5 +1,5 @@
 module Admin
-  class SearchFormBase
+  class BaseSearchForm
     include ActiveModel::Model
 
     attr_accessor :sort_field
