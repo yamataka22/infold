@@ -1,6 +1,6 @@
 <%# encoding: utf-8 -%>
 module Admin
-  class <%= @writer.resource_name(:model) %>Controller < BaseController
+  class <%= @writer.resource_name(:multi, :camel) %>Controller < BaseController
     before_action { @page_title = '<%= @writer.app_title %>' }
 
     def index

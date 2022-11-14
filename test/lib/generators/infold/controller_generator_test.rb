@@ -13,7 +13,7 @@ module Infold
       run_generator ['products']
       assert_file Rails.root.join("app/controllers/admin/products_controller.rb") do |content|
         assert_match /module Admin/, content
-        assert_match /class ProductController < BaseController/, content
+        assert_match /class ProductsController < BaseController/, content
         # title
         assert_match /before_action { @page_title = 'Product' }/, content
         # index
