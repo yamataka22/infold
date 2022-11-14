@@ -73,10 +73,6 @@ module Infold
       route "draw(:admin)"
     end
 
-    def add_gems
-      gem "sassc-rails"
-    end
-
     def copy_locale_files
       template_path = File.expand_path("templates/install/config/locales", __dir__)
       Dir.glob("#{template_path}/*") do |item|
