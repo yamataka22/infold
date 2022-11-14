@@ -18,7 +18,7 @@
     = stylesheet_link_tag "admin", "data-turbo-track": "reload"
     = javascript_include_tag "admin", "data-turbo-track": "reload", defer: true
   %body{:class => "#{'border-top-wide border-primary' unless admin_user_signed_in?}"}
-    .page
+    #admin_wrapper
       - if admin_user_signed_in?
         %header.navbar.navbar-expand-md.navbar-dark
           .container-fluid
