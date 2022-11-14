@@ -16,7 +16,7 @@ module Admin
     end
 
     def name
-      @search.class::BASE_MODEL.human_attribute_name(@field)
+      @search.class.human_attribute_name(@field)
     end
 
     def current_field?
