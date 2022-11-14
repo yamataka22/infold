@@ -38,7 +38,7 @@
       - if @<%= @writer.resource_name(:table) %>.present?
         .card-body.d-md-flex.align-items-center.justify-content-between
           .mb-3.mb-md-0
-            = <%= @ns_snake %>_search_result_count(@<%= @writer.resource_name(:table) %>)
+            = admin_search_result_count(@<%= @writer.resource_name(:table) %>)
           .mb-3.mb-md-0
-            = paginate(@<%= @writer.resource_name(:table) %>, views_prefix: "Admin")
+            = paginate(@<%= @writer.resource_name(:table) %>, views_prefix: "admin")
           = link_to t('infold.operation.output_csv'), '#', class: 'btn btn-info', data: { action: 'index-page#outputCsv' }
