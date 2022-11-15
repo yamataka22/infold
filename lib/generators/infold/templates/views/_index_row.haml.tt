@@ -4,7 +4,7 @@
     = link_to <%= @writer.show_path(@writer.resource_name(:snake)) %>, class: 'd-block', data: { turbo_frame: 'modal_main' } do
       %i.bi.bi-file-text
 <%- @writer.index_list_fields.each do |field| -%>
-  %td<%= @writer.index_list_value_code(field) %>
+  %td<%= @writer.field_display_code(field, :index) %>
 <%- end -%>
   %td.tac
     = link_to <%= @writer.edit_path(@writer.resource_name(:snake)) %>, class: 'd-block', data: { turbo_frame: "modal_main" } do

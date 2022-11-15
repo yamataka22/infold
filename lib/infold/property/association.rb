@@ -56,6 +56,10 @@ module Infold
       "admin_#{model_name(:multi, :snake)}_path"
     end
 
+    def belongs_to_show_path(object)
+      "admin_#{model_name( :snake)}_path(#{object})"
+    end
+
     def name_field
       @name_field.presence || 'id'
     end

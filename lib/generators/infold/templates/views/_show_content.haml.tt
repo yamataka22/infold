@@ -1,0 +1,35 @@
+<%# encoding: utf-8 -%>
+<%- rendered_list_group = false -%>
+<%- @writer.show_fields.each do |field| -%>
+<%- if field.show_element.kind_association? -%>
+.my-3
+  %h4= <%= @writer.resource_name(:snake) %>.class.human_attribute_name(:<%= field.name %>)
+  - if <%= @writer.resource_name(:snake) %>.<%= field.name %>.blank?
+    .alert= t('infold.no_data')
+  - else
+    .table-responsive
+      %table.table.table-bordered.table-hover
+        %thead
+          %tr
+          <%- field.show_element.association_fields.each do |association_field| -%>
+            %th= Admin::<%= field.association.model_name %>.class.human_attribute_name(:association_field.name)
+          <%- end -%>
+        %tbody
+          - <%= @writer.resource_name(:snake) %>.<%= field.name %>.each do |<%= field.name(:single) %>|
+            %tr
+              %td
+                <%= @writer.field_display_code(field, :list) %>
+  <%- rendered_list_group = false -%>
+<%- else -%>
+<%- unless rendered_list_group -%>
+.list-group
+  <%- rendered_list_group = true -%>
+<%- end -%>
+  .list-group-item
+    .row
+      .col-md-3.col-xl-2
+        .fw-bold= <%= @writer.resource_name(:snake) %>.class.human_attribute_name(:<%= field.name %>)
+      .col-md-9.col-xl-10
+        <%= @writer.field_display_code(field, :show) %>
+<%- end -%>
+<%- end -%>

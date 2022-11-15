@@ -1,0 +1,4 @@
+<%# encoding: utf-8 -%>
+= turbo_frame_tag(admin_remote_modal_id) do
+  = render Admin::RemoteModalComponent.new(admin_remote_modal_id) do |modal|
+    = render 'show_wrapper', modal: modal, <%= @writer.resource_name(:snake) %>: @<%= @writer.resource_name(:snake) %>

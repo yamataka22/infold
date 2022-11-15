@@ -63,6 +63,10 @@ module Infold
       fields.select { |f| f.in_index_list? }
     end
 
+    def show_fields
+      fields.select { |f| f.show_element.present? }
+    end
+
     def association_search_list_fields
       fields.select { |f| f.in_association_search_list? }
     end

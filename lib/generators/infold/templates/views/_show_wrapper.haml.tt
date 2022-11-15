@@ -1,0 +1,13 @@
+= modal.with_header do
+  = "<%= @writer.app_title %> / ##{<%= @writer.resource_name(:snake) %>.id}"
+= modal.with_body do
+  .modal-body
+    = render 'show_content', <%= @writer.resource_name(:snake) %>: <%= @writer.resource_name(:snake) %>
+- unless admin_remote_modal_id == 'modal_sub'
+  = modal.with_footer do
+    .modal-footer
+      = link_to t('infold.operation.edit'), <%= @writer.edit_path(@writer.resource_name(:snake)) %>,
+        class: 'btn btn-primary', data: { turbo_frame: "modal_main" }
+      = link_to t('infold.operation.delete'), <%= @writer.show_path(@writer.resource_name(:snake)) %>,
+        class: 'btn btn-danger ms-1', data: { turbo_confirm: t('infold.operation.confirm',
+        submit: t('infold.operation.delete')), turbo_method: :delete, turbo_frame: "_top" }

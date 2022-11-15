@@ -12,7 +12,7 @@
       = form.hidden_field :sort_field, data: { index_page_target: 'sortField' }
       = form.hidden_field :sort_kind, data: { index_page_target: 'sortKind' }
     <%- @writer.index_conditions&.each do |condition| -%>
-      .mb-3<%= @writer.search_condition_form_code(condition) %>
+      .mb-3<%= @writer.condition_form_code(condition) %>
     <%- end -%>
       %hr.my-3
       .row.gx-2
@@ -30,7 +30,7 @@
             %tr
               %th.icon_cell
             <%- @writer.index_list_fields.each do |field| -%>
-              %th<%= @writer.index_list_header_code(field) %>
+              %th<%= @writer.list_header_code(field) %>
             <%- end -%>
               %th.icon_cell
           %tbody#<%= @writer.resource_name(:table) %>

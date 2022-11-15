@@ -3,6 +3,7 @@ require 'infold/property/active_storage'
 require 'infold/property/condition'
 require 'infold/property/association'
 require 'infold/property/enum'
+require 'infold/property/show_element'
 require 'infold/property/form_element'
 require 'infold/property/decorator'
 
@@ -12,13 +13,13 @@ module Infold
                 :enum,
                 :active_storage,
                 :form_element,
+                :show_element,
                 :decorator,
                 :search_conditions,
                 :association
 
     attr_writer :in_index_list,
                 :in_csv,
-                :in_show,
                 :in_association_search_list
 
     def initialize(name, type=nil)
@@ -50,6 +51,10 @@ module Infold
 
     def build_enum
       @enum = Enum.new(self)
+    end
+
+    def build_show_element(**attrs)
+      @show_element = ShowElement.new(self, **attrs)
     end
 
     def build_form_element(**attrs)

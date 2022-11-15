@@ -277,7 +277,6 @@ module Infold
       assert_equal('number', conditions[1].association_search_form_kind)
     end
 
-
     test "index_search_conditions and association_search_conditions should be merged" do
       yaml = <<-"YAML"
         app:
@@ -315,51 +314,6 @@ module Infold
       assert(!conditions[2].in_index?)
       assert(conditions[2].in_association_search?)
       assert_equal('number', conditions[2].association_search_form_kind)
-    end
-
-    test "form_element_fields should be return FormField" do
-      yaml = <<-"YAML"
-        model:
-          association:
-            details:
-              kind: has_many
-        app:
-          form:
-            fields:
-              - title
-              - description:
-                  kind: textarea
-              - details:
-                  kind: association
-                  fields:
-                    - amount
-                    - unit_price:
-                        kind: number
-      YAML
-      db_schema_content = <<-"RUBY"
-        create_table "products" do |t|
-          t.string "title"
-          t.integer "description"
-        end
-
-        create_table "details" do |t|
-          t.bigint "product_id"
-          t.string "amount"
-        end
-      RUBY
-      db_schema = DbSchema.new(db_schema_content)
-      yaml_reader = YamlReader.new('product', YAML.load(yaml), db_schema)
-      form_elements = yaml_reader.send('read_form_elements')
-      assert_equal(3, form_elements.size)
-      assert_equal('title', form_elements[0].field.name)
-      assert_equal('description', form_elements[1].field.name)
-      assert_equal(:textarea, form_elements[1].form_kind)
-      assert_equal('details', form_elements[2].field.name)
-      assert_equal(:association, form_elements[2].form_kind)
-      assert_equal(2, form_elements[2].association_fields.size)
-      assert_equal('amount', form_elements[2].association_fields[0].name)
-      assert_equal('unit_price', form_elements[2].association_fields[1].name)
-      assert_equal(:number, form_elements[2].association_fields[1].form_element.form_kind)
     end
 
     test "index_default_order and association_search_default_order should be return DefaultOrder" do
@@ -451,6 +405,128 @@ module Infold
       association_search_list_fields = list_fields.select(&:in_association_search_list?)
       assert_equal(2, association_search_list_fields.size)
       assert_equal('category', association_search_list_fields[1].name)
+    end
+
+    test "read_show_elements should be return show elements" do
+      yaml = <<-"YAML"
+        model:
+          association:
+            details:
+              kind: has_many
+          active_storage:
+            image:
+              kind: image
+            pdf:
+              kind: file
+        app:
+          show:
+            fields:
+              - name
+              - price
+              - details:
+                  fields:
+                    - color
+                    - stock
+              - image
+              - pdf
+      YAML
+      db_schema_content = <<-"RUBY"
+        create_table "products" do |t|
+          t.string "name"
+          t.float "price"
+        end
+        create_table "details" do |t|
+          t.bigint "product_id"
+          t.string "color"
+          t.integer "stock"
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      yaml_reader = YamlReader.new('product', YAML.load(yaml), db_schema)
+      yaml_reader.send('read_associations')
+      yaml_reader.send('read_active_storages')
+      show_elements = yaml_reader.send('read_show_elements')
+      assert_equal(5, show_elements.size)
+      assert_equal('name', show_elements[0].field.name)
+      assert_equal('price', show_elements[1].field.name)
+      assert_equal('details', show_elements[2].field.name)
+      assert(show_elements[2].kind_association?)
+      assert_equal(2, show_elements[2].association_fields.size)
+      assert_equal('color', show_elements[2].association_fields[0].name)
+      assert_equal('stock', show_elements[2].association_fields[1].name)
+      assert_equal('image', show_elements[3].field.name)
+      assert(show_elements[3].field.active_storage.kind_image?)
+      assert_equal('pdf', show_elements[4].field.name)
+      assert(show_elements[4].field.active_storage.kind_file?)
+    end
+
+    test "read_show_fields should be return table all columns if show field is blank" do
+      yaml = <<-"YAML"
+        app:
+          show:
+      YAML
+      db_schema_content = <<-"RUBY"
+        create_table "products" do |t|
+          t.string "name"
+          t.float "price"
+          t.integer "stock"
+          t.datetime "created_at", null: false
+          t.datetime "updated_at", null: false
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      yaml_reader = YamlReader.new('product', YAML.load(yaml), db_schema)
+      show_elements = yaml_reader.send('read_show_elements')
+      assert_equal(6, show_elements.size)
+      assert_equal('id', show_elements[0].field.name)
+      assert_equal('name', show_elements[1].field.name)
+      assert_equal('updated_at', show_elements[5].field.name)
+    end
+
+    test "form_element_fields should be return FormField" do
+      yaml = <<-"YAML"
+        model:
+          association:
+            details:
+              kind: has_many
+        app:
+          form:
+            fields:
+              - title
+              - description:
+                  kind: textarea
+              - details:
+                  kind: association
+                  fields:
+                    - amount
+                    - unit_price:
+                        kind: number
+      YAML
+      db_schema_content = <<-"RUBY"
+        create_table "products" do |t|
+          t.string "title"
+          t.integer "description"
+        end
+
+        create_table "details" do |t|
+          t.bigint "product_id"
+          t.string "amount"
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      yaml_reader = YamlReader.new('product', YAML.load(yaml), db_schema)
+      yaml_reader.send('read_associations')
+      form_elements = yaml_reader.send('read_form_elements')
+      assert_equal(3, form_elements.size)
+      assert_equal('title', form_elements[0].field.name)
+      assert_equal('description', form_elements[1].field.name)
+      assert_equal(:textarea, form_elements[1].form_kind)
+      assert_equal('details', form_elements[2].field.name)
+      assert_equal(:association, form_elements[2].form_kind)
+      assert_equal(2, form_elements[2].association_fields.size)
+      assert_equal('amount', form_elements[2].association_fields[0].name)
+      assert_equal('unit_price', form_elements[2].association_fields[1].name)
+      assert_equal(:number, form_elements[2].association_fields[1].form_element.form_kind)
     end
   end
 end

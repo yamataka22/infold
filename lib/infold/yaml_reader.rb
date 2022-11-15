@@ -21,6 +21,7 @@ module Infold
       read_decorators
       read_search_conditions
       read_list_fields
+      read_show_elements
       read_form_elements
       @fields
     end
@@ -194,6 +195,29 @@ module Infold
       end
 
       @fields.select { |f| f.in_index_list? || f.in_association_search_list? }
+    end
+
+    def read_show_elements
+      field_configs = app.dig(:show, :fields).presence
+      field_configs ||= @table.columns.map(&:name)
+      field_configs.map do |field_config|
+        if field_config.is_a?(String)
+          field = find_or_initialize_field(field_config)
+          field.build_show_element
+        else
+          field = find_or_initialize_field(field_config.keys[0])
+          show_element = field.build_show_element
+          if show_element.kind_association?
+            association = find_association(show_element.field.name)
+            field_config[field.name].dig(:fields)&.each do |association_field_name|
+              association_field =
+                association.find_or_initialize_association_field(association_field_name)
+              show_element.add_association_fields(association_field)
+            end
+          end
+          show_element
+        end
+      end
     end
 
     def read_form_elements

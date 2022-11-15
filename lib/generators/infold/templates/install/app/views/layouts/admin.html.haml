@@ -40,7 +40,7 @@
                     %li
                       = button_to 'Logout', destroy_admin_user_session_path, class: 'dropdown-item', method: :delete
       = yield
-    = turbo_frame_tag "modal_main", target: "_top"
-    = turbo_frame_tag "modal_sub", target: "_top"
-    #flashes
-      = render 'admin/common/flash'
+      = turbo_frame_tag "modal_main", target: "_top"
+      = turbo_frame_tag "modal_sub", target: "_top"
+      #flashes
+        = render 'admin/common/flash'

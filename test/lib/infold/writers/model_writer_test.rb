@@ -86,7 +86,7 @@ module Infold
 
     test "active_storage_attachment_code should generate active_storage field" do
       fields = []
-      field = Field.new('image')
+      field = Field.new('photo')
       field.build_active_storage(kind: :image)
       fields << field
 
@@ -98,9 +98,9 @@ module Infold
       writer = ModelWriter.new(resource)
       code = writer.active_storage_attachment_code
       expect_code = <<-RUBY.gsub(/^\s+/, '')
-        has_one_attached :image
-        attr_accessor :remove_image
-        before_validation { self.image = nil if remove_image.to_s == '1' }
+        has_one_attached :photo
+        attr_accessor :remove_photo
+        before_validation { self.photo = nil if remove_photo.to_s == '1' }
       RUBY
       assert_match(expect_code, code.gsub(/^\s+|\[TAB\]/, ''))
       assert_match("has_one_attached :pdf", code)
