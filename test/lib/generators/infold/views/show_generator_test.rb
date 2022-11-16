@@ -4,11 +4,11 @@ require "generators/infold/views/show_generator"
 
 module Infold
   module Views
-    class IndexGeneratorTest < ::Rails::Generators::TestCase
+    class ShowGeneratorTest < ::Rails::Generators::TestCase
       tests ShowGenerator
       destination Rails.root.join('app/views/admin/products')
       # remove destination exist files
-      setup :prepare_destination
+      # setup :prepare_destination
 
       test "generates infold:views:show" do
         run_generator ['products']

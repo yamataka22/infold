@@ -99,6 +99,7 @@ module Infold
     end
 
     def in_index_list?; @in_index_list end
+    def in_csv?; @in_csv end
     def in_association_search_list?; @in_association_search_list end
   end
 end

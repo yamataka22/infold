@@ -13,8 +13,8 @@ module Infold
       test "generates infold:views:index" do
         run_generator ['products']
         assert_file Rails.root.join("app/views/admin/products/index.html.haml") do |content|
-          assert_match " = form_with model: @search, url: admin_products_path, method: :get, scope: 'search'", content
-          assert_match "= render Admin::FieldsetComponent.new(form, :id_eq, :text, prepend: '=')", content
+          assert_match "= form_with model: @search, url: admin_products_path, method: :get, scope: 'search'", content
+          assert_match "= render Admin::FieldsetComponent.new(form, :id_eq, :text, placeholder: '=')", content
           assert_match "%th= render Admin::SortableComponent.new(@search, :id)", content
         end
 

@@ -30,6 +30,7 @@ module Infold
     end
 
     def form_kind(view)
+      # indexとassociation_searchでform_kindが異なる場合に対応
       _form_kind = (view == :index ? index_form_kind : association_search_form_kind).to_s
       if _form_kind == 'association_search' && field.association&.belongs_to?
         :association_search
