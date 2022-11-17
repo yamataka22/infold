@@ -19,7 +19,7 @@ module Infold
       end
 
       def show_file
-        template "views/show+turbo_frame.haml", Rails.root.join("app/views/admin/#{name.underscore.pluralize}/show.html+turbo_frame.haml"), force: true
+        template "views/show.html+turbo_frame.haml", Rails.root.join("app/views/admin/#{name.underscore.pluralize}/show.html+turbo_frame.haml"), force: true
       end
 
       def show_wrapper_file
