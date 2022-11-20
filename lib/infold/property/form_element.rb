@@ -17,6 +17,7 @@ module Infold
     def add_association_fields(field, **attrs)
       field.build_form_element(**attrs)
       @association_fields << field
+      field
     end
 
     def kind_association?
@@ -32,12 +33,16 @@ module Infold
     end
 
     def form_kind
-      if kind_datetime?
+      if @form_kind == 'association_search'
+        if field.association&.belongs_to?
+          :association_search
+        else
+          :text
+        end
+      elsif kind_datetime?
         :datetime
       elsif kind_file?
         :file
-      elsif kind_association?
-        :association
       else
         (@form_kind.presence || :text).to_sym
       end

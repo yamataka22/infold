@@ -2,7 +2,7 @@
 %nav.navbar.navbar-light
   .container-fluid
     %ol.breadcrumb
-      %li.breadcrumb-item.active <%= @writer.app_title %>
+      %li.breadcrumb-item.active <%= @writer.resource.app_title %>
     .ms-auto
       = link_to t('infold.operation.new'), <%= @writer.new_path %>, class: 'btn btn-warning', data: { turbo_frame: "modal_main" }
 #index_page.d-md-flex{ data: { controller: 'index-page', index_page_target: 'wrapper' } }

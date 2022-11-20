@@ -8,6 +8,20 @@ model:
     purchase_details:
       kind: has_many
       dependent: destroy
+      # purchase_detailのモデル情報
+      model:
+        validate:
+          product_id:
+            presence: true
+          amount:
+            presence: true
+        decorator:
+          unit_price:
+            prepend: $
+            digit: true
+        association:
+          product:
+            kind: belongs_to
     customer:
       kind: belongs_to
   enum:

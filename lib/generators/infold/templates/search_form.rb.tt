@@ -6,7 +6,7 @@ module Admin
     def perform(page = nil, limit: nil, csv: false)
       records = <%= @writer.resource_name(:model) %><%= @writer.record_search_includes_code %>.distinct
       records = apply_conditions(records, page, limit, csv)
-    <%- if default_order = @writer.default_order -%>
+    <%- if default_order = @writer.resource.default_order -%>
       @sort_field ||= :<%= default_order.field.name %>
       @sort_kind  ||= :<%= default_order.order_kind || 'asc' %>
     <%- end -%>

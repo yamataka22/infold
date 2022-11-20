@@ -60,7 +60,7 @@ module Infold::Views
       ERB.new(code, trim_mode: '-').result(binding)
     end
 
-    def association_search_form_option(association)
+    def belongs_to_search_form_option(association)
       "association_name: :#{association.name}, " +
         "search_path: #{association.search_path}, " +
         "name_field: :#{association.model_name(:snake)}_#{association.name_field}"
@@ -71,7 +71,7 @@ module Infold::Views
         "checked_values: form.object.#{name}"
     end
 
-    def select_form_list(field)
+    def form_field_list(field)
       if field.enum?
         "Admin::#{resource_name}.#{field.name(:multi)}_i18n.invert"
       elsif field.association?

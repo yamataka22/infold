@@ -1,7 +1,7 @@
 <%# encoding: utf-8 -%>
 module Admin
   class <%= @writer.resource_name(:multi, :camel) %>Controller < BaseController
-    before_action { @page_title = '<%= @writer.app_title %>' }
+    before_action { @page_title = '<%= @writer.resource.app_title %>' }
 
     def index
       @search = <%= @writer.resource_name(:model) %>SearchForm.new(search_params)

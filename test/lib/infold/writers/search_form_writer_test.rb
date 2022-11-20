@@ -1,40 +1,39 @@
 require 'test_helper'
 require 'infold/writers/search_form_writer'
 require 'infold/table'
+require 'infold/field_group'
 require 'infold/field'
 require 'infold/resource'
 
 module Infold
   class SearchFormWriterTest < ::ActiveSupport::TestCase
 
-    test "set_conditions_code should generate set condition each field" do
-      fields = []
-      field = Field.new('id')
+    def setup
+      @field_group = FieldGroup.new
+      @resource = Resource.new('Product')
+    end
+    
+    test "it should generate set_conditions_code each fields" do
+      field = @field_group.add_field('id')
       field.add_search_condition(:index, sign: :eq, form_kind: :text)
-      fields << field
 
-      field = Field.new('name')
+      field = @field_group.add_field('name')
       field.add_search_condition(:index, sign: :full_like, form_kind: :text)
-      fields << field
 
-      field = Field.new('status')
+      field = @field_group.add_field('status')
       field.add_search_condition(:index, sign: :any, form_kind: :checkbox)
-      fields << field
 
-      field = Field.new('id')
+      field = @field_group.add_field('id')
       field.add_search_condition(:association_search, sign: :eq, form_kind: :text)
-      fields << field
 
-      field = Field.new('status')
+      field = @field_group.add_field('status')
       field.add_search_condition(:association_search, sign: :eq, form_kind: :text)
-      fields << field
 
-      field = Field.new('price')
+      field = @field_group.add_field('price')
       field.add_search_condition(:association_search, sign: :gteq, form_kind: :text)
-      fields << field
 
-      resource = Resource.new('Product', fields)
-      writer = SearchFormWriter.new(resource, nil)
+      @resource.field_group = @field_group
+      writer = SearchFormWriter.new(@resource)
       code = writer.set_conditions_code
       expect_code = <<-RUBY.gsub(/^\s+/, '')
         set_condition :id_eq,
@@ -46,35 +45,29 @@ module Infold
       assert_match(expect_code, code.gsub(/^\s+|\[TAB\]/, ''))
     end
 
-    test "record_search_includes_code should generate 'include belongs_to associations'" do
-      fields = []
-      field = Field.new('details')
-      field.build_association(kind: :has_many, association_table: Table.new('details'))
-      fields << field
+    test "it should generate record_search_includes_code" do
+      field = @field_group.add_field('details')
+      field.build_association(kind: :has_many, table: Table.new('details'))
 
-      field = Field.new('one_parent_id')
-      field.build_association(kind: :belongs_to, association_table: Table.new('one_parents'), name: 'one_parent')
-      fields << field
+      field = @field_group.add_field('one_parent_id')
+      field.build_association(kind: :belongs_to, table: Table.new('one_parents'), name: 'one_parent')
 
-      field = Field.new('two_parent_id')
-      field.build_association(kind: :belongs_to, association_table: Table.new('two_parents'), name: 'two_parent')
-      fields << field
+      field = @field_group.add_field('two_parent_id')
+      field.build_association(kind: :belongs_to, table: Table.new('two_parents'), name: 'two_parent')
 
-      resource = Resource.new('Product', fields)
-      writer = SearchFormWriter.new(resource, nil)
+      @resource.field_group = @field_group
+      writer = SearchFormWriter.new(@resource)
       code = writer.record_search_includes_code
       assert_match("includes(:one_parent, :two_parent)", code)
       refute_match("details", code)
     end
 
-    test "if belongs_to association is blank, record_search_includes_code should return nil" do
-      fields = []
-      field = Field.new('details')
-      field.build_association(kind: :has_many, association_table: Table.new('details'))
-      fields << field
+    test "if belongs_to association is blank, it should return nil" do
+      field = @field_group.add_field('details')
+      field.build_association(kind: :has_many, table: Table.new('details'))
 
-      resource = Resource.new('Product', fields)
-      writer = SearchFormWriter.new(resource, nil)
+      @resource.field_group = @field_group
+      writer = SearchFormWriter.new(@resource)
       code = writer.record_search_includes_code
       assert_nil(code)
     end

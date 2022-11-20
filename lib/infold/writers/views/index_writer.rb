@@ -5,9 +5,8 @@ module Infold::Views
 
     attr_reader :app_title
 
-    def initialize(resource, app_title=nil)
+    def initialize(resource)
       @resource = resource
-      @app_title = app_title || @resource.name
     end
 
     def index_conditions; @resource.conditions(:index) end
@@ -18,16 +17,17 @@ module Infold::Views
         ":#{condition.scope}, :#{condition.form_kind(:index)}"
       case condition.form_kind(:index)
       when :association_search
-        "#{code}, #{association_search_form_option(condition.field.association)})"
+        "#{code}, #{belongs_to_search_form_option(condition.field.association)})"
       when :select
-        "#{code}, list: #{select_form_list(condition.field)}, " +
+        "#{code}, list: #{form_field_list(condition.field)}, " +
           "selected_value: form.object.#{condition.scope})"
       when :checkbox
         "#{code}, #{checkbox_form_option(condition.field, condition.scope)})"
       when :switch
         "#{code}, include_hidden: false)"
       else
-        "#{code}, #{text_form_option(condition.field, placeholder: condition.sign_label)})"
+        option = text_form_option(condition.field, placeholder: condition.sign_label).presence
+        option ? "#{code}, #{option})" : "#{code})"
       end
     end
 

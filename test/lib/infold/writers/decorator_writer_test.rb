@@ -1,17 +1,22 @@
 require 'test_helper'
 require 'infold/writers/decorator_writer'
 require 'infold/table'
+require 'infold/field_group'
 require 'infold/field'
 require 'infold/resource'
 
 module Infold
   class ModelWriterTest < ::ActiveSupport::TestCase
 
-    test "if columns have boolean field, decorator_code should return boolean_code" do
-      fields = []
-      fields << Field.new('removed', :boolean)
-      resource = Resource.new('Product', fields)
-      writer = DecoratorWriter.new(resource)
+    def setup
+      @field_group = FieldGroup.new
+      @resource = Resource.new('Product')
+    end
+
+    test "it should return boolean decorator_code" do
+      @field_group.add_field('removed', :boolean)
+      @resource.field_group = @field_group
+      writer = DecoratorWriter.new(@resource)
       code = writer.decorator_code
       expect_code = <<-RUBY.gsub(/^\s+/, '')
         def removed_display
@@ -21,11 +26,10 @@ module Infold
       assert_match(expect_code, code.gsub(/^\s+|\[TAB\]/, ''))
     end
 
-    test "if columns have datetime field, decorator_code should return datetime_code" do
-      fields = []
-      fields << Field.new('delivered_at', :datetime)
-      resource = Resource.new('Product', fields)
-      writer = DecoratorWriter.new(resource)
+    test "it should return datetime decorator_code" do
+      @field_group.add_field('delivered_at', :datetime)
+      @resource.field_group = @field_group
+      writer = DecoratorWriter.new(@resource)
       code = writer.decorator_code
       expect_code = <<-RUBY.gsub(/^\s+/, '')
         def delivered_at_display
@@ -35,11 +39,10 @@ module Infold
       assert_match(expect_code, code.gsub(/^\s+|\[TAB\]/, ''))
     end
 
-    test "if columns have date field, decorator_code should return date_code" do
-      fields = []
-      fields << Field.new('stock_date', :date)
-      resource = Resource.new('Product', fields)
-      writer = DecoratorWriter.new(resource)
+    test "it should return date decorator_code" do
+      @field_group.add_field('stock_date', :date)
+      @resource.field_group = @field_group
+      writer = DecoratorWriter.new(@resource)
       code = writer.decorator_code
       expect_code = <<-RUBY.gsub(/^\s+/, '')
         def stock_date_display
@@ -49,13 +52,11 @@ module Infold
       assert_match(expect_code, code.gsub(/^\s+|\[TAB\]/, ''))
     end
 
-    test "if columns have int and config have options(digit and append), decorator_code should return number_code" do
-      fields = []
-      field = Field.new('price', :integer)
+    test "if columns have int and config have options(digit and append), it should return number decorator_code" do
+      field = @field_group.add_field('price', :integer)
       field.build_decorator(append: 'YEN', digit: true)
-      fields << field
-      resource = Resource.new('Product', fields)
-      writer = DecoratorWriter.new(resource)
+      @resource.field_group = @field_group
+      writer = DecoratorWriter.new(@resource)
       code = writer.decorator_code
       expect_code = <<-RUBY.gsub(/^\s+/, '')
         def price_display
@@ -65,13 +66,11 @@ module Infold
       assert_match(expect_code, code.gsub(/^\s+|\[TAB\]/, ''))
     end
 
-    test "if columns have int and config have options(digit and prepend), decorator_code should return number_code" do
-      fields = []
-      field = Field.new('price', :integer)
+    test "if columns have int and config have options(digit and prepend), it should return number decorator_code" do
+      field = @field_group.add_field('price', :integer)
       field.build_decorator(prepend: '$', digit: true)
-      fields << field
-      resource = Resource.new('Product', fields)
-      writer = DecoratorWriter.new(resource)
+      @resource.field_group = @field_group
+      writer = DecoratorWriter.new(@resource)
       code = writer.decorator_code
       expect_code = <<-RUBY.gsub(/^\s+/, '')
         def price_display
@@ -81,29 +80,23 @@ module Infold
       assert_match(expect_code, code.gsub(/^\s+|\[TAB\]/, ''))
     end
 
-    test "if columns have int but config have no option, decorator_code should return blank" do
-      fields = []
-      field = Field.new('price', :integer)
-      fields << field
-      resource = Resource.new('Product', fields)
-      writer = DecoratorWriter.new(resource)
+    test "if columns have int but config have no option, it should return blank" do
+      @field_group.add_field('price', :integer)
+      @resource.field_group = @field_group
+      writer = DecoratorWriter.new(@resource)
       code = writer.decorator_code
       assert_nil(code)
     end
 
     test "if columns have int, float or decimal fields, decorator_code should return number_code" do
-      fields = []
-      field = Field.new('price1', :integer)
+      field = @field_group.add_field('price1', :integer)
       field.build_decorator(digit: true)
-      fields << field
-      field = Field.new('price2', :float)
+      field = @field_group.add_field('price2', :float)
       field.build_decorator(digit: true)
-      fields << field
-      field = Field.new('price3', :decimal)
+      field = @field_group.add_field('price3', :decimal)
       field.build_decorator(digit: true)
-      fields << field
-      resource = Resource.new('Product', fields)
-      writer = DecoratorWriter.new(resource)
+      @resource.field_group = @field_group
+      writer = DecoratorWriter.new(@resource)
       code = writer.decorator_code
       expect_int_code = "def price1_display"
       expect_float_code = "def price2_display"
@@ -114,16 +107,11 @@ module Infold
     end
 
     test "if columns have string and config have options(prepend), decorator_code should return string_code" do
-      fields = []
-      field = Field.new('name', :string)
+      field = @field_group.add_field('name', :string)
       field.build_decorator(prepend: 'NAME:')
-      fields << field
-
-      field = Field.new('description', :string)
-      fields << field
-
-      resource = Resource.new('Product', fields)
-      writer = DecoratorWriter.new(resource)
+      @field_group.add_field('description', :string)
+      @resource.field_group = @field_group
+      writer = DecoratorWriter.new(@resource)
       code = writer.decorator_code
       expect_code = <<-RUBY.gsub(/^\s+/, '')
         def name_display
@@ -136,23 +124,20 @@ module Infold
     end
 
     test "if color defined enum in resource yaml, decorator_code should return enum_code" do
-      fields = []
-      field = Field.new('status', :integer)
+      field = @field_group.add_field('status', :integer)
       enum = field.build_enum
       enum.add_elements(key: 'ordered', value: 1, color: 'red')
       enum.add_elements(key: 'charged', value: 2, color: 'blue')
       field.build_decorator(kind: :enum)
-      fields << field
 
-      field = Field.new('category', :integer)
+      field = @field_group.add_field('category', :integer)
       enum = field.build_enum
       enum.add_elements(key: 'kitchen', value: 1)
       enum.add_elements(key: 'dining', value: 2)
       field.build_decorator(kind: :enum)
-      fields << field
 
-      resource = Resource.new('Product', fields)
-      writer = DecoratorWriter.new(resource)
+      @resource.field_group = @field_group
+      writer = DecoratorWriter.new(@resource)
       code = writer.decorator_code
       expect_code = <<-RUBY.gsub(/^\s+/, '')
         def status_color

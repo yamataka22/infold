@@ -12,7 +12,7 @@ module Infold
       @db_schema = DbSchema.new(db_schema_content)
     end
 
-    test "model_associations should be return ModelAssociation" do
+    test "it should be return fields with associations" do
       yaml = <<-"YAML"
         model:
           association:
@@ -47,22 +47,22 @@ module Infold
         end
       RUBY
       db_schema = DbSchema.new(db_schema_content)
-      yaml_reader = YamlReader.new('products', YAML.load(yaml), db_schema)
-      associations = yaml_reader.send('read_associations')
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), db_schema)
+      associations = resource.field_group.associations
       assert_equal(4, associations.size)
-      assert_equal('one_details', associations[0].name)
-      assert(associations[0].has_many?)
-      assert_equal('destroy', associations[0].dependent)
-      assert_equal('two_details', associations[1].name)
-      assert_equal('TwoDetail', associations[1].class_name)
-      assert_equal('three_detail', associations[2].name)
-      assert(associations[2].has_one?)
-      assert_equal('parent', associations[3].name)
-      assert(associations[3].belongs_to?)
-      assert_equal('parent_id', associations[3].field.name)
+      assert_equal('parent', associations[0].name)
+      assert(associations[0].belongs_to?)
+      assert_equal('parent_id', associations[0].field.name)
+      assert_equal('one_details', associations[1].name)
+      assert(associations[1].has_many?)
+      assert_equal('destroy', associations[1].dependent)
+      assert_equal('two_details', associations[2].name)
+      assert_equal('TwoDetail', associations[2].class_name)
+      assert_equal('three_detail', associations[3].name)
+      assert(associations[3].has_one?)
     end
 
-    test "active_storage should be return ActiveStorage (no thumb)" do
+    test "it should be return fields with active_storage (no thumb)" do
       yaml = <<-"YAML"
         model:
           active_storage:
@@ -71,8 +71,8 @@ module Infold
             pdf:
               kind: file
       YAML
-      yaml_reader = YamlReader.new('products', YAML.load(yaml), @db_schema)
-      active_storages = yaml_reader.send('read_active_storages')
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), @db_schema)
+      active_storages = resource.field_group.active_storage_fields.map(&:active_storage)
       assert_equal(2, active_storages.size)
       assert_equal('product_image', active_storages[0].field.name)
       assert_equal('image', active_storages[0].kind)
@@ -82,7 +82,7 @@ module Infold
       assert_nil(active_storages[1].thumb)
     end
 
-    test "active_storages should be return ActiveStorage with thumb" do
+    test "it should be return fields with active_storage (with thumb)" do
       yaml = <<-"YAML"
         model:
           active_storage:
@@ -93,8 +93,8 @@ module Infold
                 width: 100
                 height: 200
       YAML
-      yaml_reader = YamlReader.new('product', YAML.load(yaml), @db_schema)
-      active_storages = yaml_reader.send('read_active_storages')
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), @db_schema)
+      active_storages = resource.field_group.active_storage_fields.map(&:active_storage)
       assert_equal(1, active_storages.size)
       assert_equal('product_image', active_storages[0].field.name )
       thumb = active_storages[0].thumb
@@ -103,7 +103,7 @@ module Infold
       assert_equal(200, thumb.height)
     end
 
-    test "validation_fields should be return Validate" do
+    test "it should be return fields with validations" do
       yaml = <<-"YAML"
         model:
           validate:
@@ -117,8 +117,8 @@ module Infold
                   greater_than_or_equal_to: 0
                   less_than_or_equal_to: 100
       YAML
-      yaml_reader = YamlReader.new('product', YAML.load(yaml), @db_schema)
-      validations = yaml_reader.send('read_validations')
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), @db_schema)
+      validations = resource.field_group.validation_fields.map(&:validation)
 
       assert_equal(3, validations.size)
       assert_equal('stock', validations[0].field.name)
@@ -135,7 +135,7 @@ module Infold
       assert_equal(100, validations[2].conditions[1].options[:less_than_or_equal_to])
     end
 
-    test "enum should be return Enum (has no color)" do
+    test "it should be return fields with enum (no color)" do
       yaml = <<-"YAML"
         model:
           enum:
@@ -144,8 +144,8 @@ module Infold
               charged: 2
               delivered: 3
       YAML
-      yaml_reader = YamlReader.new('product', YAML.load(yaml), @db_schema)
-      enums = yaml_reader.send('read_enums')
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), @db_schema)
+      enums = resource.field_group.enum_fields.map(&:enum)
       assert_equal(1, enums.size)
       assert_equal('status', enums[0].field.name)
       assert_equal(3, enums[0].elements.size)
@@ -153,7 +153,7 @@ module Infold
       assert_equal(1, enums[0].elements[0].value)
     end
 
-    test "enum should be return Enum (with color)" do
+    test "it should be return fields with enum (with color)" do
       yaml = <<-"YAML"
         model:
           enum:
@@ -176,8 +176,8 @@ module Infold
         end
       RUBY
       db_schema = DbSchema.new(db_schema_content)
-      yaml_reader = YamlReader.new('product', YAML.load(yaml), db_schema)
-      enums = yaml_reader.send('read_enums')
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), db_schema)
+      enums = resource.field_group.enum_fields.map(&:enum)
       assert_equal(2, enums.size)
       assert_equal('status', enums[0].field.name)
       assert_equal(3, enums[0].elements.size)
@@ -189,7 +189,7 @@ module Infold
       assert_equal('blue', enums[1].elements[1].color)
     end
 
-    test "decorator should be return Decorator" do
+    test "it should be return fields with decorator" do
       yaml = <<-"YAML"
         model:
           decorator:
@@ -210,8 +210,8 @@ module Infold
         end
       RUBY
       db_schema = DbSchema.new(db_schema_content)
-      yaml_reader = YamlReader.new('product', YAML.load(yaml), db_schema)
-      decorators = yaml_reader.send('read_decorators')
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), db_schema)
+      decorators = resource.field_group.decorator_fields.map(&:decorator)
       assert_equal(3, decorators.size)
 
       assert_equal('price', decorators[0].field.name)
@@ -227,7 +227,7 @@ module Infold
       assert_equal(:enum, decorators[2].kind)
     end
 
-    test "index_conditions should be return IndexCondition" do
+    test "it should be return fields with search conditions (index)" do
       yaml = <<-"YAML"
         app:
           index:
@@ -240,9 +240,8 @@ module Infold
               - price:
                   sign: gteq
       YAML
-      yaml_reader = YamlReader.new('product', YAML.load(yaml), @db_schema)
-      conditions = yaml_reader.send('read_search_conditions')
-      conditions = conditions.select(&:in_index?)
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), @db_schema)
+      conditions = resource.field_group.conditions(:index)
       assert_equal(3, conditions.size)
       assert_equal('id', conditions[0].field.name)
       assert_equal(:eq, conditions[0].sign)
@@ -255,7 +254,7 @@ module Infold
       assert_equal('text', conditions[2].index_form_kind)
     end
 
-    test "association_search_conditions should be return AssociationCondition" do
+    test "it should be return fields with search conditions (association search)" do
       yaml = <<-"YAML"
         app:
           association_search:
@@ -266,9 +265,8 @@ module Infold
                   sign: gteq
                   form_kind: number
       YAML
-      yaml_reader = YamlReader.new('product', YAML.load(yaml), @db_schema)
-      conditions = yaml_reader.send('read_search_conditions')
-      conditions = conditions.select(&:in_association_search?)
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), @db_schema)
+      conditions = resource.field_group.conditions(:association_search)
       assert_equal(2, conditions.size)
       assert_equal('id', conditions[0].field.name)
       assert_equal(:eq, conditions[0].sign)
@@ -277,7 +275,7 @@ module Infold
       assert_equal('number', conditions[1].association_search_form_kind)
     end
 
-    test "index_search_conditions and association_search_conditions should be merged" do
+    test "if index and association search conditions are mixed, it should be return merged search conditions" do
       yaml = <<-"YAML"
         app:
           index:
@@ -296,8 +294,8 @@ module Infold
                   sign: gteq
                   form_kind: number
       YAML
-      yaml_reader = YamlReader.new('product', YAML.load(yaml), @db_schema)
-      conditions = yaml_reader.send('read_search_conditions')
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), @db_schema)
+      conditions = resource.field_group.conditions
       assert_equal(3, conditions.size)
       assert_equal('id', conditions[0].field.name)
       assert_equal(:eq, conditions[0].sign)
@@ -316,7 +314,7 @@ module Infold
       assert_equal('number', conditions[2].association_search_form_kind)
     end
 
-    test "index_default_order and association_search_default_order should be return DefaultOrder" do
+    test "it should be return default order" do
       yaml = <<-"YAML"
         app:
           index:
@@ -330,13 +328,13 @@ module Infold
                 field: name
                 kind: desc
       YAML
-      yaml_reader = YamlReader.new('product', YAML.load(yaml), @db_schema)
-      default_order = yaml_reader.default_order
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), @db_schema)
+      default_order = resource.default_order
       assert_equal('id', default_order.field.name)
       assert_equal('asc', default_order.order_kind)
     end
 
-    test "if default_order is blank, index_default_order and association_search_default_order should be return nil" do
+    test "if default_order is blank, it should be return nil" do
       yaml = <<-"YAML"
         app:
           index:
@@ -345,12 +343,11 @@ module Infold
           association_search:
             list:
       YAML
-      yaml_reader = YamlReader.new('product', YAML.load(yaml), @db_schema)
-      default_order = yaml_reader.default_order
-      assert_nil(default_order)
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), @db_schema)
+      assert_nil(resource.default_order)
     end
 
-    test "index_list_fields should be return index list fields" do
+    test "it should be return fields with index list" do
       yaml = <<-"YAML"
         app:
           index:
@@ -365,8 +362,8 @@ module Infold
                 - id
                 - address
       YAML
-      yaml_reader = YamlReader.new('product', YAML.load(yaml), @db_schema)
-      list_fields = yaml_reader.send('read_list_fields')
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), @db_schema)
+      list_fields = resource.field_group.index_list_fields
 
       index_list_fields = list_fields.select(&:in_index_list?)
       assert_equal(3, index_list_fields.size)
@@ -377,7 +374,7 @@ module Infold
       assert_equal('address', association_search_list_fields[1].name)
     end
 
-    test "index_list_fields should be return table top several columns if index list field is blank" do
+    test "if index list is blank, it should be return table top several fields" do
       yaml = <<-"YAML"
         app:
           index:
@@ -395,19 +392,18 @@ module Infold
         end
       RUBY
       db_schema = DbSchema.new(db_schema_content)
-      yaml_reader = YamlReader.new('product', YAML.load(yaml), db_schema)
-      list_fields = yaml_reader.send('read_list_fields')
-      index_list_fields = list_fields.select(&:in_index_list?)
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), db_schema)
+      index_list_fields = resource.field_group.index_list_fields
       assert_equal(5, index_list_fields.size)
       assert_equal('category', index_list_fields[1].name)
       assert_equal('created_at', index_list_fields[4].name)
 
-      association_search_list_fields = list_fields.select(&:in_association_search_list?)
+      association_search_list_fields = resource.field_group.association_search_list_fields
       assert_equal(2, association_search_list_fields.size)
       assert_equal('category', association_search_list_fields[1].name)
     end
 
-    test "read_show_elements should be return show elements" do
+    test "it should be return fields with show element" do
       yaml = <<-"YAML"
         model:
           association:
@@ -442,25 +438,24 @@ module Infold
         end
       RUBY
       db_schema = DbSchema.new(db_schema_content)
-      yaml_reader = YamlReader.new('product', YAML.load(yaml), db_schema)
-      yaml_reader.send('read_associations')
-      yaml_reader.send('read_active_storages')
-      show_elements = yaml_reader.send('read_show_elements')
-      assert_equal(5, show_elements.size)
-      assert_equal('name', show_elements[0].field.name)
-      assert_equal('price', show_elements[1].field.name)
-      assert_equal('details', show_elements[2].field.name)
-      assert(show_elements[2].kind_association?)
-      assert_equal(2, show_elements[2].association_fields.size)
-      assert_equal('color', show_elements[2].association_fields[0].name)
-      assert_equal('stock', show_elements[2].association_fields[1].name)
-      assert_equal('image', show_elements[3].field.name)
-      assert(show_elements[3].field.active_storage.kind_image?)
-      assert_equal('pdf', show_elements[4].field.name)
-      assert(show_elements[4].field.active_storage.kind_file?)
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), db_schema)
+      show_fields = resource.field_group.show_fields
+      assert_equal(5, show_fields.size)
+      assert_equal('name', show_fields[0].name)
+      assert_equal('price', show_fields[1].name)
+      assert_equal('details', show_fields[2].name)
+      assert(show_fields[2].show_element.kind_association?)
+      association_fields = show_fields[2].show_element.association_fields
+      assert_equal(2, association_fields.size)
+      assert_equal('color', association_fields[0].name)
+      assert_equal('stock', association_fields[1].name)
+      assert_equal('image', show_fields[3].name)
+      assert(show_fields[3].active_storage.kind_image?)
+      assert_equal('pdf', show_fields[4].name)
+      assert(show_fields[4].active_storage.kind_file?)
     end
 
-    test "read_show_fields should be return table all columns if show field is blank" do
+    test "if show element is blank, show fields should be return all fields" do
       yaml = <<-"YAML"
         app:
           show:
@@ -475,15 +470,15 @@ module Infold
         end
       RUBY
       db_schema = DbSchema.new(db_schema_content)
-      yaml_reader = YamlReader.new('product', YAML.load(yaml), db_schema)
-      show_elements = yaml_reader.send('read_show_elements')
-      assert_equal(6, show_elements.size)
-      assert_equal('id', show_elements[0].field.name)
-      assert_equal('name', show_elements[1].field.name)
-      assert_equal('updated_at', show_elements[5].field.name)
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), db_schema)
+      show_fields = resource.field_group.show_fields
+      assert_equal(6, show_fields.size)
+      assert_equal('id', show_fields[0].name)
+      assert_equal('name', show_fields[1].name)
+      assert_equal('updated_at', show_fields[5].name)
     end
 
-    test "form_element_fields should be return FormField" do
+    test "it should be return fields with form element" do
       yaml = <<-"YAML"
         model:
           association:
@@ -514,19 +509,19 @@ module Infold
         end
       RUBY
       db_schema = DbSchema.new(db_schema_content)
-      yaml_reader = YamlReader.new('product', YAML.load(yaml), db_schema)
-      yaml_reader.send('read_associations')
-      form_elements = yaml_reader.send('read_form_elements')
-      assert_equal(3, form_elements.size)
-      assert_equal('title', form_elements[0].field.name)
-      assert_equal('description', form_elements[1].field.name)
-      assert_equal(:textarea, form_elements[1].form_kind)
-      assert_equal('details', form_elements[2].field.name)
-      assert_equal(:association, form_elements[2].form_kind)
-      assert_equal(2, form_elements[2].association_fields.size)
-      assert_equal('amount', form_elements[2].association_fields[0].name)
-      assert_equal('unit_price', form_elements[2].association_fields[1].name)
-      assert_equal(:number, form_elements[2].association_fields[1].form_element.form_kind)
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), db_schema)
+      form_fields = resource.field_group.form_fields
+      assert_equal(3, form_fields.size)
+      assert_equal('title', form_fields[0].name)
+      assert_equal('description', form_fields[1].name)
+      assert_equal(:textarea, form_fields[1].form_element.form_kind)
+      assert_equal('details', form_fields[2].name)
+      assert_equal(:association, form_fields[2].form_element.form_kind)
+      association_fields = form_fields[2].form_element.association_fields
+      assert_equal(2, association_fields.size)
+      assert_equal('amount', association_fields[0].name)
+      assert_equal('unit_price', association_fields[1].name)
+      assert_equal(:number, association_fields[1].form_element.form_kind)
     end
   end
 end

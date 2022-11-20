@@ -11,7 +11,5 @@ model:
     amount:
       digit: true
   association:
-    purchase:
-      kind: belongs_to
     product:
       kind: belongs_to

@@ -3,11 +3,8 @@ require 'infold/writers/base_writer'
 module Infold
   class SearchFormWriter < BaseWriter
 
-    attr_reader :default_order
-
-    def initialize(resource, default_order)
+    def initialize(resource)
       @resource = resource
-      @default_order = default_order
     end
 
     def set_conditions_code

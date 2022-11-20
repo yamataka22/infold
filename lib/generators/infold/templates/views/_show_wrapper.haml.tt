@@ -1,5 +1,5 @@
 = modal.with_header do
-  = "<%= @writer.app_title %> / ##{<%= @writer.resource_name(:snake) %>.id}"
+  = "<%= @writer.resource.app_title %> / ##{<%= @writer.resource_name(:snake) %>.id}"
 = modal.with_body do
   .modal-body
     = render 'show_content', <%= @writer.resource_name(:snake) %>: <%= @writer.resource_name(:snake) %>

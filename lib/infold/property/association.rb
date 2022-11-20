@@ -5,8 +5,8 @@ module Infold
     attr_reader :field,
                 :kind,
                 :name,
-                :association_table,
-                :association_fields
+                :table,
+                :field_group
 
     attr_writer :name_field
 
@@ -14,12 +14,12 @@ module Infold
                   :foreign_key,
                   :dependent
 
-    def initialize(field, kind:, association_table:, name: nil, **attrs)
+    def initialize(field, kind:, table:, field_group: [], name: nil, **attrs)
       @field = field
       @kind = kind
-      @association_table = association_table
+      @table = table
+      @field_group = field_group
       @name = name || (belongs_to? ? field.name : nil)
-      set_association_fields
       super(**attrs)
     end
 
@@ -44,12 +44,8 @@ module Infold
       name
     end
 
-    def find_or_initialize_association_field(field_name, type=nil)
-      find_association_field(field_name) || (@association_fields << Field.new(field_name, type)).last
-    end
-
-    def find_association_field(field_name)
-      @association_fields.find { |field| field.name == field_name }
+    def find_or_initialize_field(field_name)
+      field_group.find_or_initialize_field(field_name)
     end
 
     def search_path
@@ -62,12 +58,6 @@ module Infold
 
     def name_field
       @name_field.presence || 'id'
-    end
-
-    private
-
-    def set_association_fields
-      @association_fields = @association_table&.columns&.map { |column| Field.new(column.name, column.type) }.to_a
     end
   end
 end

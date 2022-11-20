@@ -13,9 +13,8 @@ module Infold
         resource_name = name.camelize.singularize
         db_schema = DbSchema.new(File.read(Rails.root.join('db/schema.rb')))
         yaml = YAML.load_file(Rails.root.join("config/infold/#{resource_name.underscore}.yml"))
-        yaml_reader = YamlReader.new(resource_name, yaml, db_schema)
-        resource = Resource.new(resource_name, yaml_reader.fields)
-        @writer = IndexWriter.new(resource, yaml_reader.app_title)
+        resource = YamlReader.generate_resource(resource_name, yaml, db_schema)
+        @writer = IndexWriter.new(resource)
       end
 
       def index_file

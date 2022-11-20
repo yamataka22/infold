@@ -41,7 +41,7 @@ module Infold
     end
 
     def post_params_code
-      fields = post_params_fields(@resource.form_element_fields)
+      fields = post_params_fields(@resource.form_fields)
       fields = fields.join(",\n") if fields.present?
       code = "params.require(:admin_#{resource_name(:snake)}).permit(\n" + fields.to_s + "\n)"
       indent(code, 3) if fields.present?
@@ -49,20 +49,20 @@ module Infold
 
     private
 
-      def post_params_fields(form_element_fields)
+      def post_params_fields(form_fields)
         fields = []
-        form_element_fields&.sort_by{ |field| field.form_element.kind_association? ? 9 : 0 }&.each do |form_element_field|
-          form_element = form_element_field.form_element
+        form_fields&.sort_by{ |field| field.form_element.kind_association? ? 9 : 0 }&.each do |form_field|
+          form_element = form_field.form_element
           if form_element.kind_file?
-            fields += %W(:#{form_element_field.name} :remove_#{form_element_field.name})
+            fields += %W(:#{form_field.name} :remove_#{form_field.name})
           elsif form_element.kind_association?
             association_fields = post_params_fields(form_element.association_fields)
-            fields << "#{form_element_field.name}_attributes: [\n[TAB]" + association_fields.join(",\n[TAB]") + "\n[TAB]]"
+            fields << "#{form_field.name}_attributes: [\n[TAB]" + association_fields.join(",\n[TAB]") + "\n[TAB]]"
           elsif form_element.kind_datetime?
             # datetimeはdateとtimeに分ける
-            fields += %W(:#{form_element_field.name}_date :#{form_element_field.name}_time)
+            fields += %W(:#{form_field.name}_date :#{form_field.name}_time)
           else
-            fields << ":#{form_element_field.name}"
+            fields << ":#{form_field.name}"
           end
         end
         fields.map{ |f| "[TAB]#{f}"}
