@@ -12,56 +12,6 @@ module Infold
       @db_schema = DbSchema.new(db_schema_content)
     end
 
-    test "it should be return fields with associations" do
-      yaml = <<-"YAML"
-        model:
-          association:
-            one_details:
-              kind: has_many
-              dependent: destroy
-            two_details:
-              kind: has_many
-              class_name: TwoDetail
-            three_detail:
-              kind: has_one
-            parent:
-              kind: belongs_to
-              foreign_key: parent_id
-      YAML
-      db_schema_content = <<-"RUBY"
-        create_table "products" do |t|
-          t.bigint "parent_id"
-          t.string "name"
-        end
-        create_table "one_details" do |t|
-          t.bigint "product_id"
-        end
-        create_table "two_details" do |t|
-          t.bigint "product_id"
-        end
-        create_table "three_details" do |t|
-          t.bigint "product_id"
-        end
-        create_table "parents" do |t|
-          t.integer "kind"
-        end
-      RUBY
-      db_schema = DbSchema.new(db_schema_content)
-      resource = YamlReader.generate_resource('products', YAML.load(yaml), db_schema)
-      associations = resource.field_group.associations
-      assert_equal(4, associations.size)
-      assert_equal('parent', associations[0].name)
-      assert(associations[0].belongs_to?)
-      assert_equal('parent_id', associations[0].field.name)
-      assert_equal('one_details', associations[1].name)
-      assert(associations[1].has_many?)
-      assert_equal('destroy', associations[1].dependent)
-      assert_equal('two_details', associations[2].name)
-      assert_equal('TwoDetail', associations[2].class_name)
-      assert_equal('three_detail', associations[3].name)
-      assert(associations[3].has_one?)
-    end
-
     test "it should be return fields with active_storage (no thumb)" do
       yaml = <<-"YAML"
         model:
@@ -522,6 +472,108 @@ module Infold
       assert_equal('amount', association_fields[0].name)
       assert_equal('unit_price', association_fields[1].name)
       assert_equal(:number, association_fields[1].form_element.form_kind)
+    end
+
+    test "it should be return fields with associations" do
+      yaml = <<-"YAML"
+        model:
+          association:
+            one_details:
+              kind: has_many
+              dependent: destroy
+            two_details:
+              kind: has_many
+              class_name: TwoDetail
+            three_detail:
+              kind: has_one
+            parent:
+              kind: belongs_to
+              foreign_key: parent_id
+      YAML
+      db_schema_content = <<-"RUBY"
+        create_table "products" do |t|
+          t.bigint "parent_id"
+          t.string "name"
+        end
+        create_table "one_details" do |t|
+          t.bigint "product_id"
+        end
+        create_table "two_details" do |t|
+          t.bigint "product_id"
+        end
+        create_table "three_details" do |t|
+          t.bigint "product_id"
+        end
+        create_table "parents" do |t|
+          t.integer "kind"
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), db_schema)
+      associations = resource.field_group.associations
+      assert_equal(4, associations.size)
+      assert_equal('parent', associations[0].name)
+      assert(associations[0].belongs_to?)
+      assert_equal('parent_id', associations[0].field.name)
+      assert_equal('one_details', associations[1].name)
+      assert(associations[1].has_many?)
+      assert_equal('destroy', associations[1].dependent)
+      assert_equal('two_details', associations[2].name)
+      assert_equal('TwoDetail', associations[2].class_name)
+      assert_equal('three_detail', associations[3].name)
+      assert(associations[3].has_one?)
+    end
+
+    test "If there are settings such as validate in the has_many association, they should be reflected in the association.field_group." do
+      yaml = <<-"YAML"
+        model:
+          association:
+            details:
+              kind: has_many
+              class_name: PurchaseDetail
+              dependent: destroy
+              model:
+                validate:
+                  product_id: presence
+                  amount: presence
+                decorator:
+                  amount:
+                    digit: true
+                association:
+                  product:
+                    kind: belongs_to
+      YAML
+      db_schema_content = <<-"RUBY"
+        create_table "purchases" do |t|
+          t.bigint "customer_id"
+        end
+        create_table "purchase_details" do |t|
+          t.bigint "purchase_id"
+          t.bigint "product_id"
+          t.integer "amount"
+        end
+        create_table "products" do |t|
+          t.string "name"
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      resource = YamlReader.generate_resource('purchase', YAML.load(yaml), db_schema)
+      associations = resource.field_group.associations
+      assert_equal(1, associations.size)
+      assert_equal('details', associations[0].name)
+      assert_equal('PurchaseDetail', associations[0].class_name)
+      assert_equal('purchase_details', associations[0].table.name)
+      assert_equal(4, associations[0].field_group.count)
+
+      product_id_field = associations[0].field_group.fields[2]
+      assert_equal('product_id', product_id_field.name)
+      assert_equal('product', product_id_field.association.name)
+      assert(product_id_field.association.belongs_to?)
+      assert_equal(:presence, product_id_field.validation.conditions[0].condition)
+
+      amount_field = associations[0].field_group.fields[3]
+      assert_equal(:presence, amount_field.validation.conditions[0].condition)
+      assert(amount_field.decorator.digit)
     end
   end
 end

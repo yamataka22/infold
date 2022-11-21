@@ -47,7 +47,7 @@ module Infold
           else
             field = field_group.find_or_initialize_field(field_name)
           end
-          association_table = @db_schema.table(field_name)
+          association_table = @db_schema.table(class_name || field_name)
           association_field_group = FieldGroup.new(association_table)
           # association先のmodelの情報
           assign_associations(     association_field_group, options.dig(:model, :association))
