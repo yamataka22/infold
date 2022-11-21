@@ -68,33 +68,33 @@ module Infold
 
     test "post_params_code should generate post params" do
       field = @field_group.add_field('name')
-      field.build_form_element
+      field.build_form_element(seq: 0)
 
       field = @field_group.add_field('price')
-      field.build_form_element(form_kind: :number)
+      field.build_form_element(form_kind: :number, seq: 1)
 
       field = @field_group.add_field('published_at', :datetime)
-      field.build_form_element
+      field.build_form_element(seq: 2)
 
       field = @field_group.add_field('image')
       field.build_active_storage(kind: :image)
-      field.build_form_element(form_kind: :file)
+      field.build_form_element(form_kind: :file, seq: 3)
 
       field = @field_group.add_field('one_details')
       association_field_group = FieldGroup.new
       field_title = association_field_group.add_field('title')
       field_stock = association_field_group.add_field('stock')
       field.build_association(kind: :has_many, table: Table.new('one_details'), field_group: association_field_group)
-      form_element = field.build_form_element(form_kind: :association)
-      form_element.add_association_fields(field_title)
-      form_element.add_association_fields(field_stock, form_kind: :number)
+      form_element = field.build_form_element(form_kind: :association, seq: 4)
+      form_element.add_association_fields(field_title, seq: 0)
+      form_element.add_association_fields(field_stock, form_kind: :number, seq: 1)
 
       field = @field_group.add_field('two_details')
       association_field_group = FieldGroup.new
       field_birthday = association_field_group.add_field('birthday', :date)
       field.build_association(kind: :has_many, table: Table.new('two_details'), field_group: association_field_group)
-      form_element = field.build_form_element(form_kind: :association)
-      form_element.add_association_fields(field_birthday)
+      form_element = field.build_form_element(form_kind: :association, seq: 5)
+      form_element.add_association_fields(field_birthday, seq: 0)
 
       field = @field_group.add_field('three_detail')
       association_field_group = FieldGroup.new
@@ -102,9 +102,9 @@ module Infold
       field_pdf = association_field_group.add_field('pdf')
       field_pdf.build_active_storage(kind: :file)
       field.build_association(kind: :has_one, table: Table.new('three_details'), field_group: association_field_group)
-      form_element = field.build_form_element(form_kind: :association)
-      form_element.add_association_fields(field_pdf)
-      form_element.add_association_fields(field_removed_at)
+      form_element = field.build_form_element(form_kind: :association, seq: 6)
+      form_element.add_association_fields(field_pdf, seq: 0)
+      form_element.add_association_fields(field_removed_at, seq: 1)
 
       @resource.field_group = @field_group
       writer = ControllerWriter.new(@resource)

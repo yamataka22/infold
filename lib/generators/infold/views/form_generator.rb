@@ -33,25 +33,13 @@ module Infold
       end
 
       def association_form_file
-        # @writer.form_fields.each do |field|
-        #   if field.association&.has_many? || field.association&.has_one?
-        #     @association_field = field
-        #     # [TODO] association先のyamlを読み込むしかないか
-        #     # association先のyamlを読み込んで、その先にあるbelongs_toの情報を取得
-        #     association_name = field.association.name.underscore.singularize
-        #     association_yaml = Rails.root.join("config/infold/#{association_name}.yml")
-        #     if File.exist?(association_yaml)
-        #       yaml = YAML.load_file(association_yaml)
-        #       yaml_reader = YamlReader.new(association_name, yaml, @db_schema)
-        #       association_resource = Resource.new(association_name, yaml_reader.fields)
-        #       # association先のリソースのform_fieldsに、自分のassociation先のform_fieldsを設定する
-        #       association_resource.merge_form_fields(field.form_element.association_fields)
-        #       @association_writer = FormWriter.new(association_resource, yaml_reader.app_title)
-        #     end
-        #     template "views/_form_association.haml",
-        #              Rails.root.join("app/views/admin/#{name.underscore.pluralize}/_form_#{field.name}.html.haml"), force: true
-        #   end
-        # end
+        @writer.form_fields.each do |field|
+          if field.association&.has_many? || field.association&.has_one?
+            @association_field = field
+            template "views/_form_association.haml",
+                     Rails.root.join("app/views/admin/#{name.underscore.pluralize}/_form_#{field.name}.html.haml"), force: true
+          end
+        end
       end
     end
   end

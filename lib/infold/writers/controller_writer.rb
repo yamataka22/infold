@@ -51,11 +51,11 @@ module Infold
 
       def post_params_fields(form_fields)
         fields = []
-        form_fields&.sort_by{ |field| field.form_element.kind_association? ? 9 : 0 }&.each do |form_field|
+        form_fields&.sort_by{ |field| field.form_element.kind_has_association? ? 9 : 0 }&.each do |form_field|
           form_element = form_field.form_element
           if form_element.kind_file?
             fields += %W(:#{form_field.name} :remove_#{form_field.name})
-          elsif form_element.kind_association?
+          elsif form_element.kind_has_association?
             association_fields = post_params_fields(form_element.association_fields)
             fields << "#{form_field.name}_attributes: [\n[TAB]" + association_fields.join(",\n[TAB]") + "\n[TAB]]"
           elsif form_element.kind_datetime?

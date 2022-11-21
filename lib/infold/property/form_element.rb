@@ -5,7 +5,9 @@ module Infold
     attr_reader :field,
                 :association_fields
 
-    attr_accessor :association
+    attr_accessor :association,
+                  :seq
+
     attr_writer :form_kind
 
     def initialize(field, **attrs)
@@ -14,14 +16,14 @@ module Infold
       super(**attrs)
     end
 
-    def add_association_fields(field, **attrs)
-      field.build_form_element(**attrs)
+    def add_association_fields(field, seq:, **attrs)
+      field.build_form_element(seq: seq, **attrs)
       @association_fields << field
       field
     end
 
-    def kind_association?
-      field.association.present? || @form_kind.to_s == 'association'
+    def kind_has_association?
+      field.association && !field.association.belongs_to? || @form_kind.to_s == 'association'
     end
 
     def kind_file?

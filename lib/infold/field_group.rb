@@ -66,11 +66,11 @@ module Infold
     end
 
     def conditions(kind=nil)
-      condition_fields(kind).map(&:search_conditions)&.flatten
+      condition_fields(kind).map(&:search_conditions).flatten
     end
 
     def form_fields
-      select { |f| f.form_element.present? }
+      select { |f| f.form_element.present? }.sort_by { |f| f.form_element.seq }
     end
 
     def index_list_fields

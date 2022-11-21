@@ -1,9 +1,9 @@
 model:
   validate:
     customer:
-      presence: true
+      - presence
     status:
-      presence: true
+      - presence
   association:
     purchase_details:
       kind: has_many
@@ -12,9 +12,9 @@ model:
       model:
         validate:
           product_id:
-            presence: true
+            - presence
           amount:
-            presence: true
+            - presence
         decorator:
           amount:
             digit: true
@@ -80,7 +80,6 @@ app:
       - remarks
   form:
     fields:
-      - id
       - customer_id:
           kind: association_search
       - status:
@@ -88,7 +87,7 @@ app:
       - total_price:
           kind: number
       - purchase_details:
-          kind: associations
+          kind: association
           fields:
             - product_id:
                 kind: association_search

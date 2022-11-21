@@ -16,7 +16,7 @@ module Infold
       self.conditions << ValidateCondition.new(condition, options)
     end
 
-    def has_presence_validation?
+    def has_presence?
       conditions.find { |c| c.condition == :presence }
     end
 

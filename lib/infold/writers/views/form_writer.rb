@@ -12,9 +12,9 @@ module Infold::Views
     def form_fields; @resource.form_fields end
 
     def form_field_code(field)
-      field = form_fields.find { |form_field| form_field == field }
       code = "= render Admin::FieldsetComponent.new(form, " +
         ":#{field.name}, :#{field.form_element.form_kind}"
+      code += ", required: true" if field.validation&.has_presence?
       case field.form_element.form_kind
       when :association_search
         "#{code}, #{belongs_to_search_form_option(field.association)})"

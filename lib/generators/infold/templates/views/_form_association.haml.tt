@@ -1,7 +1,7 @@
 %tr.nested-fields{ class: "#{'d-none' if form.object._destroy}", data: { new_record: form.object.new_record? } }
 <%- @association_field.form_element.association_fields.each do |association_field| -%>
   %td.nested_form
-    <%= @writer.form_field_code(association_field.name) %>
+    <%= @writer.form_field_code(association_field)&.gsub('[TAB]', '  ') %>
 <%- end -%>
   %td.tac.vam
     = link_to "#", class: 'd-block', data: { action: "click->nested-form#remove_association" } do
