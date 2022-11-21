@@ -5,7 +5,8 @@ module Infold
     attr_reader :field,
                 :association_fields
 
-    attr_accessor :association
+    attr_accessor :seq,
+                  :association
 
     def initialize(field, **attrs)
       @field = field

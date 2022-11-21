@@ -49,7 +49,7 @@ module Infold
 
     def decorator_fields
       decorator_fields = select { |f| f.decorator.present? }.to_a
-      decorator_fields + select { |field| %i(datetime date boolean).include?(field.type) }&.each do |field|
+      decorator_fields + select { |field| %i(datetime date boolean).include?(field.type) }.each do |field|
         field.build_decorator(kind: field.type.to_sym)
       end.to_a
     end
@@ -66,7 +66,14 @@ module Infold
     end
 
     def conditions(kind=nil)
-      condition_fields(kind).map(&:search_conditions).flatten
+      conditions = condition_fields(kind).map(&:search_conditions).flatten
+      if kind.to_s == 'index'
+        conditions.sort_by(&:index_seq)
+      elsif kind.to_s == 'association_search'
+        conditions.sort_by(&:association_seq)
+      else
+        conditions
+      end
     end
 
     def form_fields
@@ -74,15 +81,15 @@ module Infold
     end
 
     def index_list_fields
-      select { |f| f.in_index_list? }
+      select { |f| f.in_index_list? }.sort_by { |f| f.index_list_seq }
     end
 
     def show_fields
-      select { |f| f.show_element.present? }
+      select { |f| f.show_element.present? }.sort_by { |f| f.show_element.seq }
     end
 
     def association_search_list_fields
-      select { |f| f.in_association_search_list? }
+      select { |f| f.in_association_search_list? }.sort_by { |f| f.association_search_list_seq }
     end
 
     private

@@ -141,9 +141,9 @@ module Infold
       end
   
       test "list_header_code should be return field code" do
-        %w(id name category).each do |name|
+        %w(id name category).each_with_index do |name, seq|
           field = @field_group.add_field(name)
-          field.in_index_list = true
+          field.index_list_seq = seq
         end
 
         @resource.field_group = @field_group

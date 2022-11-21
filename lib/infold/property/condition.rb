@@ -6,7 +6,9 @@ module Infold
     attr_writer :sign
     attr_accessor :index_form_kind,
                   :index_association_name,
-                  :association_search_form_kind
+                  :index_seq,
+                  :association_search_form_kind,
+                  :association_seq
 
     def initialize(field, **attrs)
       @field = field

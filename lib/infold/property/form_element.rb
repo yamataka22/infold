@@ -16,8 +16,8 @@ module Infold
       super(**attrs)
     end
 
-    def add_association_fields(field, seq:, **attrs)
-      field.build_form_element(seq: seq, **attrs)
+    def add_association_fields(field, **attrs)
+      field.build_form_element(**attrs)
       @association_fields << field
       field
     end

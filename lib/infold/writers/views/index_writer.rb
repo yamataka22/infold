@@ -9,8 +9,11 @@ module Infold::Views
       @resource = resource
     end
 
-    def index_conditions; @resource.conditions(:index) end
+    def index_conditions; @resource.conditions(:index)&.sort_by { |c| c.index_seq } end
     def index_list_fields; @resource.index_list_fields end
+
+    def association_search_conditions; @resource.conditions(:association_search)&.sort_by { |c| c.association_seq } end
+    def association_search_list_fields; @resource.association_search_list_fields end
 
     def condition_form_code(condition)
       code = "= render Admin::FieldsetComponent.new(form, " +

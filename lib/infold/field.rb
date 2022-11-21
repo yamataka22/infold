@@ -19,9 +19,9 @@ module Infold
                 :search_conditions,
                 :association
 
-    attr_writer :in_index_list,
-                :in_csv,
-                :in_association_search_list
+    attr_accessor :index_list_seq,
+                  :csv_seq,
+                  :association_search_list_seq
 
     def initialize(name, type=nil)
       @name = name
@@ -74,14 +74,16 @@ module Infold
       @validation.add_conditions(condition, options)
     end
 
-    def add_search_condition(view_kind, sign:, form_kind:, association_name: nil)
+    def add_search_condition(view_kind, sign:, form_kind:, seq: 0, association_name: nil)
       form_kind = 'text' if form_kind.blank?
       condition = @search_conditions.find{ |sc| sc.sign == sign.to_sym }
       condition ||= (@search_conditions << Condition.new(self, sign: sign)).last
       if view_kind == :index
         condition.index_form_kind = form_kind
+        condition.index_seq = seq
       else
         condition.association_search_form_kind = form_kind
+        condition.association_seq = seq
       end
       condition.index_association_name = association_name
       condition
@@ -95,8 +97,8 @@ module Infold
       %w(integer float decimal).include?(type.to_s)
     end
 
-    def in_index_list?; @in_index_list end
-    def in_csv?; @in_csv end
-    def in_association_search_list?; @in_association_search_list end
+    def in_index_list?; index_list_seq.present? end
+    def in_csv?; csv_seq.present? end
+    def in_association_search_list?; association_search_list_seq.present? end
   end
 end

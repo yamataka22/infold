@@ -138,19 +138,21 @@ module Infold
       end
 
       def assign_search_conditions(field_group, app)
-        app.dig(:index, :conditions)&.each do |condition|
+        app.dig(:index, :conditions)&.each_with_index do |condition, seq|
           field = field_group.find_or_initialize_field(condition.keys[0])
           cond = condition.dig(condition.keys[0])
           field.add_search_condition(:index,
                                      sign: cond.dig(:sign),
                                      form_kind: cond.dig(:form_kind),
+                                     seq: seq,
                                      association_name: cond.dig(:association_name))
         end
-        app.dig(:association_search, :conditions)&.each do |condition|
+        app.dig(:association_search, :conditions)&.each_with_index do |condition, seq|
           field = field_group.find_or_initialize_field(condition.keys[0])
           cond = condition.dig(condition.keys[0])
           field.add_search_condition(:association_search,
                                      sign: cond.dig(:sign),
+                                     seq: seq,
                                      form_kind: cond.dig(:form_kind))
         end
       end
@@ -158,35 +160,35 @@ module Infold
       def assign_list_fields(field_group, app)
         field_names = app.dig(:index, :list, :fields).presence
         field_names ||= field_group.fields[0, 5]&.map(&:name)
-        field_names.each do |field_name|
+        field_names.each_with_index do |field_name, seq|
           field = field_group.find_or_initialize_field(field_name)
-          field.in_index_list = true
+          field.index_list_seq = seq
         end
 
         field_names = app.dig(:association_search, :list, :fields).presence
         field_names ||= field_group.fields[0, 2]&.map(&:name)
-        field_names.each do |field_name|
+        field_names.each_with_index do |field_name, seq|
           field = field_group.find_or_initialize_field(field_name)
-          field.in_association_search_list = true
+          field.association_search_list_seq = seq
         end
       end
 
       def assign_show_elements(field_group, app)
         field_configs = app.dig(:show, :fields).presence
         field_configs ||= field_group.map(&:name)
-        field_configs.each do |field_config|
+        field_configs.each_with_index do |field_config, seq|
           if field_config.is_a?(String)
             field = field_group.find_or_initialize_field(field_config)
-            field.build_show_element
+            field.build_show_element(seq: seq)
           else
             field = field_group.find_or_initialize_field(field_config.keys[0])
-            show_element = field.build_show_element
+            show_element = field.build_show_element(seq: seq)
             if show_element.kind_association?
               association = find_association(field_group, show_element.field.name)
-              field_config[field.name].dig(:fields)&.each do |association_field_name|
+              field_config[field.name].dig(:fields)&.each_with_index do |association_field_name, association_seq|
                 association_field =
                   association.find_or_initialize_field(association_field_name)
-                show_element.add_association_fields(association_field)
+                show_element.add_association_fields(association_field, seq: association_seq)
               end
             end
           end

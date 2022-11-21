@@ -191,7 +191,7 @@ module Infold
                   sign: gteq
       YAML
       resource = YamlReader.generate_resource('products', YAML.load(yaml), @db_schema)
-      conditions = resource.field_group.conditions(:index)
+      conditions = resource.conditions(:index)
       assert_equal(3, conditions.size)
       assert_equal('id', conditions[0].field.name)
       assert_equal(:eq, conditions[0].sign)
@@ -202,6 +202,37 @@ module Infold
       assert_equal('number', conditions[1].index_form_kind)
       assert_equal(:gteq, conditions[2].sign)
       assert_equal('text', conditions[2].index_form_kind)
+    end
+
+    test "conditions should be sorted in yaml order" do
+      yaml = <<-"YAML"
+        app:
+          index:
+            conditions:
+              - price:
+                  sign: lteq
+              - name:
+                  sign: full_like
+              - price:
+                  sign: gteq
+              - id:
+                  sign: eq
+      YAML
+      db_schema_content = <<-"RUBY"
+        create_table "products" do |t|
+          t.string "name"
+          t.integer "price"
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), db_schema)
+      conditions = resource.conditions(:index)
+      assert_equal('price', conditions[0].field.name)
+      assert_equal(:lteq, conditions[0].sign)
+      assert_equal('name', conditions[1].field.name)
+      assert_equal('price', conditions[2].field.name)
+      assert_equal(:gteq, conditions[2].sign)
+      assert_equal('id', conditions[3].field.name)
     end
 
     test "it should be return fields with search conditions (association search)" do
@@ -353,6 +384,32 @@ module Infold
       assert_equal('category', association_search_list_fields[1].name)
     end
 
+    test "index_list_fields should be sorted in yaml order" do
+      yaml = <<-"YAML"
+        app:
+          index:
+            list:
+              fields:
+                - address
+                - name
+                - id
+                - price
+      YAML
+      db_schema_content = <<-"RUBY"
+        create_table "products" do |t|
+          t.string "name"
+          t.integer "price"
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), db_schema)
+      list_fields = resource.field_group.index_list_fields
+      assert_equal('address', list_fields[0].name)
+      assert_equal('name', list_fields[1].name)
+      assert_equal('id', list_fields[2].name)
+      assert_equal('price', list_fields[3].name)
+    end
+
     test "it should be return fields with show element" do
       yaml = <<-"YAML"
         model:
@@ -428,6 +485,45 @@ module Infold
       assert_equal('updated_at', show_fields[5].name)
     end
 
+
+    test "show_fields should be sorted in yaml order" do
+      yaml = <<-"YAML"
+        model:
+          association:
+            details:
+              kind: has_many
+        app:
+          show:
+            fields:
+              - price
+              - details:
+                  fields:
+                    - stock
+                    - color
+              - name
+      YAML
+      db_schema_content = <<-"RUBY"
+        create_table "products" do |t|
+          t.string "name"
+          t.float "price"
+        end
+        create_table "details" do |t|
+          t.bigint "product_id"
+          t.string "color"
+          t.integer "stock"
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), db_schema)
+      show_fields = resource.field_group.show_fields
+      assert_equal('price', show_fields[0].name)
+      assert_equal('details', show_fields[1].name)
+      association_fields = show_fields[1].show_element.association_fields
+      assert_equal('stock', association_fields[0].name)
+      assert_equal('color', association_fields[1].name)
+      assert_equal('name', show_fields[2].name)
+    end
+
     test "it should be return fields with form element" do
       yaml = <<-"YAML"
         model:
@@ -472,6 +568,44 @@ module Infold
       assert_equal('amount', association_fields[0].name)
       assert_equal('unit_price', association_fields[1].name)
       assert_equal(:number, association_fields[1].form_element.form_kind)
+    end
+
+    test "form_fields should be sorted in yaml order" do
+      yaml = <<-"YAML"
+        model:
+          association:
+            details:
+              kind: has_many
+        app:
+          form:
+            fields:
+              - price
+              - details:
+                  fields:
+                    - stock
+                    - color
+              - name
+      YAML
+      db_schema_content = <<-"RUBY"
+        create_table "products" do |t|
+          t.string "name"
+          t.float "price"
+        end
+        create_table "details" do |t|
+          t.bigint "product_id"
+          t.string "color"
+          t.integer "stock"
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), db_schema)
+      form_fields = resource.field_group.form_fields
+      assert_equal('price', form_fields[0].name)
+      assert_equal('details', form_fields[1].name)
+      association_fields = form_fields[1].form_element.association_fields
+      assert_equal('stock', association_fields[0].name)
+      assert_equal('color', association_fields[1].name)
+      assert_equal('name', form_fields[2].name)
     end
 
     test "it should be return fields with associations" do
