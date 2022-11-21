@@ -16,12 +16,15 @@ model:
           amount:
             presence: true
         decorator:
+          amount:
+            digit: true
           unit_price:
             prepend: $
             digit: true
         association:
           product:
             kind: belongs_to
+            name_field: name
     customer:
       kind: belongs_to
   enum:
@@ -67,7 +70,7 @@ app:
       - total_price
       - purchase_details:
           fields:
-            - product.name
+            - product
             - amount
             - unit_price
       - delivery_zipcode

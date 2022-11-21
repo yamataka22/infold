@@ -9,7 +9,8 @@ require 'infold/property/decorator'
 
 module Infold
   class Field
-    attr_reader :validation,
+    attr_reader :type,
+                :validation,
                 :enum,
                 :active_storage,
                 :form_element,
@@ -24,7 +25,7 @@ module Infold
 
     def initialize(name, type=nil)
       @name = name
-      @type = type
+      @type = type&.to_sym
       @search_conditions = []
     end
 
@@ -35,10 +36,6 @@ module Infold
       name = name.singularize if attr.include?(:single)
       name = name.pluralize if attr.include?(:multi)
       name
-    end
-
-    def type
-      @type&.to_sym
     end
 
     def build_active_storage(**attrs)

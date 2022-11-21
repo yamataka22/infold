@@ -15,7 +15,7 @@ module Infold
     end
 
     def find_or_initialize_field(field_name)
-      find { |field| field.name == field_name } ||
+      find { |field| field.name == field_name || field.association&.name == field_name } ||
         (@fields << Field.new(field_name)).last
     end
 

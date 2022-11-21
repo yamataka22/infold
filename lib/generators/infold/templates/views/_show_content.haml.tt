@@ -17,8 +17,10 @@
         %tbody
           - <%= @writer.resource_name(:snake) %>.<%= field.name %>.each do |<%= field.name(:single) %>|
             %tr
+            <%- field.show_element.association_fields.each do |association_field| -%>
               %td
-                <%= @writer.field_display_code(field, :list) %>
+                <%= @writer.field_display_code(association_field, :list, model_name: field.name(:single)) %>
+            <%- end -%>
   <%- rendered_list_group = false -%>
 <%- else -%>
 <%- unless rendered_list_group -%>

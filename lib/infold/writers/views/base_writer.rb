@@ -10,13 +10,13 @@ module Infold::Views
       @app_title = app_title || @resource.name
     end
 
-    def field_display_code(field, part)
-      field_code = "#{resource_name(:snake)}.#{field.name}"
+    def field_display_code(field, part, model_name: nil)
+      field_code = "#{model_name || resource_name(:snake)}.#{field.name}"
       if part == :csv
         "= #{field_code}#{'_i18n' if field.enum}"
       else
         if field.association&.belongs_to?
-          belongs_to_field_display(field.association)
+          belongs_to_field_display(field.association, model_name)
         elsif field.active_storage
           active_storage_field_display(field, part, field_code)
         elsif field.enum&.has_color?
@@ -33,8 +33,8 @@ module Infold::Views
 
     protected
 
-    def belongs_to_field_display(association)
-      association_field = "#{resource_name(:snake)}.#{association.name}"
+    def belongs_to_field_display(association, model_name=nil)
+      association_field = "#{model_name || resource_name(:snake)}.#{association.name}"
       "= link_to #{association_field}.#{association.name_field}, " +
         "#{association.belongs_to_show_path(association_field)}, " +
         "data: { turbo_frame: 'modal_sub' } if #{association_field}"
