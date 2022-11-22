@@ -12,7 +12,7 @@ module Admin
       @turbo_frame_id = "relation_#{ SecureRandom.hex(3) }#{ @nested_form ? '_NEW_RECORD' : '' }"
     end
 
-    def name_field
+    def name_field_tag
       classes = %W(form-control)
       classes << 'is-invalid' if helpers.admin_field_invalid?(@form, @id_field) || helpers.admin_field_invalid?(@form, @association_name)
       text_field_tag '',

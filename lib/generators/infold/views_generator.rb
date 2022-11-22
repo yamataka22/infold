@@ -7,8 +7,7 @@ module Infold
     def perform
       invoke 'infold:views:index', [ name ]
       invoke 'infold:views:show',  [ name ]
-      # invoke 'infold:views:form',  [ name ]
-      # invoke 'infold:views:association_search', [ name ]
+      invoke 'infold:views:form',  [ name ]
     end
   end
 end

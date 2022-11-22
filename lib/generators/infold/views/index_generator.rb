@@ -24,6 +24,10 @@ module Infold
       def index_row_file
         template "views/_index_row.haml", Rails.root.join("app/views/admin/#{name.underscore.pluralize}/_index_row.html.haml"), force: true
       end
+
+      def index_turbo_frame_file
+        template "views/index.html+turbo_frame.haml", Rails.root.join("app/views/admin/#{name.underscore.pluralize}/index.html+turbo_frame.haml"), force: true
+      end
     end
   end
 end

@@ -1,6 +1,6 @@
 model:
   validate:
-    name:
+    title:
       - presence
     category:
       - presence
@@ -29,12 +29,12 @@ model:
     image:
       kind: image
 app:
-  title: Product
+  title: 商品管理
   index:
     conditions:
       - id:
           sign: eq
-      - name:
+      - title:
           sign: full_like
       - category:
           sign: any
@@ -47,7 +47,7 @@ app:
     list:
       fields:
         - id
-        - name
+        - title
         - category
         - price
         - removed
@@ -58,7 +58,7 @@ app:
       fields:
   show:
     fields:
-      - name
+      - title
       - description
       - category
       - price
@@ -67,7 +67,7 @@ app:
       - removed
   form:
     fields:
-      - name
+      - title
       - description:
           kind: textarea
       - category:
@@ -80,9 +80,9 @@ app:
     conditions:
       - id:
           sign: eq
-      - name:
+      - title:
           sign: full_like
     list:
       fields:
         - id
-        - name
+        - title

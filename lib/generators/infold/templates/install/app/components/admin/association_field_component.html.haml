@@ -1,7 +1,7 @@
 %div{ data: { controller: 'relation-search' } }
   = @form.hidden_field @id_field, data: { relation_search_target: 'selectedId' }
   .input-group
-    = name_field
+    = name_field_tag
     = link_to @search_path, class: "btn btn-info px-1", data: { turbo_frame: @turbo_frame_id } do
       %i.bi.bi-search
     %a.btn.btn-secondary.px-1{ href: '#', data: { action: "relation-search#relationClear" } }

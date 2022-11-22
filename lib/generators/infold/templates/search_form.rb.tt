@@ -12,5 +12,12 @@ module Admin
     <%- end -%>
       apply_sort(records, <%= @writer.resource_name(:model) %>.primary_key)
     end
+  <%- @writer.resource.conditions&.select { |c| c.form_kind(:index) == :association_search }&.each do |condition| -%>
+    <%- association = condition.field.association -%>
+
+    def <%= association.name %>_<%= association.name_field %>
+      <%= association.model_name %>.find(<%= condition.scope %>)&.<%= association.name_field %> if <%= condition.scope %>.present?
+    end
+  <%- end -%>
   end
 end

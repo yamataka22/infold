@@ -62,7 +62,7 @@ module Infold::Views
 
     def belongs_to_search_form_option(association)
       "association_name: :#{association.name}, " +
-        "search_path: #{association.search_path}, " +
+        "search_path: #{association.search_path}(name_field: :#{association.name_field}), " +
         "name_field: :#{association.model_name(:snake)}_#{association.name_field}"
     end
 

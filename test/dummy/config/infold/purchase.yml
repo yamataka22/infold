@@ -8,7 +8,6 @@ model:
     purchase_details:
       kind: has_many
       dependent: destroy
-      # purchase_detailのモデル情報
       model:
         validate:
           product_id:
@@ -24,9 +23,10 @@ model:
         association:
           product:
             kind: belongs_to
-            name_field: name
+            name_field: title
     customer:
       kind: belongs_to
+      name_field: name
   enum:
     status:
       ordered:
@@ -42,21 +42,21 @@ model:
         value: 9
         color: secondary
 app:
-  title: Purchase
+  title: 注文管理
   index:
     conditions:
       - id:
           sign: eq
       - status:
           sign: any
-          kind: checkbox
+          form_kind: checkbox
       - customer_id:
           sign: eq
-          kind: association_search
+          form_kind: association_search
     list:
       fields:
         - id
-        - customer.name
+        - customer
         - status
         - total_price
         - delivered_at
@@ -65,7 +65,7 @@ app:
   show:
     fields:
       - id
-      - customer.name
+      - customer
       - status
       - total_price
       - purchase_details:
