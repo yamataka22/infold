@@ -28,6 +28,10 @@ module Infold
       def index_turbo_frame_file
         template "views/index.html+turbo_frame.haml", Rails.root.join("app/views/admin/#{name.underscore.pluralize}/index.html+turbo_frame.haml"), force: true
       end
+
+      def csv_file
+        template "views/index.csv.ruby", Rails.root.join("app/views/admin/#{name.underscore.pluralize}/index.csv.ruby"), force: true
+      end
     end
   end
 end

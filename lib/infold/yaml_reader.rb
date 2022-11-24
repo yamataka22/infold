@@ -21,6 +21,7 @@ module Infold
         assign_decorators(       field_group, model.dig(:decorator))
         assign_search_conditions(field_group, app)
         assign_list_fields(      field_group, app)
+        assign_csv_fields(       field_group, app)
         assign_show_elements(    field_group, app)
         assign_form_elements(    field_group, app)
         resource.field_group = field_group
@@ -174,6 +175,15 @@ module Infold
         field_names.each_with_index do |field_name, seq|
           field = field_group.find_or_initialize_field(field_name)
           field.association_search_list_seq = seq
+        end
+      end
+
+      def assign_csv_fields(field_group, app)
+        field_names = app.dig(:index, :csv, :fields).presence
+        field_names ||= field_group.reject { |field| field.type.blank? }.map(&:name)
+        field_names.each_with_index do |field_name, seq|
+          field = field_group.find_or_initialize_field(field_name)
+          field.csv_seq = seq
         end
       end
 

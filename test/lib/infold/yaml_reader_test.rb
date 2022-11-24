@@ -410,6 +410,89 @@ module Infold
       assert_equal('price', list_fields[3].name)
     end
 
+    test "it should be return csv_fields" do
+      yaml = <<-"YAML"
+        app:
+          index:
+            csv:
+              fields:
+                - price
+                - id
+                - name
+      YAML
+      db_schema_content = <<-"RUBY"
+        create_table "products" do |t|
+          t.string "name"
+          t.integer "price"
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), db_schema)
+      csv_fields = resource.field_group.csv_fields
+
+      assert_equal(3, csv_fields.size)
+      assert_equal('price', csv_fields[0].name)
+      assert_equal('id', csv_fields[1].name)
+      assert_equal('name', csv_fields[2].name)
+    end
+
+    test "csv_fields should reject active_storage and has_association fields" do
+      yaml = <<-"YAML"
+        model:
+          association:
+            details:
+              kind: has_many
+          active_storage:
+            image:
+              kind: image
+        app:
+          index:
+            csv:
+              fields:
+                - id
+                - name
+      YAML
+      db_schema_content = <<-"RUBY"
+        create_table "products" do |t|
+          t.string "name"
+          t.integer "price"
+        end
+        create_table "details" do |t|
+          t.bigint "product_id"
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), db_schema)
+      csv_fields = resource.field_group.csv_fields
+
+      assert_equal(2, csv_fields.size)
+      assert_equal('id', csv_fields[0].name)
+      assert_equal('name', csv_fields[1].name)
+    end
+
+    test "if csv field is blank, it should be return all columns" do
+      yaml = <<-"YAML"
+        app:
+          index:
+      YAML
+      db_schema_content = <<-"RUBY"
+        create_table "products" do |t|
+          t.string "name"
+          t.integer "price"
+          t.integer "category"
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), db_schema)
+      csv_fields = resource.field_group.csv_fields
+
+      assert_equal(4, csv_fields.size)
+      assert_equal('id', csv_fields[0].name)
+      assert_equal('name', csv_fields[1].name)
+      assert_equal('price', csv_fields[2].name)
+      assert_equal('category', csv_fields[3].name)
+    end
+
     test "it should be return fields with show element" do
       yaml = <<-"YAML"
         model:

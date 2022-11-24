@@ -23,6 +23,11 @@ module Infold
           assert_match "= link_to admin_product_path(product), class: 'd-block', data: { turbo_frame: 'modal_main' } do", content
           assert_match /%td\n\s+= product\.id/, content
         end
+
+        assert_file Rails.root.join("app/views/admin/products/index.csv.ruby") do |content|
+          assert_match "Admin::Product.human_attribute_name(:title),", content
+          assert_match "product.category_i18n,", content
+        end
       end
     end
   end

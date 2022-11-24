@@ -152,6 +152,24 @@ module Infold
         code = writer.list_header_code(list_field)
         assert_equal("= render Admin::SortableComponent.new(@search, :category)", code)
       end
+
+      test "csv_field_code should convert enum to i18n" do
+        field = @field_group.add_field('category', :int)
+        enum = field.build_enum
+        enum.add_elements(key: :kitchen, value: 1)
+        field.csv_seq = 0
+
+        field = @field_group.add_field('price', :int)
+        field.csv_seq = 1
+
+        @resource.field_group = @field_group
+        writer = IndexWriter.new(@resource)
+        csv_fields = @resource.csv_fields
+        code = writer.csv_field_code(csv_fields[0])
+        assert_equal("product.category_i18n", code)
+        code = writer.csv_field_code(csv_fields[1])
+        assert_equal("product.price", code)
+      end
     end
   end
 end

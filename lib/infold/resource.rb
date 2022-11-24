@@ -25,6 +25,7 @@ module Infold
     delegate conditions: :@field_group
     delegate form_fields: :@field_group
     delegate index_list_fields: :@field_group
+    delegate csv_fields: :@field_group
     delegate show_fields: :@field_group
     delegate association_search_list_fields: :@field_group
   end

@@ -85,6 +85,10 @@ module Infold
       select { |f| f.in_index_list? }.sort_by { |f| f.index_list_seq }
     end
 
+    def csv_fields
+      select { |f| f.in_csv? }.sort_by { |f| f.csv_seq }
+    end
+
     def show_fields
       select { |f| f.show_element.present? }.sort_by { |f| f.show_element.seq }
     end

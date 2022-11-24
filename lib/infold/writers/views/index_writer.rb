@@ -11,6 +11,7 @@ module Infold::Views
 
     def index_conditions; @resource.conditions(:index)&.sort_by { |c| c.index_seq } end
     def index_list_fields; @resource.index_list_fields end
+    def csv_fields; @resource.csv_fields end
 
     def association_search_conditions; @resource.conditions(:association_search)&.sort_by { |c| c.association_seq } end
     def association_search_list_fields; @resource.association_search_list_fields end
@@ -36,6 +37,12 @@ module Infold::Views
 
     def list_header_code(list_field)
       "= render Admin::SortableComponent.new(@search, :#{list_field.name})"
+    end
+
+    def csv_field_code(csv_field)
+      code = "#{resource_name(:snake)}.#{csv_field.name}"
+      code = "#{code}_i18n" if csv_field.enum
+      code
     end
 
   end

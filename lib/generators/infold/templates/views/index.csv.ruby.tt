@@ -1,0 +1,19 @@
+<%# encoding: utf-8 -%>
+require 'csv'
+
+CSV.generate do |csv|
+  # set title row
+  csv << [
+  <%- @writer.csv_fields.each do |csv_field| -%>
+    Admin::<%= @writer.resource_name(:model) %>.human_attribute_name(:<%= csv_field.name %>),
+  <%- end -%>
+  ]
+  # set body rows
+  @<%= @writer.resource_name(:table) %>.each do |<%= @writer.resource_name(:single, :snake) %>|
+    csv << [
+    <%- @writer.csv_fields.each do |csv_field| -%>
+      <%= @writer.csv_field_code(csv_field) %>,
+    <%- end -%>
+    ]
+  end
+end
