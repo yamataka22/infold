@@ -5,9 +5,8 @@ module Infold
 
     attr_reader :app_title
 
-    def initialize(resource, app_title=nil)
+    def initialize(resource)
       @resource = resource
-      @app_title = app_title || @resource.name
     end
 
     def association_build_code(if_blank: false)

@@ -84,6 +84,15 @@ module Infold
     def install_admin_users
       template "config/infold/admin_user.yml", "config/infold/admin_user.yml", ask: true
       generate 'infold:scaffold', 'admin_user'
+
+      route_file = Rails.root.join('config/routes/admin.rb')
+      route = "resources :admin_users"
+      in_file = File.readlines(route_file).grep(/^\s+#{route}$/)
+      if in_file.blank?
+        inject_into_file route_file, after: "namespace 'admin' do" do
+          "\n  #{route}"
+        end
+      end
     end
   end
 end

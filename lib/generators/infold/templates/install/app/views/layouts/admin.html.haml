@@ -28,7 +28,7 @@
               = render 'admin/common/header_menu'
               %ul.navbar-nav.ms-auto.mb-2.mb-lg-0
                 %li.nav-item
-                  = link_to 'Users', admin_admin_users_path, class: 'nav-link'
+                  = link_to 'ADMIN USERS', admin_admin_users_path, class: 'nav-link'
                 %li.nav-item.dropdown
                   %a.nav-link.dropdown-toggle#header_current_user{ role: :button, data: { bs_toggle: :dropdown } }
                     = current_admin_user.email

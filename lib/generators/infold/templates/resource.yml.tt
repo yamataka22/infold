@@ -6,7 +6,7 @@ model:
   enum:
   active_storage:
 app:
-  title: <%= @name %>
+  title: <%= @name.pluralize.underscore.gsub('_', ' ').upcase %>
   index:
     conditions:
       - id:
