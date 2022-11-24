@@ -1,0 +1,16 @@
+.page{ style: 'padding-top: 5rem' }
+  .container-tight
+    = form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |form|
+      .card
+        .card-header
+          %h3.mb-0.text-center Edit my account
+        .card-body{ data: {controller: "modal-form" } }
+          .row.gy-3
+            .col-12
+              = form.label :email, 'Email', class: 'form-label'
+              = form.email_field :email, class: 'form-control'
+            .col-12
+              = form.label :password, 'Password', class: 'form-label'
+              = form.password_field :password, class: 'form-control', placeholder: 'Enter only when changing password', autocomplete: 'new-password'
+        .card-footer.text-end
+          = form.submit t('infold.operation.update'), class: 'btn btn-primary'

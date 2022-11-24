@@ -1,0 +1,19 @@
+.page{ style: 'padding-top: 5rem' }
+  .container-tight
+    = form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: 'card card-md' }) do |form|
+      .card-body
+        .card-title.text-center.mb-4
+          %h1 Infold Admin
+        .mb-3
+          = form.label :email, 'Email', class: 'form-label'
+          = form.email_field :email, class: 'form-control'
+        .mb-2
+          = form.label :password, 'Password', class: 'form-label'
+          = form.password_field :password, class: 'form-control'
+        .mb-2
+          %label.form-check
+            = form.check_box :remember_me, class: 'form-check-input'
+            %span.form-check-label Remember Me
+        .form-footer
+          = form.submit 'Login', class: 'btn btn-primary w-100'
+

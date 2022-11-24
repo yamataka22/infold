@@ -1,0 +1,31 @@
+model:
+  validate:
+    email: presence
+    password: presence
+  decorator:
+  association:
+  enum:
+  active_storage:
+app:
+  title: AdminUser
+  index:
+    conditions:
+      - email:
+          sign: eq
+    list:
+      fields:
+        - email
+      default_order:
+    csv:
+      fields:
+  show:
+    fields:
+      - email
+      - created_at
+      - updated_at
+  form:
+    fields:
+      - email:
+          kind: email
+      - password:
+          kind: password

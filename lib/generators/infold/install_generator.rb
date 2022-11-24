@@ -80,5 +80,10 @@ module Infold
         template item, dist_path, encoding: :utf8, ask: true
       end
     end
+
+    def install_admin_users
+      template "config/infold/admin_user.yml", "config/infold/admin_user.yml", ask: true
+      generate 'infold:scaffold', 'admin_user'
+    end
   end
 end
