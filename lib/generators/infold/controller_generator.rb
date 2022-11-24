@@ -23,6 +23,7 @@ module Infold
     def add_routes
       file = Rails.root.join('config/routes/admin.rb')
       route = "resources :#{name.pluralize.underscore}"
+      return unless File.exist?(file)
       in_file = File.readlines(file).grep(/^\s+#{route}$/)
       if in_file.blank?
         inject_into_file file, after: "namespace 'admin' do" do
@@ -41,6 +42,7 @@ module Infold
     def add_menu
       return if name.pluralize.underscore == 'admin_users'
       file = Rails.root.join('app/views/admin/common/_header_menu.html.haml')
+      return unless File.exist?(file)
       menu = "\n  %li.nav-item\n    = link_to '#{@writer.resource.app_title}', #{@writer.index_path}, class: 'nav-link'"
       in_file = File.readlines(file).grep(/, #{@writer.index_path},/)
       if in_file.blank?
