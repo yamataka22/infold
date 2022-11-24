@@ -535,7 +535,7 @@ module Infold
             fields:
               - title
               - description:
-                  kind: textarea
+                  kind: text_area
               - details:
                   kind: association
                   fields:
@@ -560,7 +560,7 @@ module Infold
       assert_equal(3, form_fields.size)
       assert_equal('title', form_fields[0].name)
       assert_equal('description', form_fields[1].name)
-      assert_equal(:textarea, form_fields[1].form_element.form_kind)
+      assert_equal(:text_area, form_fields[1].form_element.form_kind)
       assert_equal('details', form_fields[2].name)
       assert_equal(:association, form_fields[2].form_element.form_kind)
       association_fields = form_fields[2].form_element.association_fields

@@ -1,37 +1,34 @@
 <%# encoding: utf-8 -%>
-.card.card-sm
-  .card-body
-  <%- area_rendered = false -%>
-  <%- @writer.form_fields.each do |field| -%>
-  <%- if field.form_element.kind_has_association? -%>
-    .mb-3{ data: {controller: 'nested-form'} }
-      %h4.mb-2.fw-bold <%= @writer.resource_name(:snake) %>.class.human_attribute_name(:<%= field.name %>)
-      %template{ data: { nested_form_target: 'template' } }
-        = form.fields_for :<%= field.name %>, Admin::<%= field.association.model_name %>.new, child_index: 'NEW_RECORD' do |nested_form|
-          = render 'form_<%= field.name(:single) %>', purchase: form.object, form: nested_form
-      .table-responsive
-        %table.table.table-bordered.table-sm.nested_form_table
-          %thead
-            %tr
-            <%- field.form_element.association_fields.each do |association_field| -%>
-              %th<%= '.required' if association_field.validation&.has_presence? %>
-                = Admin::<%= field.association.model_name %>.class.human_attribute_name(:association_field.name)
-            <%- end -%>
-              %th.icon_sell
-          %tbody{ data: { nested_form_target: 'links' } }
-            = form.fields_for :<%= field.name %> do |nested_form|
-              = render 'form_<%= field.name %>', form: nested_form
-      = link_to '#', class: 'btn btn-info btn-sm mt-2', data: { action: 'nested-form#add_association' } do
-        %i.bi.bi-plus-lg.me-1
-        = t('infold.operation.add')
-    <%- area_rendered = false -%>
-  <%- else -%>
-    <%- unless area_rendered -%>
-    .row
-      .col-lg-8
-      <%- area_rendered = true -%>
-    <%- end -%>
-        .mb-3
-          <%= @writer.form_field_code(field)&.gsub('[TAB]', '  ') %>
-  <%- end -%>
-  <%- end -%>
+<%- area_rendered = false -%>
+<%- @writer.form_fields.each do |field| -%>
+<%- if field.form_element.kind_has_association? -%>
+.card.mb-3{ data: {controller: 'nested-form'} }
+  .card-header.py-2
+    %h3.text-muted.mb-0= Admin::<%= field.association.model_name %>.human_attribute_name(:<%= field.name %>)
+    %template{ data: { nested_form_target: 'template' } }
+      = form.fields_for :<%= field.name %>, Admin::<%= field.association.model_name %>.new, child_index: 'NEW_RECORD' do |nested_form|
+        = render 'form_<%= field.name(:single) %>', purchase: form.object, form: nested_form
+  .table-responsive
+    %table.table.nested_form_table.card-table
+      %thead
+        %tr
+        <%- field.form_element.association_fields.each do |association_field| -%>
+          %th<%= '.required' if association_field.validation&.has_presence? %>
+            = Admin::<%= field.association.model_name %>.human_attribute_name(:<%= association_field.name %>)
+        <%- end -%>
+          %th.icon_sell
+      %tbody{ data: { nested_form_target: 'links' } }
+        = form.fields_for :<%= field.name %> do |nested_form|
+          = render 'form_<%= field.name(:single) %>', form: nested_form
+  .card-body.text-end.py-2
+    = link_to t('infold.operation.add'), '#', class: 'btn btn-info', data: { action: 'nested-form#add_association' }
+<%- area_rendered = false -%>
+<%- else -%>
+<%- unless area_rendered -%>
+.list-group.mb-3
+  <%- area_rendered = true -%>
+<%- end -%>
+  .list-group-item
+    <%= @writer.form_field_code(field)&.gsub('[TAB]', '  ') %>
+<%- end -%>
+<%- end -%>

@@ -18,7 +18,6 @@ module Infold
         end
 
         assert_file Rails.root.join("app/views/admin/products/_show_wrapper.html.haml") do |content|
-          assert_match '= "Product / ##{product.id}"', content
           assert_match "= render 'show_content', product: product", content
           expect_code = "= link_to t('infold.operation.edit'), edit_admin_product_path(product), " +
             "class: 'btn btn-primary', data: { turbo_frame: \"modal_main\" }"
@@ -31,7 +30,7 @@ module Infold
 
         assert_file Rails.root.join("app/views/admin/products/_show_content.html.haml") do |content|
           assert_match '.list-group', content
-          assert_match '.fw-bold= product.class.human_attribute_name(:name)', content
+          assert_match '.fw-bold= product.class.human_attribute_name(:title)', content
           assert_match '= product.description', content
         end
       end

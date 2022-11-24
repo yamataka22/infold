@@ -9,7 +9,7 @@ module Admin
     end
 
     def call
-      @form.label @field, class: "form-label fw-bold #{@required}"
+      @form.label @field, class: "form-label fw-bold text-muted #{@required}"
     end
   end
 end

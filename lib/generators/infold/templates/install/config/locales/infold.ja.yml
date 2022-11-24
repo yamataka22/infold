@@ -4,6 +4,7 @@ ja:
     operation:
       create: 登録
       edit: 編集
+      show: 参照
       update: 更新
       delete: 削除
       submit: 登録

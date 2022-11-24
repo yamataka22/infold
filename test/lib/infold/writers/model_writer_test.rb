@@ -32,12 +32,14 @@ module Infold
     test "it should generate association_code with options" do
       field = @field_group.add_field('one_details')
       field.build_association(kind: :has_many,
+                              name: 'one_details',
                               table: Table.new('one_details'),
                               foreign_key: 'one_detail_id',
                               dependent: 'destroy')
       field = @field_group.add_field('two_details')
       field.build_association(kind: :has_many,
-                              table: Table.new('one_details'),
+                              name: 'two_details',
+                              table: Table.new('two_details'),
                               class_name: 'TwoDetail',
                               dependent: 'delete_all')
       @resource.field_group = @field_group

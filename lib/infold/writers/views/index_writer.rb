@@ -17,7 +17,7 @@ module Infold::Views
 
     def condition_form_code(condition)
       code = "= render Admin::FieldsetComponent.new(form, " +
-        ":#{condition.scope}, :#{condition.form_kind(:index)}"
+        ":#{condition.scope}, :#{condition.form_kind(:index)}, alignment: false"
       case condition.form_kind(:index)
       when :association_search
         "#{code}, #{belongs_to_search_form_option(condition.field.association)})"

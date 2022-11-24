@@ -12,12 +12,12 @@ module Infold
 
     def association_build_code(if_blank: false)
       codes = []
-      @resource.association_fields&.select { |af| af.form_element.present?  } &.each do |association_field|
+      @resource.association_fields&.select { |af| !af.association.belongs_to? && af.form_element.present?  } &.each do |association_field|
         code =
           if association_field.association.has_one?
-            "@#{resource_name(:snake)}.build_#{association_field.name}"
+            "@#{resource_name(:snake)}.build_#{association_field.association.name}"
           else
-            "@#{resource_name(:snake)}.#{association_field.name}.build"
+            "@#{resource_name(:snake)}.#{association_field.association.name}.build"
           end
         code += " if @#{resource_name(:snake)}.#{association_field.name}.blank?" if if_blank
         codes << code
@@ -57,7 +57,8 @@ module Infold
             fields += %W(:#{form_field.name} :remove_#{form_field.name})
           elsif form_element.kind_has_association?
             association_fields = post_params_fields(form_element.association_fields)
-            fields << "#{form_field.name}_attributes: [\n[TAB]" + association_fields.join(",\n[TAB]") + "\n[TAB]]"
+            fields << "#{form_field.name}_attributes: [\n[TAB][TAB]:id,\n[TAB][TAB]:_destroy,\n[TAB]" +
+              association_fields.join(",\n[TAB]") + "\n[TAB]]"
           elsif form_element.kind_datetime?
             # datetimeはdateとtimeに分ける
             fields += %W(:#{form_field.name}_date :#{form_field.name}_time)

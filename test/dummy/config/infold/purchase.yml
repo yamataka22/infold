@@ -42,7 +42,7 @@ model:
         value: 9
         color: secondary
 app:
-  title: 注文管理
+  title: Purchase
   index:
     conditions:
       - id:
@@ -98,4 +98,4 @@ app:
       - delivery_name
       - delivered_at
       - remarks:
-          kind: textarea
+          kind: text_area

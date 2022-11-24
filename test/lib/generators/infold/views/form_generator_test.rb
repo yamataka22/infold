@@ -22,14 +22,15 @@ module Infold
 
         assert_file Rails.root.join("app/views/admin/purchases/_form.html.haml") do |content|
           assert_match "= render Admin::FieldsetComponent.new(form, :customer_id, :association_search, " +
-                         "required: true, association_name: :customer, search_path: admin_customers_path, " +
-                         "name_field: :customer_id)", content
+                         "required: true, association_name: :customer, " +
+                         "search_path: admin_customers_path(name_field: :name), name_field: :customer_name)", content
         end
 
-        assert_file Rails.root.join("app/views/admin/purchases/_form_purchase_details.html.haml") do |content|
+        assert_file Rails.root.join("app/views/admin/purchases/_form_purchase_detail.html.haml") do |content|
           assert_match "= render Admin::FieldsetComponent.new(form, :product_id, :association_search, " +
-                         "required: true, association_name: :product, search_path: admin_products_path, " +
-                         "name_field: :product_name)", content
+                         "required: true, no_label: true, association_name: :product, " +
+                         "search_path: admin_products_path(name_field: :title), " +
+                         "name_field: :product_title)", content
         end
       end
     end

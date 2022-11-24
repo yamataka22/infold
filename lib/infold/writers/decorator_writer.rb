@@ -27,7 +27,7 @@ module Infold
       def boolean_code(name)
         <<-CODE.gsub(/^\s+/, '')
           def #{name}_display
-          [TAB]'<i class="bi bi-check-square-fill text-info"></i>'.html_safe if #{name}?
+          [TAB]'<i class="bi bi-check-circle-fill h3 text-warning"></i>'.html_safe if #{name}?
           end
         CODE
       end

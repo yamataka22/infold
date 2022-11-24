@@ -25,7 +25,7 @@
       .alert#no_data= t('infold.no_data')
     .card.border-top-0
       .table_wrapper.table-responsive.bg-secondary-lt{ data: { index_page_target: 'resultTableWrapper' } }
-        %table.table.table-bordered.table-hover.mb-0.bg-white
+        %table.table.table-hover.table-striped.mb-0.bg-white
           %thead{ data: { index_page_target: 'thead' } }
             %tr
               %th.icon_cell

@@ -118,13 +118,19 @@ module Infold
           :image,
           :remove_image,
           one_details_attributes: [
+            :id,
+            :_destroy,
             :title,
             :stock
           ],
           two_details_attributes: [
+            :id,
+            :_destroy,
             :birthday
           ],
           three_detail_attributes: [
+            :id,
+            :_destroy,
             :pdf,
             :remove_pdf,
             :removed_at_date,

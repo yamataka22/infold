@@ -1,11 +1,12 @@
 <%# encoding: utf-8 -%>
 %tr{ id: dom_id(<%= @writer.resource_name(:snake) %>) }
-  %td.tac
+  %td.icon_cell
     = link_to <%= @writer.show_path(@writer.resource_name(:snake)) %>, class: 'd-block', data: { turbo_frame: 'modal_main' } do
-      %i.bi.bi-file-text
+      %i.bi.bi-file-text.h3
 <%- @writer.index_list_fields.each do |field| -%>
-  %td<%= @writer.field_display_code(field, :index) %>
+  %td<%= '.image_cell' if field.active_storage&.kind_image? %>
+    <%= @writer.indent(@writer.field_display_code(field, :index).gsub('[TAB]', '  '), 2) %>
 <%- end -%>
-  %td.tac
+  %td.icon_cell
     = link_to <%= @writer.edit_path(@writer.resource_name(:snake)) %>, class: 'd-block', data: { turbo_frame: "modal_main" } do
-      %i.bi.bi-pencil-square
+      %i.bi.bi-pencil-square.h3

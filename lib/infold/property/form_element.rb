@@ -6,6 +6,7 @@ module Infold
                 :association_fields
 
     attr_accessor :association,
+                  :in_association,
                   :seq
 
     attr_writer :form_kind
@@ -17,7 +18,7 @@ module Infold
     end
 
     def add_association_fields(field, **attrs)
-      field.build_form_element(**attrs)
+      field.build_form_element(in_association: true, **attrs)
       @association_fields << field
       field
     end
@@ -45,6 +46,8 @@ module Infold
         :datetime
       elsif kind_file?
         :file
+      elsif field.type == :boolean
+        :switch
       else
         (@form_kind.presence || :text).to_sym
       end

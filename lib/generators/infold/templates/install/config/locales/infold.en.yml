@@ -4,17 +4,18 @@ en:
     operation:
       create: Create
       edit: Edit
+      show: Details
       update: Update
       delete: Delete
       submit: Submit
       cancel: Cancel
       clear: Clear
       new: Create New
-      add: Add
+      add: ADD
       search: Search
       setting: Setting
       output_csv: Output CSV
-      confirm: "Are you sure you want to %{submit} it?"
+      confirm: Are you sure?
     flash:
       created: Successfully created
       updated: Successfully updated

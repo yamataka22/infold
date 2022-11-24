@@ -15,6 +15,7 @@ module Infold::Views
       code = "= render Admin::FieldsetComponent.new(form, " +
         ":#{field.name}, :#{field.form_element.form_kind}"
       code += ", required: true" if field.validation&.has_presence?
+      code += ", no_label: true" if field.form_element.in_association
       case field.form_element.form_kind
       when :association_search
         "#{code}, #{belongs_to_search_form_option(field.association)})"
@@ -28,7 +29,7 @@ module Infold::Views
       when :file
         "#{code})"
       when :switch
-        "#{code})"
+        "#{code}, include_hidden: true)"
       else
         option = text_form_option(field).presence
         option ? "#{code}, #{option})" : "#{code})"

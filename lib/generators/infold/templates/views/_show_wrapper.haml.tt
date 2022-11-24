@@ -1,5 +1,7 @@
 = modal.with_header do
-  = "<%= @writer.resource.app_title %> / ##{<%= @writer.resource_name(:snake) %>.id}"
+  %ol.breadcrumb.text-dark
+    %li.breadcrumb-item <%= @writer.resource.app_title %>
+    %li.breadcrumb-item.active= "#{t('infold.operation.show')} ##{<%= @writer.resource_name(:snake) %>.id}"
 = modal.with_body do
   .modal-body
     = render 'show_content', <%= @writer.resource_name(:snake) %>: <%= @writer.resource_name(:snake) %>

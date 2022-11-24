@@ -1,0 +1,16 @@
+- if @<%= @writer.resource_name(:snake) %>.invalid?
+  = turbo_stream.update "form_body" do
+    = fields_for @<%= @writer.resource_name(:snake) %> do |form|
+      = render "form", form: form
+- else
+  = turbo_stream.update "modal_main" do
+    = render Admin::RemoteModalComponent.new do |modal|
+      = render 'show_wrapper', modal: modal, <%= @writer.resource_name(:snake) %>: @<%= @writer.resource_name(:snake) %>
+  - if action_name == "create"
+    = turbo_stream.prepend "<%= @writer.resource_name(:snake, :multi) %>" do
+      = render 'index_row', <%= @writer.resource_name(:snake) %>: @<%= @writer.resource_name(:snake) %>
+    = turbo_stream.remove "no_data"
+  - else
+    = turbo_stream.replace @<%= @writer.resource_name(:snake) %> do
+      = render 'index_row', <%= @writer.resource_name(:snake) %>: @<%= @writer.resource_name(:snake) %>
+= admin_turbo_stream_flash

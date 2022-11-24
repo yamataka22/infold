@@ -3,11 +3,13 @@
   = form_with model: @<%= @writer.resource_name(:snake) %> do |form|
     = render Admin::RemoteModalComponent.new(backdrop: :static) do |modal|
       = modal.with_header do
-        = "<%= @writer.resource.app_title %> ##{@<%= @writer.resource_name(:snake) %>.id}"
+        %ol.breadcrumb.text-dark
+          %li.breadcrumb-item <%= @writer.resource.app_title %>
+          %li.breadcrumb-item.active= "#{t('infold.operation.edit')} ##{@<%= @writer.resource_name(:snake) %>.id}"
       = modal.with_body do
         .modal-body#form_body
           = render "form", form: form
       = modal.with_footer do
         .modal-footer
-          %button.btn.btn-light{"data-bs-dismiss" => "modal", :type => "button"}= t('infold.operation.cancel')
-          = form.submit t('infold.operation.create'), class: 'btn btn-primary'
+          %button.btn.btn-secondary{"data-bs-dismiss" => "modal", :type => "button"}= t('infold.operation.cancel')
+          = form.submit t('infold.operation.update'), class: 'btn btn-primary'

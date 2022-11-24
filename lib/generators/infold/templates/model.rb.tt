@@ -12,6 +12,9 @@ module Admin
   <%- if accepts_nested_attributes_code = @writer.accepts_nested_attributes_code.presence -%>
     <%= accepts_nested_attributes_code %>
   <%- end -%>
+  <%- if delegate_code = @writer.delegate_code.presence -%>
+    <%= delegate_code %>
+  <%- end -%>
   <%- if active_storage_attachment_code = @writer.active_storage_attachment_code.presence -%>
     <%= active_storage_attachment_code.gsub('[TAB]', '  ') %>
   <%- end -%>

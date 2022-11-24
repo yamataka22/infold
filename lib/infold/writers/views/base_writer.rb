@@ -23,7 +23,7 @@ module Infold::Views
           "= render Admin::BadgeComponent.new(#{field_code}_i18n, #{field_code}_color)"
         elsif field.enum
           "= #{field_code}_i18n"
-        elsif field.decorator
+        elsif field.decorator || field.type == :boolean
           "= #{field_code}_display"
         else
           "= #{field_code}"

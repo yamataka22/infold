@@ -1,9 +1,12 @@
-- if @kind != :switch && !hide_label?
-  = render Admin::LabelComponent.new(@form, @field, required: @required)
-- if input_group?
-  = render Admin::InputGroupComponent.new(append: @append, prepend: @prepend) do
-    = render form_field
-- elsif form_field
-  = render form_field
-= content
-= render Admin::InvalidMessageComponent.new(@form, @field)
+%div{ class: "#{'row' if alignment?}" }
+  - if label_rendering?
+    %div{ class: "#{'col-md-3' if alignment?}"}
+      = render Admin::LabelComponent.new(@form, @field, required: @required)
+  %div{ class: "#{'col-md-9 col-xl-6' if alignment?}" }
+    - if input_group?
+      = render Admin::InputGroupComponent.new(append: @append, prepend: @prepend) do
+        = render form_field
+    - elsif form_field
+      = render form_field
+    = content
+    = render Admin::InvalidMessageComponent.new(@form, @field)

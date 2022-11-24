@@ -17,7 +17,7 @@ module Infold
         # association
         assert_match /has_many :purchase_details, dependent: :restrict_with_error/, content
         # validates
-        assert_match /validates :name, presence: true/, content
+        assert_match /validates :title, presence: true/, content
         # enum
         assert_match /enum category: { kitchen: 1, dining: 2, bedroom: 3, bathroom: 4 }, _prefix: true/, content
         # scope

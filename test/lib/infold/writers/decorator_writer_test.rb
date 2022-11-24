@@ -20,7 +20,7 @@ module Infold
       code = writer.decorator_code
       expect_code = <<-RUBY.gsub(/^\s+/, '')
         def removed_display
-          '<i class="bi bi-check-square-fill text-info"></i>'.html_safe if removed?
+          '<i class="bi bi-check-circle-fill h3 text-warning"></i>'.html_safe if removed?
         end
       RUBY
       assert_match(expect_code, code.gsub(/^\s+|\[TAB\]/, ''))

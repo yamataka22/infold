@@ -42,7 +42,7 @@ module Infold
         writer = FormWriter.new(@resource)
         code = writer.form_field_code(field)
         assert_equal("= render Admin::FieldsetComponent.new(form, :parent_id, :association_search, " +
-                       "association_name: :parent, search_path: admin_parents_path, name_field: :parent_name)", code)
+                       "association_name: :parent, search_path: admin_parents_path(name_field: :name), name_field: :parent_name)", code)
       end
 
       test "If form is a enum type and form_kind is a select type, form_field_code should be return select field" do
@@ -67,7 +67,7 @@ module Infold
         @resource.field_group = @field_group
         writer = FormWriter.new(@resource)
         code = writer.form_field_code(field)
-        assert_equal("= render Admin::FieldsetComponent.new(form, :removed, :switch)", code)
+        assert_equal("= render Admin::FieldsetComponent.new(form, :removed, :switch, include_hidden: true)", code)
       end
 
       test "If form is a date type, form_field_code should be return text field with datepicker" do

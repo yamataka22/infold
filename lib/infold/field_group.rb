@@ -5,6 +5,7 @@ module Infold
     include Enumerable
 
     attr_reader :fields
+    attr_writer :has_association_model
 
     def initialize(table=nil)
       init_fields(table)
@@ -91,6 +92,8 @@ module Infold
     def association_search_list_fields
       select { |f| f.in_association_search_list? }.sort_by { |f| f.association_search_list_seq }
     end
+
+    def has_association_model?; @has_association_model end
 
     private
 

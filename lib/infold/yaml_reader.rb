@@ -50,12 +50,16 @@ module Infold
           association_table = @db_schema.table(class_name || field_name)
           association_field_group = FieldGroup.new(association_table)
           # association先のmodelの情報
-          assign_associations(     association_field_group, options.dig(:model, :association))
-          assign_active_storages(  association_field_group, options.dig(:model, :active_storage))
-          assign_validations(      association_field_group, options.dig(:model, :validate))
-          assign_enums(            association_field_group, options.dig(:model, :enum))
-          assign_enum_decorators(  association_field_group, options.dig(:model, :enum))
-          assign_decorators(       association_field_group, options.dig(:model, :decorator))
+          association_model = options.dig(:model)
+          if association_model
+            association_field_group.has_association_model = true
+            assign_associations(     association_field_group, association_model.dig(:association))
+            assign_active_storages(  association_field_group, association_model.dig(:active_storage))
+            assign_validations(      association_field_group, association_model.dig(:validate))
+            assign_enums(            association_field_group, association_model.dig(:enum))
+            assign_enum_decorators(  association_field_group, association_model.dig(:enum))
+            assign_decorators(       association_field_group, association_model.dig(:decorator))
+          end
           field.build_association(
             table: association_table,
             field_group: association_field_group,

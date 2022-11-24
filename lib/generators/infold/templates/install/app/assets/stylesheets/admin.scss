@@ -1,8 +1,4 @@
 #admin_wrapper {
-  font-family: -apple-system, BlinkMacSystemFont, Roboto, "Segoe UI", "Helvetica Neue", HelveticaNeue, Verdana, Meiryo, sans-serif;
-  font-weight: 400;
-  line-height: 1.5;
-  color: #6c757d;
 
   h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
     font-weight: bold;
@@ -20,21 +16,8 @@
     text-align: center !important;
   }
 
-  //.bg-light {
-  //  color: #626976 !important;
-  //}
-
   .thead-no-border tr th {
     border-top: none;
-  }
-
-  .enum_badge {
-    font-size: 85%;
-    line-height: initial;
-  }
-
-  .list-group-item {
-    color: #6c757d !important;
   }
 
   i.pointer:hover,
@@ -105,6 +88,12 @@
         text-decoration: underline;
       }
     }
+    .icon_cell {
+      width: 40px;
+      text-align: center;
+      vertical-align: middle;
+      padding: 0.6rem;
+    }
   }
 
   .table_wrapper {
@@ -129,25 +118,18 @@
     .sortable {
       text-decoration: underline;
     }
-    tbody {
-      tr {
-        border-top: none;
-      }
-      tr:not(:last-child) {
-        border-bottom: none;
-      }
-      tr:nth-of-type(even) {
-        background-color: #f1f3fa;
-      }
-    }
     th, td {
       word-break: break-all;
     }
     .image_cell img {
       max-width: 160px;
     }
-    .icon_cell {
-      width: 40px;
+  }
+
+  .card-table {
+    tr th:last-child,
+    tr td:last-child{
+      padding-right: 1.5rem;
     }
   }
 
@@ -265,11 +247,6 @@
   }
 
   .nested_form_table {
-    th {
-      font-size: 0.8rem !important;
-      padding-top: 0.3rem !important;
-      padding-bottom: 0.3rem !important;
-    }
     .nested_form {
       min-width: 120px;
     }

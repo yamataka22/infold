@@ -3,10 +3,10 @@
   = render Admin::RemoteModalComponent.new('modal_sub') do |modal|
     = modal.with_header { '<%= @writer.resource.app_title %>' }
     = modal.with_body do
-      .card.card-sm.mb-3
-        .card-body
+      .modal-body
+        .mb-3
           = form_with model: Admin::CustomerSearchForm.new, url: <%= @writer.index_path %>, method: :get,
-                scope: 'search', data: { turbo_frame: 'association_search_body' } do |form|
+            scope: 'search', data: { turbo_frame: 'association_search_body' } do |form|
             .row.gy-3.align-items-end
             <%- @writer.association_search_conditions&.each do |condition| -%>
               .col-lg-6.col-xl-4
@@ -15,26 +15,27 @@
               .col-lg-6.col-xl-4
                 = hidden_field_tag :name_field, params[:name_field]
                 = form.submit t('infold.operation.search'), class: 'btn btn-primary'
-      = turbo_frame_tag 'association_search_body' do
-        - if @<%= @writer.resource_name(:table) %>.blank?
-          .alert= t('infold.no_data')
-        - else
-          .search_result.bg-white
-            %table.table.table-bordered.table-hover.mb-0
-              %thead
-                %tr
-                <%- @writer.association_search_list_fields.each do |field| -%>
-                  %th<%= @writer.list_header_code(field) %>
-                <%- end -%>
-                  %th.icon_cell
-              %tbody
-                - @<%= @writer.resource_name(:table) %>.each do |<%= @writer.resource_name(:snake) %>|
+        = turbo_frame_tag 'association_search_body' do
+          - if @<%= @writer.resource_name(:multi, :snake) %>.blank?
+            .alert= t('infold.no_data')
+          - else
+            .search_result.bg-white.border
+              %table.table.table-hover.mb-0
+                %thead
                   %tr
                   <%- @writer.association_search_list_fields.each do |field| -%>
-                    %td<%= @writer.field_display_code(field, :index) %>
+                    %th= Admin::<%= @writer.resource_name(:model) %>.human_attribute_name(:<%= field.name %>)
                   <%- end -%>
-                    %td.tac
-                      %a{ href: '#', data: { action: "relation-search#select remote-modal#close",
-                        id: <%= @writer.resource_name(:snake) %>.id, name: <%= @writer.resource_name(:snake) %>.read_attribute(params[:name_field]) } }
-                        %i.bi.bi-check2-square
-            = paginate(@customers, views_prefix: "admin")
+                    %th
+                %tbody
+                  - @<%= @writer.resource_name(:multi, :snake) %>.each do |<%= @writer.resource_name(:snake) %>|
+                    %tr
+                    <%- @writer.association_search_list_fields.each do |field| -%>
+                      %td<%= '.image_cell' if field.active_storage&.kind_image? %>
+                        <%= @writer.field_display_code(field, :index).gsub('[TAB]', '  ') %>
+                    <%- end -%>
+                      %td.icon_cell
+                        %a{ href: '#', data: { action: "relation-search#select remote-modal#close",
+                          id: <%= @writer.resource_name(:snake) %>.id, name: <%= @writer.resource_name(:snake) %>.read_attribute(params[:name_field]) } }
+                          %i.bi.bi-check2-square.h3
+              = paginate(@<%= @writer.resource_name(:multi, :snake) %>, views_prefix: "admin")

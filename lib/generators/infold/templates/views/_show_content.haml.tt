@@ -1,37 +1,39 @@
 <%# encoding: utf-8 -%>
 <%- rendered_list_group = false -%>
 <%- @writer.show_fields.each do |field| -%>
-<%- if field.show_element.kind_association? -%>
-.my-3
-  %h4= <%= @writer.resource_name(:snake) %>.class.human_attribute_name(:<%= field.name %>)
+<%- if field.show_element.kind_association? && !field.association.belongs_to? -%>
+.card.mb-3
+  .card-header.py-2
+    %h3.text-muted.mb-0= <%= @writer.resource_name(:snake) %>.class.human_attribute_name(:<%= field.name %>)
   - if <%= @writer.resource_name(:snake) %>.<%= field.name %>.blank?
-    .alert= t('infold.no_data')
+    .card-body
+      .alert= t('infold.no_data')
   - else
     .table-responsive
-      %table.table.table-bordered.table-hover
+      %table.table.table-hover.card-table
         %thead
           %tr
           <%- field.show_element.association_fields.each do |association_field| -%>
-            %th= Admin::<%= field.association.model_name %>.class.human_attribute_name(:association_field.name)
+            %th= Admin::<%= field.association.model_name %>.human_attribute_name(:<%= association_field.name %>)
           <%- end -%>
         %tbody
           - <%= @writer.resource_name(:snake) %>.<%= field.name %>.each do |<%= field.name(:single) %>|
             %tr
             <%- field.show_element.association_fields.each do |association_field| -%>
               %td
-                <%= @writer.field_display_code(association_field, :list, model_name: field.name(:single)) %>
+                <%= @writer.field_display_code(association_field, :list, model_name: field.name(:single)).gsub('[TAB]', '  ') %>
             <%- end -%>
   <%- rendered_list_group = false -%>
 <%- else -%>
 <%- unless rendered_list_group -%>
-.list-group
+.list-group.mb-3
   <%- rendered_list_group = true -%>
 <%- end -%>
   .list-group-item
     .row
-      .col-md-3.col-xl-2
-        .fw-bold= <%= @writer.resource_name(:snake) %>.class.human_attribute_name(:<%= field.name %>)
-      .col-md-9.col-xl-10
-        <%= @writer.field_display_code(field, :show) %>
+      .col-md-3
+        .text-muted.fw-bold= <%= @writer.resource_name(:snake) %>.class.human_attribute_name(:<%= field.name %>)
+      .col-md-9
+        <%= @writer.indent(@writer.field_display_code(field, :show).gsub('[TAB]', '  '), 4) %>
 <%- end -%>
 <%- end -%>

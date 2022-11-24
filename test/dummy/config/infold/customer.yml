@@ -14,7 +14,7 @@ model:
       man: 1
       female: 2
 app:
-  title: 顧客管理
+  title: Customer
   index:
     conditions:
       - id:

@@ -7,7 +7,7 @@ module Infold
       code = ''
       @resource.association_fields&.each do |association_field|
         association = association_field.association
-        code += "#{association.kind} :#{association_field.name}"
+        code += "#{association.kind} :#{association.name}"
         code += ", class_name: '#{association.class_name}'" if association.class_name.present?
         code += ", foreign_key: '#{association.foreign_key}'" if association.foreign_key.present?
         code += ", dependent: :#{association.dependent}" if association.dependent.present?
@@ -18,8 +18,9 @@ module Infold
 
     def accepts_nested_attributes_code
       code = ''
-      @resource.association_fields&.select { |af| af.form_element.present?  } &.each do |association_field|
-        code += "accepts_nested_attributes_for :#{association_field.name}, reject_if: :all_blank, allow_destroy: true\n"
+      @resource.associations&.
+        select { |as| !as.belongs_to? && as.field.form_element.present?  }&.each do |association|
+        code += "accepts_nested_attributes_for :#{association.name}, reject_if: :all_blank, allow_destroy: true\n"
       end
       indent(code, 2).presence
     end
@@ -28,6 +29,14 @@ module Infold
       code = ''
       @resource.datetime_fields&.each do |field|
         code += "datetime_field :#{field.name}\n"
+      end
+      indent(code, 2).presence
+    end
+
+    def delegate_code
+      code = ''
+      @resource.associations&.select { |as| as.belongs_to? && as.name_field != 'id' }&.each do |association|
+        code += "delegate :#{association.name_field}, to: :#{association.name}, prefix: true, allow_nil: true\n"
       end
       indent(code, 2).presence
     end

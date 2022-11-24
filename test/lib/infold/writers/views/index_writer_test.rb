@@ -26,8 +26,8 @@ module Infold
         writer = IndexWriter.new(@resource)
         condition = @resource.conditions.first
         code = writer.condition_form_code(condition)
-        assert_equal("= render Admin::FieldsetComponent.new(form, :parent_id_eq, :association_search, " +
-                    "association_name: :parent, search_path: admin_parents_path, name_field: :parent_name)", code)
+        assert_equal("= render Admin::FieldsetComponent.new(form, :parent_id_eq, :association_search, alignment: false, " +
+                    "association_name: :parent, search_path: admin_parents_path(name_field: :name), name_field: :parent_name)", code)
       end
 
       test "condition has select association, condition_form_code should be return select component" do
@@ -43,7 +43,7 @@ module Infold
         writer = IndexWriter.new(@resource)
         condition = @resource.conditions.first
         code = writer.condition_form_code(condition)
-        assert_equal("= render Admin::FieldsetComponent.new(form, :parent_id_eq, :select, " +
+        assert_equal("= render Admin::FieldsetComponent.new(form, :parent_id_eq, :select, alignment: false, " +
                        "list: Admin::ParentClass.all.pluck(:name, :id), selected_value: form.object.parent_id_eq)", code)
       end
 
@@ -59,7 +59,7 @@ module Infold
         writer = IndexWriter.new(@resource)
         condition = @resource.conditions.first
         code = writer.condition_form_code(condition)
-        assert_equal("= render Admin::FieldsetComponent.new(form, :status_eq, :select, " +
+        assert_equal("= render Admin::FieldsetComponent.new(form, :status_eq, :select, alignment: false, " +
                        "list: Admin::Product.statuses_i18n.invert, selected_value: form.object.status_eq)", code)
       end
 
@@ -75,7 +75,7 @@ module Infold
         writer = IndexWriter.new(@resource)
         condition = @resource.conditions.first
         code = writer.condition_form_code(condition)
-        assert_equal("= render Admin::FieldsetComponent.new(form, :status_any, :checkbox, " +
+        assert_equal("= render Admin::FieldsetComponent.new(form, :status_any, :checkbox, alignment: false, " +
                        "list: Admin::Product.statuses_i18n, checked_values: form.object.status_any)", code)
       end
 
@@ -87,7 +87,7 @@ module Infold
         writer = IndexWriter.new(@resource)
         condition = @resource.conditions.first
         code = writer.condition_form_code(condition)
-        assert_equal("= render Admin::FieldsetComponent.new(form, :removed_eq, :switch, include_hidden: false)", code)
+        assert_equal("= render Admin::FieldsetComponent.new(form, :removed_eq, :switch, alignment: false, include_hidden: false)", code)
       end
 
       test "condition has date, condition_form_code should be return text with datepicker" do
@@ -98,7 +98,7 @@ module Infold
         writer = IndexWriter.new(@resource)
         condition = @resource.conditions.first
         code = writer.condition_form_code(condition)
-        assert_equal("= render Admin::FieldsetComponent.new(form, :published_on_gteq, :text, datepicker: true, " +
+        assert_equal("= render Admin::FieldsetComponent.new(form, :published_on_gteq, :text, alignment: false, datepicker: true, " +
                        "placeholder: '#{condition.sign_label}')", code)
       end
 
@@ -110,7 +110,7 @@ module Infold
         writer = IndexWriter.new(@resource)
         condition = @resource.conditions.first
         code = writer.condition_form_code(condition)
-        assert_equal("= render Admin::FieldsetComponent.new(form, :delivered_at_lteq, :text, datepicker: true, " +
+        assert_equal("= render Admin::FieldsetComponent.new(form, :delivered_at_lteq, :text, alignment: false, datepicker: true, " +
                        "placeholder: '#{condition.sign_label}')", code)
       end
 
@@ -123,7 +123,7 @@ module Infold
         writer = IndexWriter.new(@resource)
         condition = @resource.conditions.first
         code = writer.condition_form_code(condition)
-        assert_equal("= render Admin::FieldsetComponent.new(form, :price_eq, :text, " +
+        assert_equal("= render Admin::FieldsetComponent.new(form, :price_eq, :text, alignment: false, " +
                        "prepend: '$', placeholder: '#{condition.sign_label}')", code)
       end
 
@@ -136,10 +136,10 @@ module Infold
         writer = IndexWriter.new(@resource)
         condition = @resource.conditions.first
         code = writer.condition_form_code(condition)
-        assert_equal("= render Admin::FieldsetComponent.new(form, :price_eq, :text, " +
+        assert_equal("= render Admin::FieldsetComponent.new(form, :price_eq, :text, alignment: false, " +
                        "append: 'YEN', placeholder: '#{condition.sign_label}')", code)
       end
-  
+
       test "list_header_code should be return field code" do
         %w(id name category).each_with_index do |name, seq|
           field = @field_group.add_field(name)

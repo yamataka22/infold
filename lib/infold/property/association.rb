@@ -1,6 +1,9 @@
+require 'forwardable'
+
 module Infold
   class Association
     include ActiveModel::Model
+    extend Forwardable
 
     attr_reader :field,
                 :kind,
@@ -14,12 +17,27 @@ module Infold
                   :foreign_key,
                   :dependent
 
+    # [TODO] resourceとの共通化（associationはresourceである）
+    delegate association_fields: :@field_group
+    delegate associations: :@field_group
+    delegate active_storage_fields: :@field_group
+    delegate validation_fields: :@field_group
+    delegate datetime_fields: :@field_group
+    delegate enum_fields: :@field_group
+    delegate decorator_fields: :@field_group
+    delegate condition_fields: :@field_group
+    delegate conditions: :@field_group
+    delegate form_fields: :@field_group
+    delegate index_list_fields: :@field_group
+    delegate show_fields: :@field_group
+    delegate association_search_list_fields: :@field_group
+
     def initialize(field, kind:, table:, field_group: [], name: nil, **attrs)
       @field = field
       @kind = kind
       @table = table
       @field_group = field_group
-      @name = name || (belongs_to? ? field.name : nil)
+      @name = name || field.name
       super(**attrs)
     end
 

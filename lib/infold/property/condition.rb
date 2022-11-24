@@ -40,7 +40,7 @@ module Infold
         :select
       elsif sign == :any && field.enum.present?
         :checkbox
-      elsif _form_kind == 'switch'
+      elsif field.type == :boolean || _form_kind == 'switch'
         :switch
       else
         :text

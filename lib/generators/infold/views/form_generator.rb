@@ -32,12 +32,17 @@ module Infold
                  Rails.root.join("app/views/admin/#{name.underscore.pluralize}/_form.html.haml"), force: true
       end
 
+      def form_turbo_stream_file
+        template "views/form.turbo_stream.haml",
+                 Rails.root.join("app/views/admin/#{name.underscore.pluralize}/form.turbo_stream.haml"), force: true
+      end
+
       def association_form_file
         @writer.form_fields.each do |field|
           if field.association&.has_many? || field.association&.has_one?
             @association_field = field
             template "views/_form_association.haml",
-                     Rails.root.join("app/views/admin/#{name.underscore.pluralize}/_form_#{field.name}.html.haml"), force: true
+                     Rails.root.join("app/views/admin/#{name.underscore.pluralize}/_form_#{field.name(:single)}.html.haml"), force: true
           end
         end
       end

@@ -2,28 +2,28 @@
 
 module Admin
     class FieldsetComponent < ViewComponent::Base
-      def initialize(form, field=nil, kind=nil, required: false, hide_label: false, append: nil, prepend: nil, **options)
+      def initialize(form, field=nil, kind=nil, required: false, no_label: false, alignment: true, append: nil, prepend: nil, **options)
         @form = form
         @field = field
         @kind = kind
         @required = required
-        @hide_label = hide_label
+        @no_label = no_label
+        @alignment = alignment
         @append = append
         @prepend = prepend
         @options = options || {}
       end
 
-      def hide_label?
-        @hide_label
+      def label_rendering?
+        !@no_label
+      end
+
+      def alignment?
+        @alignment && label_rendering?
       end
 
       def form_field
         case @kind
-        when :text
-          Admin::TextComponent.new(@form,
-                                   @field,
-                                   form_kind: @options[:form_kind],
-                                   datepicker: @options[:datepicker])
         when :checkbox
           Admin::CheckboxComponent.new(@form,
                                        @field,
@@ -55,6 +55,12 @@ module Admin
                                                @field,
                                                @options[:name_field],
                                                nested_form: @options[:nested_form])
+        else
+          kind = @kind == :text_area ? :text_area : "#{@kind}_field"
+          Admin::TextComponent.new(@form,
+                                   @field,
+                                   form_kind: kind,
+                                   datepicker: @options[:datepicker])
         end
       end
 

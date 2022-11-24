@@ -3,7 +3,7 @@
   %td.nested_form
     <%= @writer.form_field_code(association_field)&.gsub('[TAB]', '  ') %>
 <%- end -%>
-  %td.tac.vam
+  %td.icon_cell
     = link_to "#", class: 'd-block', data: { action: "click->nested-form#remove_association" } do
-      %i.bi.bi-trash{ style: 'font-size: 1rem' }
+      %i.bi.bi-trash.h3
     = form.hidden_field :_destroy

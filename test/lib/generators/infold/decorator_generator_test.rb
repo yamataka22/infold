@@ -7,7 +7,7 @@ module Infold
     tests DecoratorGenerator
     destination Rails.root.join('app/decorators/admin')
     # remove destination exist files
-    setup :prepare_destination
+    # setup :prepare_destination
 
     test "generates infold:decorator" do
       run_generator ['Product']
