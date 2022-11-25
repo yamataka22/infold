@@ -62,7 +62,7 @@ module Infold
     def copy_app_files
       template_path = File.expand_path("templates/install", __dir__)
       Dir.glob("#{template_path}/app/**/*").each do |item|
-        next if FileTest.directory?(item)
+        next if FileTest.directory?(item) || item.end_with?('admin.scss')
         dist_path = item.to_s.gsub(template_path.to_s, Rails.root.to_s)
         template item, dist_path, encoding: :utf8, ask: true
       end
