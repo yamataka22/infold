@@ -50,7 +50,7 @@ i.pointer:hover,
     word-break: break-all;
 }
 .table .image_cell img {
-    max-width: 160px;
+    max-width: 100px;
 }
 
 .table_wrapper {

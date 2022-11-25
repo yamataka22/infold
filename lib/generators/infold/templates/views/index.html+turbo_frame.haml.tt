@@ -19,8 +19,8 @@
           - if @<%= @writer.resource_name(:multi, :snake) %>.blank?
             .alert= t('infold.no_data')
           - else
-            .search_result.bg-white.border
-              %table.table.table-hover.mb-0
+            .table_wrapper.table-responsive.bg-white.border.mb-3
+              %table.table.table-striped.table-hover
                 %thead
                   %tr
                   <%- @writer.association_search_list_fields.each do |field| -%>
@@ -32,10 +32,10 @@
                     %tr
                     <%- @writer.association_search_list_fields.each do |field| -%>
                       %td<%= '.image_cell' if field.active_storage&.kind_image? %>
-                        <%= @writer.field_display_code(field, :index).gsub('[TAB]', '  ') %>
+                        <%= @writer.indent(@writer.field_display_code(field, :index).gsub('[TAB]', '  '), 12) %>
                     <%- end -%>
                       %td.icon_cell
                         %a{ href: '#', data: { action: "relation-search#select remote-modal#close",
                           id: <%= @writer.resource_name(:snake) %>.id, name: <%= @writer.resource_name(:snake) %>.read_attribute(params[:name_field]) } }
                           %i.bi.bi-check2-square.h3
-              = paginate(@<%= @writer.resource_name(:multi, :snake) %>, views_prefix: "admin")
+            = paginate(@<%= @writer.resource_name(:multi, :snake) %>, views_prefix: "admin")
