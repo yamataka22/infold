@@ -60,6 +60,7 @@ module Admin
           Admin::TextComponent.new(@form,
                                    @field,
                                    form_kind: kind,
+                                   placeholder: @options[:placeholder],
                                    datepicker: @options[:datepicker])
         end
       end
