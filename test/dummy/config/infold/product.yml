@@ -21,15 +21,15 @@ model:
       dependent: restrict_with_error
   enum:
     category:
-      kitchen: 1
-      dining: 2
-      bedroom: 3
-      bathroom: 4
+      sofa: 1
+      bed: 2
+      accessory: 3
+      kitchen: 4
   active_storage:
     image:
       kind: image
 app:
-  title: Product
+  title: PRODUCTS
   index:
     conditions:
       - id:
@@ -47,36 +47,40 @@ app:
     list:
       fields:
         - id
+        - image
         - title
         - category
         - price
+        - stock
         - removed
       default_order:
         field: id
         kind: desc
     csv:
       fields:
-        - id
-        - title
-        - category
   show:
     fields:
       - title
-      - description
+      - image
       - category
       - price
       - stock
+      - description
       - published_at
       - removed
   form:
     fields:
       - title
-      - description:
-          kind: text_area
+      - image:
+          kind: file
       - category:
           kind: radio
-      - price
-      - stock
+      - price:
+          kind: number
+      - stock:
+          kind: number
+      - description:
+          kind: text_area
       - published_at
       - removed
   association_search:
@@ -88,4 +92,5 @@ app:
     list:
       fields:
         - id
+        - image
         - title

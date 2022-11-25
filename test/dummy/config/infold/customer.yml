@@ -5,16 +5,25 @@ model:
       - uniqueness
     name:
       - presence
+    phone:
+      - presence
   association:
     purchases:
       kind: has_many
       dependent: restrict_with_error
   enum:
     gender:
-      man: 1
-      female: 2
+      male:
+        value: 1
+        color: blue
+      female:
+        value: 2
+        color: pink
+      other:
+        value: 0
+        color: teal
 app:
-  title: Customer
+  title: CUSTOMERS
   index:
     conditions:
       - id:
@@ -23,8 +32,12 @@ app:
           sign: full_like
       - email:
           sign: start_with
+      - gender:
+          sign: eq
+          form_kind: select
     list:
       fields:
+        - id
         - email
         - name
         - phone
@@ -36,12 +49,6 @@ app:
       - id
       - email
       - name
-      - purchases:
-          fields:
-            - id
-            - status
-            - total_price
-            - delivered_at
       - phone
       - zipcode
       - address
@@ -49,12 +56,14 @@ app:
       - birthday
   form:
     fields:
-      - email
+      - email:
+          kind: email
       - name
       - phone
       - zipcode
       - address
-      - gender
+      - gender:
+          kind: radio
       - birthday
   association_search:
     conditions:
@@ -67,4 +76,3 @@ app:
         - id
         - name
         - email
-      default_order:

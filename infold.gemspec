@@ -22,6 +22,20 @@ Gem::Specification.new do |spec|
     Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
   end
 
-  spec.add_dependency "rails", ">= 7.0.4"
+  spec.add_dependency "rails", ">= 7.0"
+  spec.add_development_dependency "sprockets-rails"
+  spec.add_development_dependency "jsbundling-rails"
+  spec.add_development_dependency "turbo-rails"
+  spec.add_development_dependency "stimulus-rails"
+  spec.add_development_dependency "cssbundling-rails"
+  spec.add_development_dependency "jbuilder"
   spec.add_development_dependency "factory_bot_rails"
+  spec.add_development_dependency "puma"
+  spec.add_development_dependency "devise"
+  spec.add_development_dependency "kaminari"
+  spec.add_development_dependency "enum_help"
+  spec.add_development_dependency "view_component"
+  spec.add_development_dependency "active_decorator"
+  spec.add_development_dependency "haml-rails"
+  spec.add_development_dependency "faker"
 end

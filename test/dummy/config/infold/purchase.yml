@@ -1,6 +1,8 @@
 model:
   validate:
-    customer:
+    customer_id:
+      - presence
+    purchase_details:
       - presence
     status:
       - presence
@@ -30,29 +32,33 @@ model:
   enum:
     status:
       ordered:
-        value: 1
-        color: info
+        value: 0
+        color: blue
       charged:
-        value: 2
-        color: danger
+        value: 1
+        color: purple
       delivered:
-        value: 3
-        color: success
+        value: 2
+        color: teal
       canceled:
-        value: 9
-        color: secondary
+        value: 3
+        color: gray
+  decorator:
+    total_price:
+      prepend: $
+      digit: true
 app:
-  title: Purchase
+  title: PURCHASES
   index:
     conditions:
       - id:
           sign: eq
-      - status:
-          sign: any
-          form_kind: checkbox
       - customer_id:
           sign: eq
           form_kind: association_search
+      - status:
+          sign: any
+          form_kind: checkbox
     list:
       fields:
         - id
