@@ -19,7 +19,7 @@ module Infold
         # validates
         assert_match /validates :title, presence: true/, content
         # enum
-        assert_match /enum category: { kitchen: 1, dining: 2, bedroom: 3, bathroom: 4 }, _prefix: true/, content
+        assert_match /enum category: /, content
         # scope
         assert_match /scope :id_eq, ->\(v\) do/, content
       end

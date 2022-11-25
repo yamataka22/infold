@@ -2,9 +2,10 @@
 
 module Admin
   class SortableComponent < ViewComponent::Base
-    def initialize(search, field)
+    def initialize(search, field, label: nil)
       @search = search
       @field = field.to_s
+      @label = label
     end
 
     def dataset
@@ -16,7 +17,7 @@ module Admin
     end
 
     def name
-      @search.class.human_attribute_name(@field)
+      @label.presence || @search.class.human_attribute_name(@field)
     end
 
     def current_field?

@@ -27,7 +27,9 @@ module Infold
         condition = @resource.conditions.first
         code = writer.condition_form_code(condition)
         assert_equal("= render Admin::FieldsetComponent.new(form, :parent_id_eq, :association_search, alignment: false, " +
-                    "association_name: :parent, search_path: admin_parents_path(name_field: :name), name_field: :parent_name)", code)
+                       "label: Admin::Product.human_attribute_name(:parent_id), " +
+                       "association_name: :parent, search_path: admin_parents_path(name_field: :name), name_field: :parent_name)",
+                     code.gsub(/\[TAB\]|\n/, ''))
       end
 
       test "condition has select association, condition_form_code should be return select component" do
@@ -44,7 +46,9 @@ module Infold
         condition = @resource.conditions.first
         code = writer.condition_form_code(condition)
         assert_equal("= render Admin::FieldsetComponent.new(form, :parent_id_eq, :select, alignment: false, " +
-                       "list: Admin::ParentClass.all.pluck(:name, :id), selected_value: form.object.parent_id_eq)", code)
+                       "label: Admin::Product.human_attribute_name(:parent_id), " +
+                       "list: Admin::ParentClass.all.pluck(:name, :id), selected_value: form.object.parent_id_eq)",
+                     code.gsub(/\[TAB\]|\n/, ''))
       end
 
       test "condition has select enum, condition_form_code should be return select component" do
@@ -60,7 +64,9 @@ module Infold
         condition = @resource.conditions.first
         code = writer.condition_form_code(condition)
         assert_equal("= render Admin::FieldsetComponent.new(form, :status_eq, :select, alignment: false, " +
-                       "list: Admin::Product.statuses_i18n.invert, selected_value: form.object.status_eq)", code)
+                       "label: Admin::Product.human_attribute_name(:status), " +
+                       "list: Admin::Product.statuses_i18n.invert, selected_value: form.object.status_eq)",
+                     code.gsub(/\[TAB\]|\n/, ''))
       end
 
       test "condition has any enum, condition_form_code should be return checkbox component" do
@@ -76,7 +82,9 @@ module Infold
         condition = @resource.conditions.first
         code = writer.condition_form_code(condition)
         assert_equal("= render Admin::FieldsetComponent.new(form, :status_any, :checkbox, alignment: false, " +
-                       "list: Admin::Product.statuses_i18n, checked_values: form.object.status_any)", code)
+                       "label: Admin::Product.human_attribute_name(:status), " +
+                       "list: Admin::Product.statuses_i18n, checked_values: form.object.status_any)",
+                     code.gsub(/\[TAB\]|\n/, ''))
       end
 
       test "condition has boolean, condition_form_code should be return switch component" do
@@ -87,7 +95,10 @@ module Infold
         writer = IndexWriter.new(@resource)
         condition = @resource.conditions.first
         code = writer.condition_form_code(condition)
-        assert_equal("= render Admin::FieldsetComponent.new(form, :removed_eq, :switch, alignment: false, include_hidden: false)", code)
+        assert_equal("= render Admin::FieldsetComponent.new(form, :removed_eq, :switch, alignment: false, " +
+                       "label: Admin::Product.human_attribute_name(:removed), " +
+                       "include_hidden: false)",
+                     code.gsub(/\[TAB\]|\n/, ''))
       end
 
       test "condition has date, condition_form_code should be return text with datepicker" do
@@ -98,8 +109,10 @@ module Infold
         writer = IndexWriter.new(@resource)
         condition = @resource.conditions.first
         code = writer.condition_form_code(condition)
-        assert_equal("= render Admin::FieldsetComponent.new(form, :published_on_gteq, :text, alignment: false, datepicker: true, " +
-                       "placeholder: '#{condition.sign_label}')", code)
+        assert_equal("= render Admin::FieldsetComponent.new(form, :published_on_gteq, :text, alignment: false, " +
+                       "label: Admin::Product.human_attribute_name(:published_on), " +
+                       "datepicker: true, placeholder: '#{condition.sign_label}')",
+                     code.gsub(/\[TAB\]|\n/, ''))
       end
 
       test "condition has datetime, condition_form_code should be return text with datepicker" do
@@ -110,8 +123,10 @@ module Infold
         writer = IndexWriter.new(@resource)
         condition = @resource.conditions.first
         code = writer.condition_form_code(condition)
-        assert_equal("= render Admin::FieldsetComponent.new(form, :delivered_at_lteq, :text, alignment: false, datepicker: true, " +
-                       "placeholder: '#{condition.sign_label}')", code)
+        assert_equal("= render Admin::FieldsetComponent.new(form, :delivered_at_lteq, :text, alignment: false, " +
+                       "label: Admin::Product.human_attribute_name(:delivered_at), " +
+                       "datepicker: true, placeholder: '#{condition.sign_label}')",
+                     code.gsub(/\[TAB\]|\n/, ''))
       end
 
       test "condition has decorator(prepend), condition_form_code should be return text with prepend" do
@@ -124,7 +139,9 @@ module Infold
         condition = @resource.conditions.first
         code = writer.condition_form_code(condition)
         assert_equal("= render Admin::FieldsetComponent.new(form, :price_eq, :text, alignment: false, " +
-                       "prepend: '$', placeholder: '#{condition.sign_label}')", code)
+                       "label: Admin::Product.human_attribute_name(:price), " +
+                       "prepend: '$', placeholder: '#{condition.sign_label}')",
+                     code.gsub(/\[TAB\]|\n/, ''))
       end
 
       test "condition has decorator(append), condition_form_code should be return text with prepend" do
@@ -137,7 +154,9 @@ module Infold
         condition = @resource.conditions.first
         code = writer.condition_form_code(condition)
         assert_equal("= render Admin::FieldsetComponent.new(form, :price_eq, :text, alignment: false, " +
-                       "append: 'YEN', placeholder: '#{condition.sign_label}')", code)
+                       "label: Admin::Product.human_attribute_name(:price), " +
+                       "append: 'YEN', placeholder: '#{condition.sign_label}')",
+                     code.gsub(/\[TAB\]|\n/, ''))
       end
 
       test "list_header_code should be return field code" do
@@ -150,7 +169,9 @@ module Infold
         writer = IndexWriter.new(@resource)
         list_field = @resource.index_list_fields.last
         code = writer.list_header_code(list_field)
-        assert_equal("= render Admin::SortableComponent.new(@search, :category)", code)
+        assert_equal("= render Admin::SortableComponent.new(@search, :category, " +
+                       "label: Admin::Product.human_attribute_name(:category))",
+                     code)
       end
 
       test "csv_field_code should convert enum to i18n" do

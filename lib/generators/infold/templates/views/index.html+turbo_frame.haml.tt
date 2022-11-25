@@ -10,7 +10,7 @@
             .row.gy-3.align-items-end
             <%- @writer.association_search_conditions&.each do |condition| -%>
               .col-lg-6.col-xl-4
-                <%= @writer.condition_form_code(condition) %>
+                <%= @writer.indent(@writer.condition_form_code(condition).gsub('[TAB]', '  '), 8) %>
             <%- end -%>
               .col-lg-6.col-xl-4
                 = hidden_field_tag :name_field, params[:name_field]

@@ -2,14 +2,15 @@
 
 module Admin
   class LabelComponent < ViewComponent::Base
-    def initialize(form, field, required: false)
+    def initialize(form, field, label: nil, required: false)
       @form = form
       @field = field
+      @label = label
       @required = required ? 'required' : nil
     end
 
     def call
-      @form.label @field, class: "form-label fw-bold text-muted #{@required}"
+      @form.label @field, @label, class: "form-label fw-bold text-muted #{@required}"
     end
   end
 end

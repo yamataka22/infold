@@ -18,7 +18,8 @@ module Infold::Views
 
     def condition_form_code(condition)
       code = "= render Admin::FieldsetComponent.new(form, " +
-        ":#{condition.scope}, :#{condition.form_kind(:index)}, alignment: false"
+        ":#{condition.scope}, :#{condition.form_kind(:index)}, alignment: false, \n" +
+        "[TAB]label: Admin::#{resource_name(:model)}.human_attribute_name(:#{condition.field.name})"
       case condition.form_kind(:index)
       when :association_search
         "#{code}, #{belongs_to_search_form_option(condition.field.association)})"
@@ -36,7 +37,8 @@ module Infold::Views
     end
 
     def list_header_code(list_field)
-      "= render Admin::SortableComponent.new(@search, :#{list_field.name})"
+      "= render Admin::SortableComponent.new(@search, :#{list_field.name}, " +
+        "label: Admin::#{resource_name(:model)}.human_attribute_name(:#{list_field.name}))"
     end
 
     def csv_field_code(csv_field)

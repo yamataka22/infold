@@ -15,7 +15,7 @@ module Infold
         assert_match /module Admin/, content
         assert_match /class ProductsController < BaseController/, content
         # title
-        assert_match /before_action { @page_title = 'Product' }/, content
+        assert_match /before_action { @page_title = /, content
         # index
         assert_match /def index\n\s+@search = ProductSearchForm.new\(search_params\)/, content
         # show

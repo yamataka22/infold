@@ -1,7 +1,7 @@
 %div{ class: "#{'row' if alignment?}" }
   - if label_rendering?
     %div{ class: "#{'col-md-3' if alignment?}"}
-      = render Admin::LabelComponent.new(@form, @field, required: @required)
+      = render Admin::LabelComponent.new(@form, @field, label: @label, required: @required)
   %div{ class: "#{'col-md-9 col-xl-6' if alignment?}" }
     - if input_group?
       = render Admin::InputGroupComponent.new(append: @append, prepend: @prepend) do
