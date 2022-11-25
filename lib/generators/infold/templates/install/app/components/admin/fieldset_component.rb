@@ -47,7 +47,7 @@ module Admin
         when :switch
           Admin::SwitchComponent.new(@form,
                                      @field,
-                                     include_hidden: @options[:include_hidden] || true)
+                                     include_hidden: @options[:include_hidden])
         when :association_search
           Admin::AssociationFieldComponent.new(@options[:association_name],
                                                @options[:search_path],

@@ -31,6 +31,7 @@ module Infold
         end
       end
 
+      return if name.pluralize.underscore == 'admin_users'
       in_file = File.readlines(file).grep(/^\s+authenticated :admin_user do root/)
       if in_file.blank?
         inject_into_file file, after: "resources :admin_users" do
