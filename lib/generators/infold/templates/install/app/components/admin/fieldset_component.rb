@@ -43,11 +43,11 @@ module Admin
                                      @field,
                                      @options[:list],
                                      selected_value: @options[:selected_value],
-                                     blank: @options[:blank])
+                                     blank: @options[:blank] || true)
         when :switch
           Admin::SwitchComponent.new(@form,
                                      @field,
-                                     include_hidden: @options[:include_hidden])
+                                     include_hidden: @options[:include_hidden] || true)
         when :association_search
           Admin::AssociationFieldComponent.new(@options[:association_name],
                                                @options[:search_path],
