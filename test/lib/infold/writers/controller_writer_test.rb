@@ -37,7 +37,7 @@ module Infold
       @resource.field_group = @field_group
       writer = ControllerWriter.new(@resource)
       code = writer.association_build_code(if_blank: true)
-      assert_match("@product.details.build if @product.details.blank?", code.gsub(/^\s+/, ''))
+      assert_match("@product.details.build if @product.details.blank? && @product.errors[:details].any?", code.gsub(/^\s+/, ''))
     end
 
     test "search_params_code should generate search conditions params" do

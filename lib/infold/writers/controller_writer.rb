@@ -18,7 +18,10 @@ module Infold
           else
             "@#{resource_name(:snake)}.#{association_field.association.name}.build"
           end
-        code += " if @#{resource_name(:snake)}.#{association_field.name}.blank?" if if_blank
+        if if_blank
+          code += " if @#{resource_name(:snake)}.#{association_field.name}.blank? && " +
+            "@#{resource_name(:snake)}.errors[:#{association_field.name}].any?"
+        end
         codes << code
       end
       indent(codes.join("\n"), 3) if codes.present?
