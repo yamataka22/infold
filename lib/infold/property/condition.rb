@@ -51,8 +51,8 @@ module Infold
       case sign
       when :lteq then 'or less'
       when :gteq then 'or more'
-      when :full_like then 'like %@%'
-      when :start_with then 'like @%'
+      when :full_like then 'like %...%'
+      when :start_with then 'like ...%'
       else '='
       end
     end
