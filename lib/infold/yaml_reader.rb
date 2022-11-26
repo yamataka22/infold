@@ -210,7 +210,9 @@ module Infold
       end
 
       def assign_form_elements(field_group, app)
-        app.dig(:form, :fields)&.each_with_index do |field_config, seq|
+        field_configs = app.dig(:form, :fields).presence
+        field_configs ||= field_group.map(&:name).reject { |name| %w(id created_at updated_at).include?(name) }
+        field_configs.each_with_index do |field_config, seq|
           if field_config.is_a?(String)
             field = field_group.find_or_initialize_field(field_config)
             field.build_form_element(seq: seq)

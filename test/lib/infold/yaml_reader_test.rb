@@ -691,6 +691,29 @@ module Infold
       assert_equal('name', form_fields[2].name)
     end
 
+    test "if form element is blank, form fields should be return fields except id and timestamp column" do
+      yaml = <<-"YAML"
+        app:
+          form:
+      YAML
+      db_schema_content = <<-"RUBY"
+        create_table "products" do |t|
+          t.string "name"
+          t.float "price"
+          t.integer "stock"
+          t.datetime "created_at", null: false
+          t.datetime "updated_at", null: false
+        end
+      RUBY
+      db_schema = DbSchema.new(db_schema_content)
+      resource = YamlReader.generate_resource('products', YAML.load(yaml), db_schema)
+      show_fields = resource.field_group.form_fields
+      assert_equal(3, show_fields.size)
+      assert_equal('name', show_fields[0].name)
+      assert_equal('price', show_fields[1].name)
+      assert_equal('stock', show_fields[2].name)
+    end
+
     test "it should be return fields with associations" do
       yaml = <<-"YAML"
         model:
