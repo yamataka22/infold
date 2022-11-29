@@ -4,7 +4,9 @@
 <%- if field.form_element.kind_has_association? -%>
 .card.mb-3{ data: {controller: 'nested-form'} }
   .card-header.py-2
-    %h3.text-muted.mb-0= Admin::<%= field.association.model_name %>.human_attribute_name(:<%= field.name %>)
+    %div
+      %h3.text-muted.mb-0= Admin::<%= field.association.model_name %>.human_attribute_name(:<%= field.name %>)
+      = render Admin::InvalidMessageComponent.new(form, :<%= field.name %>)
     %template{ data: { nested_form_target: 'template' } }
       = form.fields_for :<%= field.name %>, Admin::<%= field.association.model_name %>.new, child_index: 'NEW_RECORD' do |nested_form|
         = render 'form_<%= field.name(:single) %>', purchase: form.object, form: nested_form
