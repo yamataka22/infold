@@ -21,6 +21,7 @@ module Infold
       @resource.associations&.
         select { |as| !as.belongs_to? && as.field.form_element.present?  }&.each do |association|
         code += "accepts_nested_attributes_for :#{association.name}, reject_if: :all_blank, allow_destroy: true\n"
+        code += "validates_associated :#{association.name}\n"
       end
       indent(code, 2).presence
     end

@@ -60,6 +60,7 @@ module Infold
       writer = ModelWriter.new(@resource)
       code = writer.accepts_nested_attributes_code
       assert_match("accepts_nested_attributes_for :one_details", code)
+      assert_match("validates_associated :one_details", code)
       refute_match("accepts_nested_attributes_for :two_details", code)
     end
 
