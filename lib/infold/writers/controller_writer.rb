@@ -12,17 +12,12 @@ module Infold
     def association_build_code(if_blank: false)
       codes = []
       @resource.association_fields&.select { |af| !af.association.belongs_to? && af.form_element.present?  } &.each do |association_field|
-        code =
+        codes <<
           if association_field.association.has_one?
             "@#{resource_name(:snake)}.build_#{association_field.association.name}"
           else
             "@#{resource_name(:snake)}.#{association_field.association.name}.build"
           end
-        if if_blank
-          code += " if @#{resource_name(:snake)}.#{association_field.name}.blank? && " +
-            "@#{resource_name(:snake)}.errors[:#{association_field.name}].any?"
-        end
-        codes << code
       end
       indent(codes.join("\n"), 3) if codes.present?
     end

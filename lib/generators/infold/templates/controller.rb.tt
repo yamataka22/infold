@@ -27,9 +27,6 @@ module Admin
         render :form
       else
         flash.now[:alert] = t('infold.flash.invalid')
-      <%- if association_build_code = @writer.association_build_code(if_blank: true).presence -%>
-        <%= association_build_code %>
-      <%- end -%>
         render :form, status: :unprocessable_entity
       end
     end
@@ -46,9 +43,6 @@ module Admin
         render :form
       else
         flash.now[:alert] = t('infold.flash.invalid')
-      <%- if association_build_code = @writer.association_build_code(if_blank: true).presence -%>
-        <%= association_build_code %>
-      <%- end -%>
         render :form, status: :unprocessable_entity
       end
     end

@@ -29,17 +29,6 @@ module Infold
       assert_match(/@product.build_two_detail$/, code.gsub(/^\s+/, ''))
     end
 
-    test "build_new_association_code(if_blank: true) should generate association build code append 'if blank'" do
-      field = @field_group.add_field('details')
-      field.build_association(kind: :has_many, table: Table.new('details'))
-      field.build_form_element
-
-      @resource.field_group = @field_group
-      writer = ControllerWriter.new(@resource)
-      code = writer.association_build_code(if_blank: true)
-      assert_match("@product.details.build if @product.details.blank? && @product.errors[:details].any?", code.gsub(/^\s+/, ''))
-    end
-
     test "search_params_code should generate search conditions params" do
       field = @field_group.add_field('id')
       field.add_search_condition(:index, sign: :eq, form_kind: :text)
