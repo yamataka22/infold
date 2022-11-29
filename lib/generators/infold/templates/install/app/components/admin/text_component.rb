@@ -29,7 +29,8 @@ module Admin
                    placeholder: @placeholder,
                    data: @data,
                    rows: @rows,
-                   autocomplete: 'off')
+                   autocomplete: 'off',
+                   step: @form_kind == 'number_field' ? :any : nil)
       end
 
       def call
