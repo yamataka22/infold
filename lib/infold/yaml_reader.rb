@@ -218,7 +218,7 @@ module Infold
             field.build_form_element(seq: seq)
           else
             field = field_group.find_or_initialize_field(field_config.keys[0])
-            form_element = field.build_form_element(form_kind: field_config[field.name].dig(:kind), seq: seq)
+            form_element = field.build_form_element(form_kind: field_config[field_config.keys[0]].dig(:kind), seq: seq)
             if form_element.kind_has_association?
               association = find_association(field_group, form_element.field.name)
               field_config[field.name].dig(:fields)&.each_with_index do |association_field_config, association_seq|
