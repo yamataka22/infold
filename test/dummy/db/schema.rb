@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_11_25_073455) do
+ActiveRecord::Schema[7.0].define(version: 2022_12_01_211031) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -52,8 +52,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_25_073455) do
   end
 
   create_table "customers", force: :cascade do |t|
-    t.string "email"
-    t.string "name"
+    t.string "email", null: false
+    t.string "name", null: false
     t.string "phone"
     t.string "zipcode"
     t.string "address"
@@ -63,10 +63,35 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_25_073455) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "order_details", force: :cascade do |t|
+    t.integer "order_id", null: false
+    t.integer "product_id", null: false
+    t.integer "amount"
+    t.decimal "unit_price", precision: 6, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_order_details_on_order_id"
+    t.index ["product_id"], name: "index_order_details_on_product_id"
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.integer "customer_id", null: false
+    t.integer "status"
+    t.decimal "total_price", precision: 6, scale: 2
+    t.string "delivery_zipcode"
+    t.string "delivery_address"
+    t.string "delivery_name"
+    t.datetime "delivered_at"
+    t.string "remarks"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["customer_id"], name: "index_orders_on_customer_id"
+  end
+
   create_table "products", force: :cascade do |t|
-    t.string "title"
+    t.string "title", null: false
     t.integer "category"
-    t.float "price"
+    t.decimal "price", precision: 6, scale: 2
     t.integer "stock"
     t.string "description"
     t.datetime "published_at"
@@ -75,34 +100,9 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_25_073455) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "purchase_details", force: :cascade do |t|
-    t.integer "purchase_id", null: false
-    t.integer "product_id", null: false
-    t.integer "amount"
-    t.float "unit_price"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["product_id"], name: "index_purchase_details_on_product_id"
-    t.index ["purchase_id"], name: "index_purchase_details_on_purchase_id"
-  end
-
-  create_table "purchases", force: :cascade do |t|
-    t.integer "customer_id", null: false
-    t.integer "status"
-    t.float "total_price"
-    t.string "delivery_zipcode"
-    t.string "delivery_address"
-    t.string "delivery_name"
-    t.datetime "delivered_at"
-    t.string "remarks"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["customer_id"], name: "index_purchases_on_customer_id"
-  end
-
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "purchase_details", "products"
-  add_foreign_key "purchase_details", "purchases"
-  add_foreign_key "purchases", "customers"
+  add_foreign_key "order_details", "orders"
+  add_foreign_key "order_details", "products"
+  add_foreign_key "orders", "customers"
 end

@@ -2,12 +2,12 @@ model:
   validate:
     customer_id:
       - presence
-    purchase_details:
+    order_details:
       - presence
     status:
       - presence
   association:
-    purchase_details:
+    order_details:
       kind: has_many
       dependent: destroy
       model:
@@ -36,19 +36,16 @@ model:
         color: blue
       charged:
         value: 1
-        color: purple
+        color: pink
       delivered:
         value: 2
-        color: teal
-      canceled:
-        value: 3
-        color: gray
+        color: green
   decorator:
     total_price:
       prepend: $
       digit: true
 app:
-  title: PURCHASES
+  title: ORDERS
   index:
     conditions:
       - id:
@@ -74,7 +71,7 @@ app:
       - customer
       - status
       - total_price
-      - purchase_details:
+      - order_details:
           fields:
             - product
             - amount
@@ -86,13 +83,13 @@ app:
       - remarks
   form:
     fields:
-      - customer_id:
+      - customer:
           kind: association_search
       - status:
           kind: radio
       - total_price:
           kind: number
-      - purchase_details:
+      - order_details:
           kind: association
           fields:
             - product_id:
@@ -105,3 +102,4 @@ app:
       - delivered_at
       - remarks:
           kind: text_area
+
