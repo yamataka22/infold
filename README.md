@@ -4,10 +4,14 @@ CRUD (Create,Read,Update,Delete) applications with an easy-to-use UI can be buil
 The generated code is highly readable and customizable, allowing for easy additional customization.
 Supports Rails >= 7.0 and Hotwire.
 
-## Purpose
+## Goals
 - Quickly and easily build Internal tools with all the functionality you need
 - No need for a designer, just a developer to create a usable UI/UX
 - Easy customization with YAML and Scaffold instead of DSL development
+
+## Getting started
+- Try the [live demo](https://demo.infold.dev/admin).
+- Check the [website](https://infold.dev).
 
 ## Installation
 Add this line to your application's Gemfile:
