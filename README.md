@@ -404,5 +404,19 @@ If a customer is defined as kind=association_search on the Order form, the custo
 
 ![association_search](./readme/association_search.gif)
 
+## Dependencies
+Infold is built with other open source projects:
+
+| TOOL                                                             | DESCRIPTION                                                                |
+|------------------------------------------------------------------|----------------------------------------------------------------------------|
+| [tabler](https://github.com/tabler/tabler)                       | HTML Dashboard UI Kit built on Bootstrap                                   |
+| [devise](https://github.com/heartcombo/devise)                   | Flexible authentication solution for Rails with Warden.                    |
+| [kaminari](https://github.com/kaminari/kaminari)                 | Clean, powerful, customizable and sophisticated paginator                  |
+| [enum_help](https://github.com/zmbacker/enum_help)               | Help ActiveRecord::Enum feature to work fine with I18n                     |
+| [view_component](https://github.com/github/view_component)       | A framework for building reusable, testable & encapsulated view components |
+| [active_decorator](https://github.com/amatsuda/active_decorator) | A simple and Rubyish view helper for Rails                                 |
+| [haml-rails](https://github.com/haml/haml-rails)                 | A templating engine for HTML                                               |
+
+
 ## License
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
