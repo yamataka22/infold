@@ -16,7 +16,7 @@ Supports Rails >= 7.0 and Hotwire.
 ## Installation
 Add this line to your application's Gemfile:
 ```ruby
-gem 'indold', require: false
+gem 'infold', require: false
 ```
 
 In addition, infold uses the following Gem, add these lines to your Gemfile too.
