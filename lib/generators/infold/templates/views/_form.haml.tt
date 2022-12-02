@@ -9,7 +9,7 @@
       = render Admin::InvalidMessageComponent.new(form, :<%= field.name %>)
     %template{ data: { nested_form_target: 'template' } }
       = form.fields_for :<%= field.name %>, Admin::<%= field.association.model_name %>.new, child_index: 'NEW_RECORD' do |nested_form|
-        = render 'form_<%= field.name(:single) %>', purchase: form.object, form: nested_form
+        = render 'form_<%= field.name(:single) %>', form: nested_form
   .table-responsive
     %table.table.nested_form_table.card-table
       %thead
