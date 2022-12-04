@@ -5,7 +5,8 @@ module Infold
 
     def initialize(content=nil)
       @tables = []
-      content&.split("\n").each.each do |row|
+      return unless content
+      content.split("\n").each.each do |row|
         row = row.strip
         if row.start_with?('create_table')
           table_name = row.split('"').second.strip

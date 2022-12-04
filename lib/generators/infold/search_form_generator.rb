@@ -10,7 +10,8 @@ module Infold
 
     def setup
       resource_name = name.camelize.singularize
-      db_schema = DbSchema.new(File.read(Rails.root.join('db/schema.rb')))
+      db_schema_file = Rails.root.join('db/schema.rb')
+      db_schema = DbSchema.new(File.exist?(db_schema_file) ? File.read(db_schema_file) : nil)
       yaml = YAML.load_file(Rails.root.join("config/infold/#{resource_name.underscore}.yml"))
       resource = YamlReader.generate_resource(resource_name, yaml, db_schema)
       @writer = SearchFormWriter.new(resource)
