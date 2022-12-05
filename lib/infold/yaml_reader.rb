@@ -232,7 +232,7 @@ module Infold
                   form_element.add_association_fields(
                     association_field,
                     seq: association_seq,
-                    form_kind: association_field_config.dig(association_field.name, :kind))
+                    form_kind: association_field_config.dig(association_field_config.keys[0], :kind))
                 end
               end
             end

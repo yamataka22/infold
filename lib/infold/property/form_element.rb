@@ -36,9 +36,9 @@ module Infold
     end
 
     def form_kind
-      if @form_kind == 'association_search'
+      if %w(association_search select).include?(@form_kind.to_s)
         if field.association&.belongs_to?
-          :association_search
+          @form_kind.to_sym
         else
           :text
         end
