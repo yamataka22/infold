@@ -53,6 +53,10 @@ module Infold
       kind.to_sym == :has_one
     end
 
+    def has_child?
+      !belongs_to?
+    end
+
     def model_name(*attr)
       name = class_name.presence || self.name.singularize.camelize
       name = name.underscore if attr.include?(:snake)

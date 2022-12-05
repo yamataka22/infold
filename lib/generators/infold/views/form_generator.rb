@@ -40,7 +40,7 @@ module Infold
 
       def association_form_file
         @writer.form_fields.each do |field|
-          if field.association&.has_many? || field.association&.has_one?
+          if field.association&.has_child?
             @association_field = field
             template "views/_form_association.haml",
                      Rails.root.join("app/views/admin/#{name.underscore.pluralize}/_form_#{field.name(:single)}.html.haml"), force: true
