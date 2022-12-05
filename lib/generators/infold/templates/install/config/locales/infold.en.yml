@@ -26,4 +26,4 @@ en:
       db_synced: DB sync is complete
     badge:
       required: Required
-    no_data: There is no data
+    no_data: Not found
