@@ -3,7 +3,7 @@
 <%- @writer.form_fields.each do |field| -%>
 <%- if field.form_element.kind_has_association? -%>
 .card.mb-3{ data: {controller: 'nested-form'} }
-  .card-header.py-2
+  .card-header
     %div
       %h4.text-muted.mb-0= Admin::<%= field.association.model_name %>.model_name.human
       = render Admin::InvalidMessageComponent.new(form, :<%= field.name %>)
