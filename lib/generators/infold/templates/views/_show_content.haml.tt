@@ -4,7 +4,7 @@
 <%- if field.show_element.kind_association? && !field.association.belongs_to? -%>
 .card.mb-3
   .card-header.py-2
-    %h3.text-muted.mb-0= <%= @writer.resource_name(:snake) %>.class.human_attribute_name(:<%= field.name %>)
+    %h3.text-muted.mb-0= Admin::<%= field.association.model_name %>.model_name.human
   - if <%= @writer.resource_name(:snake) %>.<%= field.name %>.blank?
     .card-body
       .alert= t('infold.no_data')

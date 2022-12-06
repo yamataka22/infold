@@ -5,7 +5,7 @@
 .card.mb-3{ data: {controller: 'nested-form'} }
   .card-header.py-2
     %div
-      %h3.text-muted.mb-0= Admin::<%= field.association.model_name %>.human_attribute_name(:<%= field.name %>)
+      %h4.text-muted.mb-0= Admin::<%= field.association.model_name %>.model_name.human
       = render Admin::InvalidMessageComponent.new(form, :<%= field.name %>)
     %template{ data: { nested_form_target: 'template' } }
       = form.fields_for :<%= field.name %>, Admin::<%= field.association.model_name %>.new, child_index: 'NEW_RECORD' do |nested_form|
