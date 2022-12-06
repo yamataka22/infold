@@ -87,8 +87,7 @@ The following example shows the `title` and `price` fields with required validat
 ```yaml
 model:
   validate:
-    title:
-      - presence
+    title: presence
     price:
       - presence
       - numericality:
@@ -224,8 +223,7 @@ model:
       kind: has_many
       model:
         validate:
-          product_id:
-            - presence
+          product: presence
         decorator:
           amount:
             digit: true
@@ -236,6 +234,9 @@ model:
 ```
 
 #### Bulk Registration Form
+In the following example, multiple lines of OrderDetails can be registered at once.  
+You can add rows from the ADD button and delete records with the trash icon.
+
 ![has_many_form](./readme/has_many_form.png)
 
 ## View Customization

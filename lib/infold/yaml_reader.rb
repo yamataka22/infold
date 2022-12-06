@@ -10,7 +10,7 @@ module Infold
         @db_schema = db_schema
         field_group = FieldGroup.new(db_schema.table(resource_name))
         resource = Resource.new(resource_name)
-        yaml = yaml.with_indifferent_access
+        yaml = (yaml || {}).with_indifferent_access
         model = yaml.dig('model') || {}
         app = yaml.dig('app') || {}
         assign_associations(     field_group, model.dig(:association))
@@ -30,7 +30,8 @@ module Infold
           field = field_group.find_or_initialize_field(default_order.dig(:field))
           resource.default_order = DefaultOrder.new(self, field, default_order.dig(:kind))
         end
-        resource.app_title = app.dig(:title)
+        resource.app_title = app.dig(:title).presence ||
+          resource_name.pluralize.underscore.gsub('_', ' ').upcase
         resource
       end
 
@@ -232,7 +233,7 @@ module Infold
                   form_element.add_association_fields(
                     association_field,
                     seq: association_seq,
-                    form_kind: association_field_config.dig(association_field.name, :kind))
+                    form_kind: association_field_config.dig(association_field_config.keys[0], :kind))
                 end
               end
             end

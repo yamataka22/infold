@@ -11,7 +11,8 @@ module Infold
 
       def setup
         resource_name = name.camelize.singularize
-        db_schema = DbSchema.new(File.read(Rails.root.join('db/schema.rb')))
+        db_schema_file = Rails.root.join('db/schema.rb')
+        db_schema = DbSchema.new(File.exist?(db_schema_file) ? File.read(db_schema_file) : nil)
         yaml = YAML.load_file(Rails.root.join("config/infold/#{resource_name.underscore}.yml"))
         resource = YamlReader.generate_resource(resource_name, yaml, db_schema)
         @writer = FormWriter.new(resource)
@@ -39,7 +40,7 @@ module Infold
 
       def association_form_file
         @writer.form_fields.each do |field|
-          if field.association&.has_many? || field.association&.has_one?
+          if field.association&.has_child?
             @association_field = field
             template "views/_form_association.haml",
                      Rails.root.join("app/views/admin/#{name.underscore.pluralize}/_form_#{field.name(:single)}.html.haml"), force: true

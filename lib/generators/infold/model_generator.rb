@@ -10,7 +10,8 @@ module Infold
 
     def setup
       resource_name = name.camelize.singularize
-      db_schema = DbSchema.new(File.read(Rails.root.join('db/schema.rb')))
+      db_schema_file = Rails.root.join('db/schema.rb')
+      db_schema = DbSchema.new(File.exist?(db_schema_file) ? File.read(db_schema_file) : nil)
       yaml = YAML.load_file(Rails.root.join("config/infold/#{resource_name.underscore}.yml"))
       @resource = YamlReader.generate_resource(resource_name, yaml, db_schema)
     end
@@ -21,10 +22,11 @@ module Infold
     end
 
     def create_association_model_file
-      @resource.associations&.
-        select { |as| !as.belongs_to? && as.field_group.has_association_model? }&.each do |association|
+      @resource.associations&.select(&:has_child?)&.each do |association|
+        # association_modelが未定義の場合、skip: trueで作成する
+        option = association.field_group.has_association_model? ? { force: true } : { skip: true }
         @writer = ModelWriter.new(association)
-        template "model.rb", Rails.root.join("app/models/admin", "#{association.model_name(:snake)}.rb"), force: true
+        template "model.rb", Rails.root.join("app/models/admin", "#{association.model_name(:snake)}.rb"), **option
       end
     end
   end

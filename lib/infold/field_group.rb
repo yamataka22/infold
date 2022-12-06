@@ -16,7 +16,7 @@ module Infold
     end
 
     def find_or_initialize_field(field_name)
-      find { |field| field.name == field_name || field.association&.name == field_name } ||
+      find { |field| field.association&.name == field_name || field.name == field_name } ||
         (@fields << Field.new(field_name)).last
     end
 
@@ -56,14 +56,24 @@ module Infold
     end
 
     def condition_fields(kind=nil)
-      case kind.to_s
-      when 'index'
-        select { |f| f.search_conditions.find(&:in_index?).present? }
-      when 'association_search'
-        select { |f| f.search_conditions.find(&:in_association_search?).present? }
-      else
-        select { |f| f.search_conditions.present? }
+      fields =
+        case kind.to_s
+        when 'index'
+          select { |f| f.search_conditions.find(&:in_index?).present? }
+        when 'association_search'
+          select { |f| f.search_conditions.find(&:in_association_search?).present? }
+        else
+          select { |f| f.search_conditions.present? }
+        end
+      if fields.blank?
+        # 条件が未設定の場合、idを対象とする
+        id_field = find_or_initialize_field(:id)
+        id_field.add_search_condition(kind || :index,
+                                      sign: 'eq',
+                                      form_kind: :text)
+        fields = [id_field]
       end
+      fields
     end
 
     def conditions(kind=nil)
