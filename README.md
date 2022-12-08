@@ -10,8 +10,10 @@ Supports Rails >= 7.0 and Hotwire.
 - Easy customization with YAML and Scaffold instead of DSL development
 
 ## Getting started
-- Try the [live demo](https://demo.infold.dev/admin).
-- Check the [website](https://infold.dev).
+- [Live Demo](https://demo.infold.dev/admin)
+- [Tutorial in English](https://dev.to/yamataka22/build-admin-panel-fast-with-rails7-and-infold-3og) (dev.to)
+- [Tutorial in Japanese](https://qiita.com/yamataka22/items/9ce9d16c3aebb9d34b5a) (qiita.com)
+- [Website](https://infold.dev)
 
 ## Installation
 Add this line to your application's Gemfile:
