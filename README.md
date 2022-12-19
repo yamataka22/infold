@@ -1,8 +1,7 @@
 # Infold
-Infold provides Scaffolding functionality specifically for Internal tools.
-CRUD (Create, Read, Update, Delete) applications with an easy-to-use UI can be built instantly.
+Infold is a scaffold code generator for CRUD applications, such as an Admin panel and Internal tools with Rails7 and Hotwire.
+It enables fast development of easy-to-use CRUD applications.
 The generated code is highly readable and customizable, allowing for easy additional customization.
-Supports Rails >= 7.0 and Hotwire.
 
 ## Goals
 - Quickly and easily build Internal tools with all the functionality you need
